@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { supabase, getCurrentUser, signOut } from "@/lib/supabase";
-import { User as SupabaseUser } from "@supabase/supabase-js";
+import { getCurrentUser, signOut, User as FirebaseUser } from "@/lib/firebase";
 import {
   LayoutDashboard,
   User,
@@ -21,7 +20,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [user, setUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

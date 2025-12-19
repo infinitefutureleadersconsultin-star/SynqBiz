@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { signUpWithEmail } from "@/lib/firebase";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
@@ -24,16 +24,7 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name,
-            role,
-          },
-        },
-      });
+      const { data, error } = await signUpWithEmail(email, password, name, role);
 
       if (error) throw error;
 
@@ -61,7 +52,7 @@ export default function SignupPage() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Account Created!</h2>
-            <p className="text-gray-600">Check your email to verify your account, then sign in.</p>
+            <p className="text-gray-600">Redirecting you to sign in...</p>
           </CardContent>
         </Card>
       </main>

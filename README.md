@@ -36,8 +36,8 @@ A modern accountability dashboard built for SponsorSynq co-founders Isaiah McLea
 - **Framework**: Next.js 14 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **Authentication**: Supabase Auth
-- **Database**: PostgreSQL (via Supabase)
+- **Authentication**: Firebase Auth
+- **Database**: Cloud Firestore
 - **Icons**: Lucide React
 - **Charts**: Recharts
 - **Hosting**: Vercel
@@ -55,17 +55,21 @@ cd SynqBiz
 npm install
 ```
 
-3. **Set up Supabase** (see Supabase Setup section below)
+3. **Set up Firebase** (see [FIREBASE_SETUP.md](./FIREBASE_SETUP.md) for detailed guide)
 
 4. **Create environment variables**:
 ```bash
 cp .env.local.example .env.local
 ```
 
-Edit `.env.local` and add your Supabase credentials:
+Edit `.env.local` and add your Firebase credentials:
 ```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 ```
 
 5. **Run the development server**:
@@ -75,141 +79,16 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## 🗄️ Supabase Setup
+## 🔥 Firebase Setup
 
-### 1. Create a Supabase Project
+For detailed Firebase setup instructions, see **[FIREBASE_SETUP.md](./FIREBASE_SETUP.md)**.
 
-1. Go to [supabase.com](https://supabase.com)
-2. Click "New Project"
-3. Fill in project details and wait for setup to complete
-4. Go to Project Settings → API to get your credentials
-
-### 2. Create Database Tables
-
-Run these SQL commands in the Supabase SQL Editor (Dashboard → SQL Editor):
-
-```sql
--- Create users profile table
-CREATE TABLE profiles (
-  id UUID REFERENCES auth.users(id) PRIMARY KEY,
-  email TEXT UNIQUE NOT NULL,
-  name TEXT,
-  role TEXT CHECK (role IN ('isaiah', 'soya')),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Enable Row Level Security
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-
--- Create policy for users to read their own profile
-CREATE POLICY "Users can read own profile"
-  ON profiles FOR SELECT
-  USING (auth.uid() = id);
-
--- Create policy for users to update their own profile
-CREATE POLICY "Users can update own profile"
-  ON profiles FOR UPDATE
-  USING (auth.uid() = id);
-
--- Create Isaiah's metrics table
-CREATE TABLE isaiah_metrics (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) NOT NULL,
-  date DATE NOT NULL,
-  outreach_contacts INTEGER DEFAULT 0,
-  meetings_scheduled INTEGER DEFAULT 0,
-  partnership_emails INTEGER DEFAULT 0,
-  business_concepts INTEGER DEFAULT 0,
-  college_outreach INTEGER DEFAULT 0,
-  personal_brand_posts INTEGER DEFAULT 0,
-  event_host_outreach INTEGER DEFAULT 0,
-  enterprise_outreach INTEGER DEFAULT 0,
-  notes TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(user_id, date)
-);
-
--- Enable RLS for Isaiah's metrics
-ALTER TABLE isaiah_metrics ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can read own metrics"
-  ON isaiah_metrics FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert own metrics"
-  ON isaiah_metrics FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own metrics"
-  ON isaiah_metrics FOR UPDATE
-  USING (auth.uid() = user_id);
-
--- Create Soya's metrics table
-CREATE TABLE soya_metrics (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES auth.users(id) NOT NULL,
-  date DATE NOT NULL,
-  revenue_milestone NUMERIC DEFAULT 0,
-  ui_improvements INTEGER DEFAULT 0,
-  user_signups INTEGER DEFAULT 0,
-  support_tickets_resolved INTEGER DEFAULT 0,
-  app_uptime_percentage NUMERIC(5,2) DEFAULT 0,
-  onboarding_completion_rate NUMERIC(5,2) DEFAULT 0,
-  feedback_collected INTEGER DEFAULT 0,
-  retention_rate NUMERIC(5,2) DEFAULT 0,
-  facebook_ads_spent NUMERIC DEFAULT 0,
-  features_shipped INTEGER DEFAULT 0,
-  notes TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(user_id, date)
-);
-
--- Enable RLS for Soya's metrics
-ALTER TABLE soya_metrics ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can read own metrics"
-  ON soya_metrics FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert own metrics"
-  ON soya_metrics FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own metrics"
-  ON soya_metrics FOR UPDATE
-  USING (auth.uid() = user_id);
-
--- Create function to auto-create profile on signup
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.profiles (id, email, name, role)
-  VALUES (
-    NEW.id,
-    NEW.email,
-    NEW.raw_user_meta_data->>'name',
-    NEW.raw_user_meta_data->>'role'
-  );
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Create trigger for new user signup
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-```
-
-### 3. Configure Authentication
-
-1. In Supabase Dashboard, go to Authentication → Providers
-2. Ensure "Email" is enabled
-3. Disable email confirmation for testing (optional):
-   - Go to Authentication → Email Templates
-   - Or set `Confirm email` to OFF in Settings
+Quick overview:
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+2. Enable **Email/Password** authentication
+3. Create a **Firestore database** in production mode
+4. Set up **Firestore security rules** (see FIREBASE_SETUP.md)
+5. Copy your Firebase config to `.env.local`
 
 ## 🎯 Usage
 
@@ -242,8 +121,6 @@ SynqBiz/
 │   │   └── layout.tsx       # Dashboard layout with navigation
 │   ├── login/               # Login page
 │   ├── signup/              # Signup page
-│   ├── api/
-│   │   └── auth/callback/   # Auth callback handler
 │   ├── globals.css          # Global styles
 │   ├── layout.tsx           # Root layout
 │   └── page.tsx             # Landing page
@@ -254,7 +131,7 @@ SynqBiz/
 │   │   └── Input.tsx
 │   └── dashboard/           # Dashboard-specific components
 ├── lib/
-│   └── supabase.ts          # Supabase client & helpers
+│   └── firebase.ts          # Firebase client & helpers
 ├── types/
 │   └── index.ts             # TypeScript type definitions
 └── middleware.ts            # Route protection middleware
@@ -281,8 +158,12 @@ SynqBiz/
 2. Go to [vercel.com](https://vercel.com)
 3. Import your repository
 4. Add environment variables:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_FIREBASE_API_KEY`
+   - `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+   - `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+   - `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+   - `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+   - `NEXT_PUBLIC_FIREBASE_APP_ID`
 5. Deploy!
 
 ## 🤝 Contributing

@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getCurrentUser } from "@/lib/firebase";
+import { saveSoyaMetrics, getAllSoyaMetrics } from "@/lib/firestore";
+import type { SoyaMetrics } from "@/types";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import ChatInterface from "@/components/ChatInterface";
+import MetricsHistory from "@/components/MetricsHistory";
 import {
   DollarSign,
   Users,
@@ -18,6 +23,9 @@ import {
 export default function SoyaDashboard() {
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [userId, setUserId] = useState<string>('');
+  const [allMetrics, setAllMetrics] = useState<SoyaMetrics[]>([]);
+  const [todayMetrics, setTodayMetrics] = useState<SoyaMetrics | null>(null);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     revenue_milestone: '',
@@ -33,31 +41,75 @@ export default function SoyaDashboard() {
     notes: '',
   });
 
+  useEffect(() => {
+    loadUserAndMetrics();
+  }, []);
+
+  async function loadUserAndMetrics() {
+    const user = await getCurrentUser();
+    if (user) {
+      setUserId(user.uid);
+      await loadMetrics(user.uid);
+    }
+  }
+
+  async function loadMetrics(uid: string) {
+    const { data } = await getAllSoyaMetrics(uid, 30);
+    if (data) {
+      setAllMetrics(data);
+      // Find today's metrics
+      const today = new Date().toISOString().split('T')[0];
+      const todaysData = data.find(m => m.date === today);
+      setTodayMetrics(todaysData || null);
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!userId) {
+      alert('Please log in first');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // TODO: Save to Supabase once database is set up
-      console.log('Saving metrics:', formData);
-
-      // Show success message
-      alert('Metrics saved successfully!');
-      setShowForm(false);
-      setFormData({
-        date: new Date().toISOString().split('T')[0],
-        revenue_milestone: '',
-        ui_improvements: '',
-        user_signups: '',
-        support_tickets_resolved: '',
-        app_uptime_percentage: '',
-        onboarding_completion_rate: '',
-        feedback_collected: '',
-        retention_rate: '',
-        facebook_ads_spent: '',
-        features_shipped: '',
-        notes: '',
+      const result = await saveSoyaMetrics(userId, formData.date, {
+        revenue_milestone: parseFloat(formData.revenue_milestone) || 0,
+        ui_improvements: parseInt(formData.ui_improvements) || 0,
+        user_signups: parseInt(formData.user_signups) || 0,
+        support_tickets_resolved: parseInt(formData.support_tickets_resolved) || 0,
+        app_uptime_percentage: parseFloat(formData.app_uptime_percentage) || 0,
+        onboarding_completion_rate: parseFloat(formData.onboarding_completion_rate) || 0,
+        feedback_collected: parseInt(formData.feedback_collected) || 0,
+        retention_rate: parseFloat(formData.retention_rate) || 0,
+        facebook_ads_spent: parseFloat(formData.facebook_ads_spent) || 0,
+        features_shipped: parseInt(formData.features_shipped) || 0,
+        notes: formData.notes,
       });
+
+      if (result.success) {
+        alert('Metrics saved successfully! 🎉');
+        setShowForm(false);
+        setFormData({
+          date: new Date().toISOString().split('T')[0],
+          revenue_milestone: '',
+          ui_improvements: '',
+          user_signups: '',
+          support_tickets_resolved: '',
+          app_uptime_percentage: '',
+          onboarding_completion_rate: '',
+          feedback_collected: '',
+          retention_rate: '',
+          facebook_ads_spent: '',
+          features_shipped: '',
+          notes: '',
+        });
+        // Reload metrics
+        await loadMetrics(userId);
+      } else {
+        alert(`Failed to save: ${result.error}`);
+      }
     } catch (error) {
       console.error('Error saving metrics:', error);
       alert('Failed to save metrics');
@@ -70,15 +122,27 @@ export default function SoyaDashboard() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  // Calculate totals for display
+  const calculateTotal = (key: keyof Omit<SoyaMetrics, 'id' | 'user_id' | 'date' | 'notes' | 'created_at' | 'updated_at'>) => {
+    return allMetrics.reduce((sum, m) => sum + (Number(m[key]) || 0), 0);
+  };
+
+  // Calculate average for percentage metrics
+  const calculateAverage = (key: keyof Omit<SoyaMetrics, 'id' | 'user_id' | 'date' | 'notes' | 'created_at' | 'updated_at'>) => {
+    if (allMetrics.length === 0) return 0;
+    const total = allMetrics.reduce((sum, m) => sum + (Number(m[key]) || 0), 0);
+    return Math.round((total / allMetrics.length) * 10) / 10;
+  };
+
   const metrics = [
-    { label: "Revenue Milestone", icon: DollarSign, value: 0, prefix: "$", color: "green" },
-    { label: "User Signups", icon: Users, value: 0, color: "blue" },
-    { label: "Features Shipped", icon: Code, value: 0, color: "purple" },
-    { label: "Support Tickets Resolved", icon: HeadphonesIcon, value: 0, color: "amber" },
-    { label: "App Uptime", icon: Activity, value: 0, suffix: "%", color: "emerald" },
-    { label: "Onboarding Completion", icon: CheckCircle, value: 0, suffix: "%", color: "indigo" },
-    { label: "Feedback Collected", icon: MessageSquare, value: 0, color: "cyan" },
-    { label: "Retention Rate", icon: TrendingUp, value: 0, suffix: "%", color: "pink" },
+    { label: "Revenue Milestone", icon: DollarSign, value: calculateTotal('revenue_milestone'), prefix: "$", color: "green" },
+    { label: "User Signups", icon: Users, value: calculateTotal('user_signups'), color: "blue" },
+    { label: "Features Shipped", icon: Code, value: calculateTotal('features_shipped'), color: "purple" },
+    { label: "Support Tickets Resolved", icon: HeadphonesIcon, value: calculateTotal('support_tickets_resolved'), color: "amber" },
+    { label: "App Uptime", icon: Activity, value: calculateAverage('app_uptime_percentage'), suffix: "%", color: "emerald" },
+    { label: "Onboarding Completion", icon: CheckCircle, value: calculateAverage('onboarding_completion_rate'), suffix: "%", color: "indigo" },
+    { label: "Feedback Collected", icon: MessageSquare, value: calculateTotal('feedback_collected'), color: "cyan" },
+    { label: "Retention Rate", icon: TrendingUp, value: calculateAverage('retention_rate'), suffix: "%", color: "pink" },
   ];
 
   return (
@@ -235,6 +299,14 @@ export default function SoyaDashboard() {
         </Card>
       )}
 
+      {/* Chat Interface */}
+      {userId && (
+        <ChatInterface
+          userId={userId}
+          onMetricsSaved={() => loadMetrics(userId)}
+        />
+      )}
+
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {metrics.map((metric) => {
@@ -259,7 +331,9 @@ export default function SoyaDashboard() {
                     <p className="text-3xl font-bold text-gray-900 mt-2">
                       {metric.prefix}{metric.value}{metric.suffix}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">Current</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {metric.suffix === '%' ? 'Average' : 'All time'}
+                    </p>
                   </div>
                   <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colorClasses[metric.color as keyof typeof colorClasses]}`}>
                     <Icon className="w-6 h-6" />
@@ -272,16 +346,7 @@ export default function SoyaDashboard() {
       </div>
 
       {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12 text-gray-500">
-            <p>No activity logged yet. Click "Log Today's Metrics" to get started!</p>
-          </div>
-        </CardContent>
-      </Card>
+      <MetricsHistory metrics={allMetrics} type="soya" />
     </div>
   );
 }

@@ -50,7 +50,7 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Isaiah's metrics - only authenticated users can read/write their own
+    // Issiah's metrics - only authenticated users can read/write their own
     match /isaiah_metrics/{metricId} {
       allow read, write: if request.auth != null && request.auth.uid == resource.data.user_id;
       allow create: if request.auth != null && request.auth.uid == request.resource.data.user_id;
@@ -130,7 +130,7 @@ users/{userId}
 ```
 
 ### **`isaiah_metrics` Collection** (Future - Phase 2)
-Stores Isaiah's business metrics.
+Stores Issiah's business metrics.
 
 ```
 isaiah_metrics/{metricId}
@@ -183,10 +183,10 @@ npm run dev
 2. Go to [http://localhost:3000](http://localhost:3000)
 3. Click **"Sign Up"**
 4. Create a test account:
-   - Name: Isaiah McLean
-   - Email: isaiah@test.com
+   - Name: Issiah McLean
+   - Email: issiah@test.com
    - Password: test123
-   - Role: Isaiah
+   - Role: Issiah
 5. Check Firebase Console:
    - **Authentication** → Users tab → You should see 1 user
    - **Firestore** → Data tab → `users` collection should have 1 document

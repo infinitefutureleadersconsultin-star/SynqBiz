@@ -45,7 +45,7 @@ export default function DashboardLayout({
 
   const navigation = [
     { name: "Overview", href: "/dashboard/overview", icon: LayoutDashboard },
-    { name: "Isaiah's Dashboard", href: "/dashboard/isaiah", icon: User },
+    { name: "Issiah's Dashboard", href: "/dashboard/isaiah", icon: User },
     { name: "Soya's Dashboard", href: "/dashboard/soya", icon: Users },
   ];
 

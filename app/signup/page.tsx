@@ -127,7 +127,7 @@ export default function SignupPage() {
                         : "border-gray-300 hover:border-gray-400"
                     }`}
                   >
-                    <div className="font-semibold">Isaiah</div>
+                    <div className="font-semibold">Issiah</div>
                     <div className="text-xs text-gray-600 mt-1">Business</div>
                   </button>
                   <button

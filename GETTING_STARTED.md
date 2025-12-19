@@ -47,7 +47,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### 5. Create Your Accounts
 
 1. Click "Sign Up" on the homepage
-2. **Isaiah**: Create an account and select the "Isaiah" role
+2. **Issiah**: Create an account and select the "Issiah" role
 3. **Soya**: Create another account and select the "Soya" role
 
 **Note**: Firebase automatically handles email verification if enabled

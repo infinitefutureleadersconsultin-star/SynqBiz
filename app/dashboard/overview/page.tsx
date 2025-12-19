@@ -152,11 +152,11 @@ export default function OverviewPage() {
 
       {/* Co-Founder Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Isaiah Section */}
+        {/* Issiah Section */}
         <Card>
           <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b">
             <div className="flex items-center justify-between">
-              <CardTitle>Isaiah's Progress</CardTitle>
+              <CardTitle>Issiah's Progress</CardTitle>
               <span className="px-3 py-1 bg-blue-200 text-blue-800 text-xs font-semibold rounded-full">
                 Business
               </span>
@@ -213,7 +213,7 @@ export default function OverviewPage() {
             </p>
             <div className="flex gap-3">
               <Link href="/dashboard/isaiah">
-                <Button size="sm">Isaiah's Dashboard</Button>
+                <Button size="sm">Issiah's Dashboard</Button>
               </Link>
               <Link href="/dashboard/soya">
                 <Button size="sm" variant="outline">Soya's Dashboard</Button>

@@ -1,16 +1,16 @@
 # SynqBiz - Co-Founder Accountability Dashboard
 
-A modern accountability dashboard built for SponsorSynq co-founders Isaiah McLean and Soya Diaoune to track progress, metrics, and stay aligned on their journey.
+A modern accountability dashboard built for SponsorSynq co-founders Issiah McLean and Soya Diaoune to track progress, metrics, and stay aligned on their journey.
 
 ## 🚀 Features (Phase 1)
 
-- ✅ **Dual Authentication**: Separate login for Isaiah (Business) and Soya (Technical)
+- ✅ **Dual Authentication**: Separate login for Issiah (Business) and Soya (Technical)
 - ✅ **Personal Dashboards**: Individual metric tracking for each co-founder
 - ✅ **Shared Overview**: Combined progress view to stay aligned
 - ✅ **Manual Metrics Input**: Clean forms to log daily/weekly progress
 - ✅ **Modern UI**: Clean, polished Google Workspace-style design
 
-### Isaiah's Metrics
+### Issiah's Metrics
 - Outreach contacts made
 - Meetings scheduled
 - Partnership emails sent
@@ -96,7 +96,7 @@ Quick overview:
 
 1. **Create Accounts**:
    - Go to `/signup`
-   - Isaiah creates an account and selects "Isaiah" role
+   - Issiah creates an account and selects "Issiah" role
    - Soya creates an account and selects "Soya" role
 
 2. **Log Daily Metrics**:
@@ -115,7 +115,7 @@ Quick overview:
 SynqBiz/
 ├── app/
 │   ├── dashboard/
-│   │   ├── isaiah/          # Isaiah's personal dashboard
+│   │   ├── isaiah/          # Issiah's personal dashboard
 │   │   ├── soya/            # Soya's personal dashboard
 │   │   ├── overview/        # Shared overview dashboard
 │   │   └── layout.tsx       # Dashboard layout with navigation
@@ -168,7 +168,7 @@ SynqBiz/
 
 ## 🤝 Contributing
 
-This is a private project for Isaiah McLean and Soya Diaoune.
+This is a private project for Issiah McLean and Soya Diaoune.
 
 ## 📄 License
 

@@ -30,7 +30,7 @@ export default function Home() {
 
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-500">
-            Built for Isaiah McLean & Soya Diaoune
+            Built for Issiah McLean & Soya Diaoune
           </p>
         </div>
       </div>

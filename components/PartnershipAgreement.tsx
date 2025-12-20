@@ -13,6 +13,7 @@ import { FileText, CheckCircle, AlertCircle, PenTool, Type } from "lucide-react"
 export default function PartnershipAgreement() {
   const [agreement, setAgreement] = useState<AgreementType | null>(null);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
   const [signing, setSigning] = useState(false);
   const [showSignature, setShowSignature] = useState(false);
   const [userRole, setUserRole] = useState<'issiah' | 'soya' | null>(null);
@@ -64,6 +65,7 @@ export default function PartnershipAgreement() {
   }
 
   async function createInitialAgreement() {
+    setCreating(true);
     try {
       const newAgreement = {
         version: AGREEMENT_VERSION,
@@ -77,10 +79,16 @@ export default function PartnershipAgreement() {
 
       const result = await savePartnershipAgreement(newAgreement);
       if (result.success) {
+        alert('✅ Partnership Agreement created successfully! Please review and sign below.');
         await loadAgreementAndUser();
+      } else {
+        alert(`❌ Failed to create agreement: ${result.error}`);
       }
     } catch (error) {
       console.error('Error creating agreement:', error);
+      alert('❌ Error creating agreement. Please try again.');
+    } finally {
+      setCreating(false);
     }
   }
 
@@ -232,8 +240,16 @@ export default function PartnershipAgreement() {
         <CardContent className="py-12 text-center">
           <AlertCircle className="w-12 h-12 mx-auto mb-3 text-amber-600" />
           <p className="text-gray-600 mb-4">No partnership agreement found.</p>
-          <Button onClick={() => createInitialAgreement()}>
-            Create Agreement
+          <p className="text-sm text-gray-500 mb-6">
+            Create a comprehensive 50/50 co-founder partnership agreement with unanimous decision requirements,
+            fair input/output tracking, and clean exit provisions.
+          </p>
+          <Button
+            onClick={() => createInitialAgreement()}
+            isLoading={creating}
+            disabled={creating}
+          >
+            {creating ? 'Creating Agreement...' : 'Create Partnership Agreement'}
           </Button>
         </CardContent>
       </Card>

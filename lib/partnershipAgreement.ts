@@ -40,14 +40,30 @@ The Co-Founders hereby agree to establish an **equal 50/50 partnership** for the
 
 This equity split is **non-negotiable** and represents the equal contribution and commitment of both Co-Founders to the success of the venture.
 
-### 1.3 Decision Making
-All major business decisions require **mutual consent** from both Co-Founders, including but not limited to:
-- Equity allocation to third parties
-- Major financial commitments (>$5,000)
-- Hiring key personnel
-- Product direction changes
-- Fundraising activities
-- Sale or dissolution of the company
+### 1.3 Decision Making - UNANIMOUS CONSENT REQUIRED
+All business decisions related to the platform require **UNANIMOUS consent** from both Co-Founders. Neither Co-Founder may unilaterally make decisions without explicit written approval from the other.
+
+**Unanimous Consent Required for ALL of the following:**
+- ANY equity allocation, transfer, or dilution
+- ANY financial commitment over $1,000
+- ALL hiring and firing decisions
+- ALL product features, direction changes, or pivots
+- ALL fundraising activities, terms, and investor selection
+- ALL partnership agreements or strategic alliances
+- ALL changes to pricing, business model, or monetization
+- ALL marketing campaigns or brand positioning changes
+- ALL technology stack decisions or major architectural changes
+- ALL legal matters, contracts, or compliance decisions
+- ALL sale negotiations, offers, or dissolution proceedings
+- ANY use of company funds, assets, or intellectual property
+- ALL changes to this agreement or partnership terms
+
+**Emergency Decision Protocol:**
+In urgent situations requiring immediate action (platform downtime, security breach, legal deadline):
+- Either Co-Founder may act unilaterally to prevent immediate harm
+- The acting Co-Founder must notify the other within 6 hours
+- A joint review must occur within 48 hours
+- Repeated unilateral decisions without genuine emergency may constitute breach
 
 ---
 
@@ -167,7 +183,7 @@ Both Co-Founders agree to meet the following **minimum productivity requirements
 
 ---
 
-## 5. FINANCIAL OBLIGATIONS
+## 5. FINANCIAL OBLIGATIONS AND CONTRIBUTION TRACKING
 
 ### 5.1 Initial Investment
 Both Co-Founders agree that **sweat equity** is the primary form of investment during the initial phase. No cash investment is required from either party unless mutually agreed upon in writing.
@@ -176,14 +192,56 @@ Both Co-Founders agree that **sweat equity** is the primary form of investment d
 If one Co-Founder invests cash into the business:
 - The other Co-Founder must match the investment within 60 days, OR
 - Equity percentages shall be adjusted proportionally based on total contribution (cash + sweat equity valuation)
+- ALL cash investments must be documented with signed promissory notes
+- Investment records maintained in transparent, shared financial ledger
 
-### 5.3 Expense Reimbursement
+### 5.3 Input Tracking and Accountability
+Both Co-Founders agree to maintain transparent records of:
+
+**Quantifiable Inputs (tracked monthly):**
+- Time invested (minimum 30 hours/week expected from each Co-Founder)
+- Cash invested (if any)
+- Resources contributed (equipment, software licenses, etc.)
+- Connections/relationships leveraged for company benefit
+- Specialized expertise or consulting value provided
+
+**Input Valuation:**
+- Sweat equity valued at $100/hour for standard work
+- Specialized expertise (legal, design, advanced technical) valued at $150/hour
+- Cash investments valued at face value plus 5% annual interest
+- Both Co-Founders review and approve input valuations quarterly
+- Significant disparity in inputs (>20% difference sustained for 3+ months) triggers rebalancing discussion
+
+### 5.4 Expense Reimbursement
 Legitimate business expenses (software, tools, advertising) shall be reimbursed from company revenue on a first-priority basis upon mutual approval.
 
-### 5.4 Salary and Compensation
+**Expense Approval Process:**
+- Expenses <$200: Either Co-Founder may approve
+- Expenses $200-$1,000: Requires notification to other Co-Founder within 24 hours
+- Expenses >$1,000: Requires unanimous pre-approval
+
+### 5.5 Revenue and Output Distribution
+**Revenue Allocation (in priority order):**
+1. Operating expenses and business obligations (100% priority)
+2. Reimbursement of documented out-of-pocket expenses
+3. Repayment of cash investments with 5% annual interest
+4. Emergency fund (target: 3 months operating expenses)
+5. Reinvestment into growth (minimum 50% of remaining profit)
+6. Co-Founder distributions (equal 50/50 split of remaining profit after above)
+
+**Output and Value Recognition:**
+- Customer relationships built by either Co-Founder belong to the company
+- Code, designs, content created by either Co-Founder owned by company
+- Revenue generated through either Co-Founder's efforts shared equally
+- Both Co-Founders receive equal credit in all public communications
+- Neither Co-Founder may claim sole ownership of company achievements
+
+### 5.6 Salary and Compensation
 - No salaries shall be paid until the company achieves minimum $15,000 monthly recurring revenue (MRR)
 - Upon reaching $15,000 MRR, Co-Founders may each draw equal monthly salaries not exceeding 30% of MRR
-- Salary amounts must be mutually agreed upon
+- Salary amounts must be mutually agreed upon and documented
+- Both Co-Founders must take equal salaries (no exceptions)
+- Salary reviews conducted quarterly with unanimous approval required for changes
 
 ---
 
@@ -230,7 +288,7 @@ If one Co-Founder fails to meet minimum productivity milestones (Section 4):
 
 ---
 
-## 8. DISSOLUTION AND EXIT
+## 8. DISSOLUTION, EXIT, AND SALE
 
 ### 8.1 Voluntary Exit
 Either Co-Founder may voluntarily exit the partnership with **90 days written notice**. Upon exit:
@@ -238,27 +296,69 @@ Either Co-Founder may voluntarily exit the partnership with **90 days written no
 - Unvested equity returns to the company
 - The exiting Co-Founder must offer their vested equity to the remaining Co-Founder at fair market value (FMV)
 - FMV shall be determined by a mutually agreed independent valuation firm
+- If the remaining Co-Founder declines to purchase, equity may be sold to approved third parties (both Co-Founders must approve buyer)
 
-### 8.2 Right of First Refusal
-If either Co-Founder receives an outside offer to purchase their equity, the other Co-Founder has a **Right of First Refusal (ROFR)** to purchase the equity at the same terms within 30 days.
+### 8.2 Right of First Refusal (ROFR)
+If either Co-Founder receives an outside offer to purchase their equity, the other Co-Founder has a **Right of First Refusal** to purchase the equity at the same terms within 30 days.
 
-### 8.3 Termination for Cause
+### 8.3 Company Sale - Distribution and Clean Exit
+Upon sale of the company, platform, or substantially all assets:
+
+**Pre-Sale Requirements:**
+- BOTH Co-Founders must unanimously approve the sale, terms, and buyer
+- BOTH Co-Founders must agree on minimum acceptable sale price
+- Neither Co-Founder can block a sale offer above $2,000,000 without documented business justification
+- Sale negotiations require joint participation or designated representative approved by both
+
+**Sale Proceeds Distribution (in order of priority):**
+1. Pay all outstanding debts, liabilities, and legal obligations
+2. Reimburse both Co-Founders for any approved out-of-pocket business expenses
+3. Repay any cash investments made by either Co-Founder (with 5% annual simple interest)
+4. Distribute remaining proceeds 50/50 to both Co-Founders based on vested equity
+
+**Post-Sale Provisions:**
+- Both Co-Founders receive equal treatment in earnouts, retention bonuses, or employment agreements
+- If buyer requires one Co-Founder to stay on, compensation must be separate from equity proceeds
+- Non-compete and confidentiality terms in acquisition agreement must be identical for both Co-Founders
+- Both Co-Founders walk away with clean title to their share, free of future liabilities (except fraud/misrepresentation)
+- Neither Co-Founder shall have ongoing obligations beyond reasonable transition period (max 90 days unless separately compensated)
+
+**Clean Break Guarantee:**
+- Upon sale completion and fund distribution, both Co-Founders are released from all future obligations related to the sold entity
+- Any ongoing liabilities transfer to the acquiring party
+- Both Co-Founders receive full legal release and indemnification from each other
+- All IP rights transfer cleanly to buyer; Co-Founders retain no residual claims
+
+### 8.4 Termination for Cause
 Either Co-Founder may terminate the other "for cause" in the event of:
 - Fraud, embezzlement, or material breach of this Agreement
 - Conviction of a felony or crime involving moral turpitude
 - Willful misconduct that materially harms the company
 - Abandonment of responsibilities for >60 consecutive days without notice
+- Repeated breach of unanimous consent requirements (Section 1.3)
 
 Upon termination for cause:
 - All unvested equity is forfeited
 - Vested equity may be repurchased by the company at a 30% discount to FMV
+- Terminated party must return all company property, access, and confidential information
+- Non-compete and confidentiality obligations remain in full effect
 
-### 8.4 Mutual Dissolution
+### 8.5 Mutual Dissolution
 If both Co-Founders agree to dissolve the partnership:
-- Company assets shall be liquidated
-- Debts and obligations shall be paid
-- Remaining proceeds shall be split 50/50
+- Company assets shall be liquidated at fair market value
+- Debts and obligations shall be paid first
+- Remaining proceeds distributed 50/50 after debt settlement
 - IP rights shall be jointly retained unless otherwise agreed
+- Both parties may negotiate separate licensing arrangements for joint IP
+- Neither Co-Founder may weaponize IP against the other's future ventures (outside direct competition)
+
+### 8.6 Deadlock Sale Provision
+If an irreconcilable deadlock persists for more than 120 days and prevents business operations:
+- Either Co-Founder may trigger a "Russian Roulette" buyout:
+  - Triggering party names a price for 100% of company
+  - Other party must either: (a) Buy triggering party's 50% at that price, OR (b) Sell their 50% to triggering party at that price
+  - Decision must be made within 30 days
+  - Payment terms: 30% down, remainder over 24 months with 6% annual interest
 
 ---
 
@@ -303,7 +403,53 @@ This Agreement shall be binding upon and inure to the benefit of the Co-Founders
 
 ---
 
-## 11. COMMITMENT AND VALUES
+## 11. PLATFORM GOVERNANCE AND UNANIMOUS DECISIONS
+
+### 11.1 Platform Decision Authority
+All decisions affecting the platform, product, or business require **UNANIMOUS agreement** from both Co-Founders:
+
+**Product & Platform Decisions:**
+- Feature additions, removals, or modifications
+- User interface and user experience changes
+- Technology choices and third-party integrations
+- API access and data sharing policies
+- Platform rules, policies, and terms of service
+- Pricing changes, promotional offers, or billing changes
+
+**Business & Strategic Decisions:**
+- Customer segments to target or exclude
+- Marketing messages and brand positioning
+- Partnership deals or strategic alliances
+- Geographic expansion or market entry
+- Hiring, firing, or contractor management
+- Budget allocation and spending priorities
+
+**Financial & Legal Decisions:**
+- Revenue sharing arrangements
+- Investment acceptance and terms
+- Debt financing or credit arrangements
+- Legal actions, settlements, or disputes
+- IP licensing or transfer agreements
+- Company structure or entity changes
+
+### 11.2 Documentation Requirement
+ALL unanimous decisions must be documented in writing with:
+- Date of decision
+- Summary of what was decided
+- Rationale and expected outcomes
+- Both Co-Founders' explicit written approval (email or signed document)
+- Decisions maintained in shared, accessible repository
+
+### 11.3 Platform Access and Control
+- Both Co-Founders maintain equal administrative access to all platform systems
+- Neither Co-Founder may lock out or restrict the other's access
+- All passwords, credentials, and access keys shared securely via joint password manager
+- Platform hosting and domain ownership structured to require both Co-Founders' approval for changes
+- Source code repository access and permissions remain equal at all times
+
+---
+
+## 12. COMMITMENT AND VALUES
 
 Both Co-Founders affirm their commitment to:
 
@@ -312,12 +458,15 @@ Both Co-Founders affirm their commitment to:
 ✓ **Shared Vision:** Building a transformative event sponsorship platform
 ✓ **Accountability:** Meeting productivity milestones and honoring obligations
 ✓ **Partnership Equality:** Respecting the 50/50 equity and decision-making structure
+✓ **Unanimous Consent:** No unilateral decisions on anything affecting the platform
 ✓ **Long-Term Thinking:** Making decisions that benefit the company's future
 ✓ **Integrity:** Operating with honesty and ethical business practices
+✓ **Fair Input & Output:** Both contribute equally, both benefit equally
+✓ **Clean Exit Commitment:** Ensuring both parties can exit cleanly post-sale
 
 ---
 
-## 12. ACKNOWLEDGMENT
+## 13. ACKNOWLEDGMENT AND SIGNATURES
 
 By electronically signing this Agreement, both Co-Founders acknowledge that:
 
@@ -327,6 +476,11 @@ By electronically signing this Agreement, both Co-Founders acknowledge that:
 4. They agree to be legally bound by all terms herein
 5. They understand their rights, obligations, and potential consequences
 6. They commit to upholding the spirit and letter of this partnership
+7. They understand that ALL platform decisions require unanimous consent
+8. They acknowledge the input/output tracking and fair distribution requirements
+9. They agree to the sale proceeds distribution and clean exit provisions
+10. They commit to equal contribution and equal benefit throughout the partnership
+11. They will walk away clean and fair upon any exit or sale of the platform
 
 ---
 

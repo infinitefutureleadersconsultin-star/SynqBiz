@@ -4,11 +4,12 @@ import { useState, useRef, useEffect } from "react";
 import { getCurrentUser } from "@/lib/firebase";
 import { getCurrentAgreement, signAgreement, savePartnershipAgreement } from "@/lib/firestore";
 import { PARTNERSHIP_AGREEMENT_CONTENT, AGREEMENT_VERSION } from "@/lib/partnershipAgreement";
+import { generateAgreementPDF } from "@/lib/pdfGenerator";
 import type { PartnershipAgreement as AgreementType } from "@/types";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
-import { FileText, CheckCircle, AlertCircle, PenTool, Type } from "lucide-react";
+import { FileText, CheckCircle, AlertCircle, PenTool, Type, Download } from "lucide-react";
 
 export default function PartnershipAgreement() {
   const [agreement, setAgreement] = useState<AgreementType | null>(null);
@@ -347,21 +348,40 @@ export default function PartnershipAgreement() {
             </div>
           )}
 
-          {!hasUserSigned && userRole && (
-            <Button
-              onClick={() => setShowSignature(true)}
-              className="w-full"
-            >
-              <PenTool className="w-4 h-4 mr-2" />
-              Sign Agreement Now
-            </Button>
-          )}
+          <div className="flex gap-3">
+            {!hasUserSigned && userRole && (
+              <Button
+                onClick={() => setShowSignature(true)}
+                className="flex-1"
+              >
+                <PenTool className="w-4 h-4 mr-2" />
+                Sign Agreement Now
+              </Button>
+            )}
 
-          {hasUserSigned && !bothSigned && (
-            <div className="text-center py-4 text-green-700 font-medium">
-              ✅ You have signed! Waiting for your co-founder to complete the agreement.
-            </div>
-          )}
+            {hasUserSigned && !bothSigned && (
+              <div className="flex-1 text-center py-3 text-green-700 font-medium bg-green-50 rounded-lg">
+                ✅ You have signed! Waiting for your co-founder.
+              </div>
+            )}
+
+            {bothSigned && (
+              <div className="flex-1 flex gap-3">
+                <div className="flex-1 text-center py-3 text-green-700 font-medium bg-green-50 rounded-lg">
+                  ✅ Fully Signed & Complete
+                </div>
+              </div>
+            )}
+
+            <Button
+              onClick={() => generateAgreementPDF(agreement)}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              Download PDF
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

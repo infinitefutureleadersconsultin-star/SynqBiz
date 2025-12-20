@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import { parseMessage, getSuggestions, hasValidMetrics } from "@/lib/chatParser";
 import type { ParsedMetrics } from "@/lib/chatParser";
-import { saveIssiahMetrics, saveSoyaMetrics } from "@/lib/firestore";
+import { saveIssiahMetrics, saveSoyaMetrics, createCalendarEvent } from "@/lib/firestore";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { Send, Sparkles, CheckCircle, AlertCircle } from "lucide-react";
+import { Send, Sparkles, CheckCircle, AlertCircle, Calendar } from "lucide-react";
 
 interface ChatInterfaceProps {
   userId: string;
@@ -73,6 +73,28 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
         );
       }
 
+      // Save calendar events if present
+      if (parsedResult.calendarEvents && parsedResult.calendarEvents.length > 0) {
+        for (const event of parsedResult.calendarEvents) {
+          promises.push(
+            createCalendarEvent({
+              title: event.title,
+              description: event.description,
+              event_type: event.event_type,
+              start_time: event.start_time,
+              end_time: event.end_time || event.start_time,
+              all_day: event.all_day,
+              attendees: event.attendees,
+              location: event.location,
+              meeting_link: event.meeting_link,
+              reminder_minutes: event.reminder_minutes,
+              status: 'scheduled',
+              created_by: userId,
+            })
+          );
+        }
+      }
+
       const results = await Promise.all(promises);
       const allSuccess = results.every(r => r.success);
 
@@ -92,18 +114,27 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
           onMetricsSaved();
         }
 
-        alert("Metrics saved successfully! 🎉");
+        const hasMetrics = Object.keys(parsedResult.issiahMetrics).length > 0 || Object.keys(parsedResult.soyaMetrics).length > 0;
+        const hasEvents = parsedResult.calendarEvents && parsedResult.calendarEvents.length > 0;
+
+        if (hasMetrics && hasEvents) {
+          alert(`✅ Metrics and ${parsedResult.calendarEvents.length} calendar event(s) saved successfully!`);
+        } else if (hasEvents) {
+          alert(`📅 ${parsedResult.calendarEvents.length} calendar event(s) saved successfully!`);
+        } else {
+          alert("✅ Metrics saved successfully!");
+        }
       } else {
-        throw new Error("Failed to save some metrics");
+        throw new Error("Failed to save some data");
       }
     } catch (error) {
-      console.error("Error saving metrics:", error);
+      console.error("Error saving data:", error);
       setChatHistory(prev => [{
         message,
         timestamp: new Date().toLocaleTimeString(),
         success: false
       }, ...prev.slice(0, 4)]);
-      alert("Failed to save metrics. Please try again.");
+      alert("Failed to save data. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -170,16 +201,16 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
               </div>
             )}
 
-            {/* Preview Parsed Metrics */}
+            {/* Preview Parsed Metrics and Events */}
             {showPreview && parsedResult && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-3">
                 <p className="font-medium text-green-900 mb-3 flex items-center gap-2">
                   <CheckCircle className="w-4 h-4" />
-                  Detected Metrics:
+                  Detected Data:
                 </p>
 
                 {Object.keys(parsedResult.issiahMetrics).length > 0 && (
-                  <div className="mb-3">
+                  <div>
                     <p className="text-xs font-semibold text-gray-700 mb-1">Issiah's Metrics:</p>
                     <div className="grid grid-cols-2 gap-2 text-sm">
                       {Object.entries(parsedResult.issiahMetrics).map(([key, value]) => (
@@ -200,6 +231,43 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
                         <div key={key} className="flex justify-between bg-white px-2 py-1 rounded">
                           <span className="text-gray-600 capitalize">{key.replace(/_/g, ' ')}</span>
                           <span className="font-semibold text-green-700">{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {parsedResult.calendarEvents && parsedResult.calendarEvents.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      Calendar Events ({parsedResult.calendarEvents.length}):
+                    </p>
+                    <div className="space-y-2">
+                      {parsedResult.calendarEvents.map((event, idx) => (
+                        <div key={idx} className="bg-white px-3 py-2 rounded border border-blue-200">
+                          <p className="text-sm font-semibold text-gray-800">{event.title}</p>
+                          <p className="text-xs text-gray-600 mt-1">
+                            {new Date(event.start_time).toLocaleString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: event.all_day ? undefined : 'numeric',
+                              minute: event.all_day ? undefined : '2-digit',
+                            })}
+                            {event.all_day && ' (All Day)'}
+                          </p>
+                          <div className="flex gap-2 mt-1">
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                              {event.event_type}
+                            </span>
+                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                              {event.attendees.join(', ')}
+                            </span>
+                          </div>
+                          {event.location && (
+                            <p className="text-xs text-gray-500 mt-1">📍 {event.location}</p>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -281,13 +349,26 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
       <Card className="bg-gray-50">
         <CardContent className="pt-4">
           <p className="text-xs font-semibold text-gray-700 mb-2">Example phrases you can try:</p>
-          <ul className="text-xs text-gray-600 space-y-1">
-            <li>• "Contacted 10 event hosts and scheduled 3 meetings today"</li>
-            <li>• "Posted 5 times on LinkedIn this week"</li>
-            <li>• "Revenue hit $5000 milestone"</li>
-            <li>• "Shipped 2 features and resolved 15 support tickets"</li>
-            <li>• "Got 25 new user signups and collected 10 feedback items"</li>
-          </ul>
+
+          <div className="mb-3">
+            <p className="text-xs font-semibold text-blue-700 mb-1">📊 Metrics:</p>
+            <ul className="text-xs text-gray-600 space-y-1">
+              <li>• "Contacted 10 event hosts and scheduled 3 meetings today"</li>
+              <li>• "Posted 5 times on LinkedIn this week"</li>
+              <li>• "Revenue hit $5000 milestone"</li>
+              <li>• "Shipped 2 features and resolved 15 support tickets"</li>
+            </ul>
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold text-purple-700 mb-1">📅 Calendar Events:</p>
+            <ul className="text-xs text-gray-600 space-y-1">
+              <li>• "Scheduled meeting with sponsor tomorrow at 2pm"</li>
+              <li>• "Call with event host on Friday at 10am"</li>
+              <li>• "Deadline for proposal next Monday"</li>
+              <li>• "Reminder to follow up with partner on Wednesday"</li>
+            </ul>
+          </div>
         </CardContent>
       </Card>
     </div>

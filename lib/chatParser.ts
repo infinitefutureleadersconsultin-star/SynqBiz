@@ -9,6 +9,19 @@
  * - "Shipped 2 features and resolved 15 support tickets"
  */
 
+export interface ParsedCalendarEvent {
+  title: string;
+  description?: string;
+  event_type: "meeting" | "deadline" | "milestone" | "reminder" | "other";
+  start_time: string; // ISO datetime string
+  end_time?: string; // ISO datetime string
+  all_day: boolean;
+  attendees: ('issiah' | 'soya')[];
+  location?: string;
+  meeting_link?: string;
+  reminder_minutes: number;
+}
+
 export interface ParsedMetrics {
   issiahMetrics: {
     outreach_contacts?: number;
@@ -32,6 +45,7 @@ export interface ParsedMetrics {
     facebook_ads_spent?: number;
     features_shipped?: number;
   };
+  calendarEvents: ParsedCalendarEvent[];
   date?: string;
   notes?: string;
 }
@@ -284,7 +298,218 @@ function extractDate(text: string): string {
 }
 
 /**
- * Main parser function - analyzes text and extracts metrics
+ * Extract datetime for calendar events
+ * Returns ISO datetime string
+ */
+function extractDateTime(text: string): { date: Date; hasTime: boolean } {
+  const now = new Date();
+  let targetDate = new Date(now);
+  let hasTime = false;
+
+  // Day of week patterns (Monday, Tuesday, etc.)
+  const dayOfWeekMatch = text.match(/(monday|tuesday|wednesday|thursday|friday|saturday|sunday|mon|tue|wed|thu|fri|sat|sun)/i);
+  if (dayOfWeekMatch) {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const shortDays = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+    const dayName = dayOfWeekMatch[0].toLowerCase();
+    const targetDayIndex = days.findIndex(d => d.startsWith(dayName)) || shortDays.indexOf(dayName);
+
+    if (targetDayIndex >= 0) {
+      const currentDay = targetDate.getDay();
+      let daysUntilTarget = targetDayIndex - currentDay;
+      if (daysUntilTarget <= 0) daysUntilTarget += 7; // Next occurrence
+      targetDate.setDate(targetDate.getDate() + daysUntilTarget);
+    }
+  }
+
+  // Relative date patterns
+  const relativeMatch = text.match(/(yesterday|today|tomorrow|next\s+(week|month))/i);
+  if (relativeMatch) {
+    const term = relativeMatch[0].toLowerCase();
+    if (term === 'yesterday') {
+      targetDate.setDate(targetDate.getDate() - 1);
+    } else if (term === 'tomorrow') {
+      targetDate.setDate(targetDate.getDate() + 1);
+    } else if (term.includes('next week')) {
+      targetDate.setDate(targetDate.getDate() + 7);
+    } else if (term.includes('next month')) {
+      targetDate.setMonth(targetDate.getMonth() + 1);
+    }
+  }
+
+  // Time patterns (2pm, 14:00, 3:30pm, etc.)
+  const timePatterns = [
+    /(\d{1,2}):(\d{2})\s*(am|pm)?/i,
+    /(\d{1,2})\s*(am|pm)/i,
+  ];
+
+  for (const pattern of timePatterns) {
+    const timeMatch = text.match(pattern);
+    if (timeMatch) {
+      hasTime = true;
+      let hours = parseInt(timeMatch[1], 10);
+      let minutes = parseInt(timeMatch[2] || '0', 10);
+      const meridiem = timeMatch[3] || timeMatch[2];
+
+      if (meridiem && meridiem.toLowerCase() === 'pm' && hours < 12) {
+        hours += 12;
+      } else if (meridiem && meridiem.toLowerCase() === 'am' && hours === 12) {
+        hours = 0;
+      }
+
+      targetDate.setHours(hours, minutes, 0, 0);
+      break;
+    }
+  }
+
+  // If no time specified, default to 9am for meetings
+  if (!hasTime) {
+    targetDate.setHours(9, 0, 0, 0);
+  }
+
+  return { date: targetDate, hasTime };
+}
+
+/**
+ * Extract event type from message
+ */
+function extractEventType(text: string): "meeting" | "deadline" | "milestone" | "reminder" | "other" {
+  const lowerText = text.toLowerCase();
+
+  if (lowerText.includes('meeting') || lowerText.includes('call') || lowerText.includes('scheduled')) {
+    return 'meeting';
+  }
+  if (lowerText.includes('deadline') || lowerText.includes('due')) {
+    return 'deadline';
+  }
+  if (lowerText.includes('milestone') || lowerText.includes('goal')) {
+    return 'milestone';
+  }
+  if (lowerText.includes('remind') || lowerText.includes('reminder')) {
+    return 'reminder';
+  }
+
+  return 'other';
+}
+
+/**
+ * Extract attendees from message
+ */
+function extractAttendees(text: string): ('issiah' | 'soya')[] {
+  const lowerText = text.toLowerCase();
+  const attendees: ('issiah' | 'soya')[] = [];
+
+  if (lowerText.includes('issiah') || lowerText.includes('isaiah')) {
+    attendees.push('issiah');
+  }
+  if (lowerText.includes('soya')) {
+    attendees.push('soya');
+  }
+
+  // If no specific attendees mentioned, include both
+  if (attendees.length === 0) {
+    return ['issiah', 'soya'];
+  }
+
+  return attendees;
+}
+
+/**
+ * Parse calendar events from message
+ * Detects patterns like:
+ * - "Scheduled meeting with sponsor tomorrow at 2pm"
+ * - "Call with event host on Friday at 10am"
+ * - "Deadline for proposal next Monday"
+ */
+function parseCalendarEvents(text: string): ParsedCalendarEvent[] {
+  const events: ParsedCalendarEvent[] = [];
+  const lowerText = text.toLowerCase();
+
+  // Calendar event trigger words
+  const triggers = [
+    'scheduled', 'schedule', 'meeting', 'call', 'deadline',
+    'reminder', 'appointment', 'set up', 'booked'
+  ];
+
+  const hasTrigger = triggers.some(trigger => lowerText.includes(trigger));
+  if (!hasTrigger) {
+    return events;
+  }
+
+  // Extract event title/description
+  let title = 'Untitled Event';
+
+  // Pattern: "meeting/call with X"
+  const withMatch = text.match(/(meeting|call|scheduled?)\s+with\s+([^,.\n]+)/i);
+  if (withMatch) {
+    title = `${withMatch[1]} with ${withMatch[2].trim()}`;
+  }
+
+  // Pattern: "meeting/call about X"
+  const aboutMatch = text.match(/(meeting|call|scheduled?)\s+about\s+([^,.\n]+)/i);
+  if (aboutMatch && !withMatch) {
+    title = `${aboutMatch[1]} about ${aboutMatch[2].trim()}`;
+  }
+
+  // Pattern: "deadline for X"
+  const deadlineMatch = text.match(/deadline\s+for\s+([^,.\n]+)/i);
+  if (deadlineMatch) {
+    title = `Deadline: ${deadlineMatch[1].trim()}`;
+  }
+
+  // Pattern: "reminder to X"
+  const reminderMatch = text.match(/remind(?:er)?\s+(?:to|for)\s+([^,.\n]+)/i);
+  if (reminderMatch) {
+    title = `Reminder: ${reminderMatch[1].trim()}`;
+  }
+
+  // Extract datetime
+  const { date, hasTime } = extractDateTime(text);
+  const startTime = date.toISOString();
+
+  // End time is 1 hour after start
+  const endDate = new Date(date);
+  endDate.setHours(endDate.getHours() + 1);
+  const endTime = endDate.toISOString();
+
+  // Extract event type
+  const eventType = extractEventType(text);
+
+  // Extract attendees
+  const attendees = extractAttendees(text);
+
+  // Extract location or meeting link
+  let location: string | undefined;
+  let meetingLink: string | undefined;
+
+  const locationMatch = text.match(/(?:at|location:|where:)\s+([^,.\n]+)/i);
+  if (locationMatch) {
+    location = locationMatch[1].trim();
+  }
+
+  const linkMatch = text.match(/(https?:\/\/[^\s]+)/);
+  if (linkMatch) {
+    meetingLink = linkMatch[0];
+  }
+
+  events.push({
+    title: title.charAt(0).toUpperCase() + title.slice(1),
+    description: text,
+    event_type: eventType,
+    start_time: startTime,
+    end_time: endTime,
+    all_day: !hasTime,
+    attendees,
+    location,
+    meeting_link: meetingLink,
+    reminder_minutes: 15,
+  });
+
+  return events;
+}
+
+/**
+ * Main parser function - analyzes text and extracts metrics and calendar events
  */
 export function parseMessage(message: string): ParsedMetrics {
   const role = detectRole(message);
@@ -293,6 +518,7 @@ export function parseMessage(message: string): ParsedMetrics {
   const result: ParsedMetrics = {
     issiahMetrics: {},
     soyaMetrics: {},
+    calendarEvents: [],
     date,
     notes: message,
   };
@@ -306,6 +532,9 @@ export function parseMessage(message: string): ParsedMetrics {
   if (role === 'soya' || role === 'both') {
     result.soyaMetrics = extractMetrics(message, SOYA_PATTERNS);
   }
+
+  // Extract calendar events
+  result.calendarEvents = parseCalendarEvents(message);
 
   return result;
 }
@@ -355,14 +584,26 @@ export function getSuggestions(partialText: string): string[] {
     suggestions.push('Fixed 8 customer issues');
   }
 
+  // Calendar event suggestions
+  if (lowerText.includes('schedul') || lowerText.includes('meeting') || lowerText.includes('call')) {
+    suggestions.push('Scheduled meeting with sponsor tomorrow at 2pm');
+    suggestions.push('Call with event host on Friday at 10am');
+  }
+
+  if (lowerText.includes('deadline') || lowerText.includes('due')) {
+    suggestions.push('Deadline for proposal next Monday');
+    suggestions.push('Due date for contract review on Wednesday');
+  }
+
   return suggestions.slice(0, 5); // Return top 5
 }
 
 /**
- * Validate parsed metrics
+ * Validate parsed metrics and calendar events
  */
 export function hasValidMetrics(parsed: ParsedMetrics): boolean {
   const hasIssiahMetrics = Object.keys(parsed.issiahMetrics).length > 0;
   const hasSoyaMetrics = Object.keys(parsed.soyaMetrics).length > 0;
-  return hasIssiahMetrics || hasSoyaMetrics;
+  const hasCalendarEvents = parsed.calendarEvents.length > 0;
+  return hasIssiahMetrics || hasSoyaMetrics || hasCalendarEvents;
 }

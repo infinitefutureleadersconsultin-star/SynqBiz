@@ -14,7 +14,15 @@ import {
   updateDoc,
   deleteDoc
 } from 'firebase/firestore';
-import type { IsaiahMetrics, SoyaMetrics } from '@/types';
+import type {
+  IsaiahMetrics,
+  SoyaMetrics,
+  Idea,
+  IdeaComment,
+  PartnershipAgreement,
+  Milestone,
+  CalendarEvent
+} from '@/types';
 
 // ============================================
 // ISSIAH'S METRICS
@@ -225,4 +233,449 @@ export function calculateStats(metrics: (IsaiahMetrics | SoyaMetrics)[]) {
     trend: trend as 'up' | 'down' | 'neutral',
     change
   };
+}
+
+// ============================================
+// PHASE 4: THINK TANK / IDEAS
+// ============================================
+
+/**
+ * Create a new idea
+ */
+export async function createIdea(idea: Omit<Idea, 'id' | 'created_at' | 'updated_at'>) {
+  try {
+    const ideasRef = collection(db, 'ideas');
+    const docRef = await addDoc(ideasRef, {
+      ...idea,
+      created_at: Timestamp.now(),
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, id: docRef.id, error: null };
+  } catch (error: any) {
+    console.error('Error creating idea:', error);
+    return { success: false, id: null, error: error.message };
+  }
+}
+
+/**
+ * Get all ideas
+ */
+export async function getAllIdeas(limitCount = 50) {
+  try {
+    const ideasRef = collection(db, 'ideas');
+    const q = query(ideasRef, orderBy('created_at', 'desc'), limit(limitCount));
+    const querySnapshot = await getDocs(q);
+
+    const ideas: Idea[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      ideas.push({
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+      } as Idea);
+    });
+
+    return { data: ideas, error: null };
+  } catch (error: any) {
+    console.error('Error fetching ideas:', error);
+    return { data: null, error: error.message };
+  }
+}
+
+/**
+ * Update idea (for voting, status changes, etc.)
+ */
+export async function updateIdea(ideaId: string, updates: Partial<Idea>) {
+  try {
+    const ideaRef = doc(db, 'ideas', ideaId);
+    await updateDoc(ideaRef, {
+      ...updates,
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error updating idea:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Add comment to idea
+ */
+export async function addIdeaComment(comment: Omit<IdeaComment, 'id' | 'created_at'>) {
+  try {
+    const commentsRef = collection(db, 'idea_comments');
+    const docRef = await addDoc(commentsRef, {
+      ...comment,
+      created_at: Timestamp.now(),
+    });
+
+    return { success: true, id: docRef.id, error: null };
+  } catch (error: any) {
+    console.error('Error adding comment:', error);
+    return { success: false, id: null, error: error.message };
+  }
+}
+
+/**
+ * Get comments for an idea
+ */
+export async function getIdeaComments(ideaId: string) {
+  try {
+    const commentsRef = collection(db, 'idea_comments');
+    const q = query(commentsRef, where('idea_id', '==', ideaId), orderBy('created_at', 'asc'));
+    const querySnapshot = await getDocs(q);
+
+    const comments: IdeaComment[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      comments.push({
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+      } as IdeaComment);
+    });
+
+    return { data: comments, error: null };
+  } catch (error: any) {
+    console.error('Error fetching comments:', error);
+    return { data: null, error: error.message };
+  }
+}
+
+// ============================================
+// PHASE 4: PARTNERSHIP AGREEMENT
+// ============================================
+
+/**
+ * Create or update partnership agreement
+ */
+export async function savePartnershipAgreement(agreement: Omit<PartnershipAgreement, 'id' | 'created_at' | 'updated_at'>) {
+  try {
+    const agreementRef = collection(db, 'partnership_agreements');
+    const docId = `agreement_v${agreement.version}`;
+
+    await setDoc(doc(agreementRef, docId), {
+      ...agreement,
+      updated_at: Timestamp.now(),
+      created_at: Timestamp.now(),
+    }, { merge: true });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error saving agreement:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Get current partnership agreement
+ */
+export async function getCurrentAgreement() {
+  try {
+    const agreementRef = collection(db, 'partnership_agreements');
+    const q = query(agreementRef, where('status', '!=', 'archived'), orderBy('created_at', 'desc'), limit(1));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return { data: null, error: null };
+    }
+
+    const doc = querySnapshot.docs[0];
+    const data = doc.data();
+
+    const agreement: PartnershipAgreement = {
+      id: doc.id,
+      ...data,
+      created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+      updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+    } as PartnershipAgreement;
+
+    return { data: agreement, error: null };
+  } catch (error: any) {
+    console.error('Error fetching agreement:', error);
+    return { data: null, error: error.message };
+  }
+}
+
+/**
+ * Sign partnership agreement
+ */
+export async function signAgreement(
+  agreementId: string,
+  cofounder: 'issiah' | 'soya',
+  signatureData: string,
+  ipAddress: string
+) {
+  try {
+    const agreementRef = doc(db, 'partnership_agreements', agreementId);
+    const agreementDoc = await getDoc(agreementRef);
+
+    if (!agreementDoc.exists()) {
+      return { success: false, error: 'Agreement not found' };
+    }
+
+    const data = agreementDoc.data();
+    const signatures = data.signatures || { issiah: { signed: false }, soya: { signed: false } };
+
+    signatures[cofounder] = {
+      signed: true,
+      signature_data: signatureData,
+      signed_at: new Date().toISOString(),
+      ip_address: ipAddress,
+    };
+
+    // Check if both signed
+    const bothSigned = signatures.issiah.signed && signatures.soya.signed;
+
+    await updateDoc(agreementRef, {
+      signatures,
+      status: bothSigned ? 'fully_signed' : 'pending',
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error signing agreement:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================
+// PHASE 4: MILESTONES
+// ============================================
+
+/**
+ * Create a milestone
+ */
+export async function createMilestone(milestone: Omit<Milestone, 'id' | 'created_at' | 'updated_at' | 'completion_percentage'>) {
+  try {
+    const milestonesRef = collection(db, 'milestones');
+    const completion_percentage = milestone.target_value > 0
+      ? Math.min(100, Math.round((milestone.current_value / milestone.target_value) * 100))
+      : 0;
+
+    const docRef = await addDoc(milestonesRef, {
+      ...milestone,
+      completion_percentage,
+      created_at: Timestamp.now(),
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, id: docRef.id, error: null };
+  } catch (error: any) {
+    console.error('Error creating milestone:', error);
+    return { success: false, id: null, error: error.message };
+  }
+}
+
+/**
+ * Update milestone progress
+ */
+export async function updateMilestone(milestoneId: string, updates: Partial<Milestone>) {
+  try {
+    const milestoneRef = doc(db, 'milestones', milestoneId);
+    const milestoneDoc = await getDoc(milestoneRef);
+
+    if (!milestoneDoc.exists()) {
+      return { success: false, error: 'Milestone not found' };
+    }
+
+    const data = milestoneDoc.data();
+    const current_value = updates.current_value ?? data.current_value;
+    const target_value = updates.target_value ?? data.target_value;
+    const completion_percentage = target_value > 0
+      ? Math.min(100, Math.round((current_value / target_value) * 100))
+      : 0;
+
+    // Auto-update status based on completion
+    let status = updates.status ?? data.status;
+    if (completion_percentage === 100 && status !== 'completed') {
+      status = 'completed';
+      updates.completed_at = new Date().toISOString();
+    } else if (completion_percentage > 0 && status === 'not_started') {
+      status = 'in_progress';
+    }
+
+    await updateDoc(milestoneRef, {
+      ...updates,
+      completion_percentage,
+      status,
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error updating milestone:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Get all milestones
+ */
+export async function getAllMilestones(filterBy?: { owner?: string; status?: string }) {
+  try {
+    const milestonesRef = collection(db, 'milestones');
+    let q = query(milestonesRef, orderBy('deadline', 'asc'));
+
+    if (filterBy?.owner) {
+      q = query(milestonesRef, where('owner', '==', filterBy.owner), orderBy('deadline', 'asc'));
+    }
+
+    const querySnapshot = await getDocs(q);
+
+    const milestones: Milestone[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const milestone = {
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+        completed_at: data.completed_at || undefined,
+      } as Milestone;
+
+      // Filter by status if provided
+      if (!filterBy?.status || milestone.status === filterBy.status) {
+        milestones.push(milestone);
+      }
+    });
+
+    return { data: milestones, error: null };
+  } catch (error: any) {
+    console.error('Error fetching milestones:', error);
+    return { data: null, error: error.message };
+  }
+}
+
+// ============================================
+// PHASE 4: CALENDAR EVENTS
+// ============================================
+
+/**
+ * Create a calendar event
+ */
+export async function createCalendarEvent(event: Omit<CalendarEvent, 'id' | 'created_at' | 'updated_at'>) {
+  try {
+    const eventsRef = collection(db, 'calendar_events');
+    const docRef = await addDoc(eventsRef, {
+      ...event,
+      created_at: Timestamp.now(),
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, id: docRef.id, error: null };
+  } catch (error: any) {
+    console.error('Error creating event:', error);
+    return { success: false, id: null, error: error.message };
+  }
+}
+
+/**
+ * Update a calendar event
+ */
+export async function updateCalendarEvent(eventId: string, updates: Partial<CalendarEvent>) {
+  try {
+    const eventRef = doc(db, 'calendar_events', eventId);
+    await updateDoc(eventRef, {
+      ...updates,
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error updating event:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Delete a calendar event
+ */
+export async function deleteCalendarEvent(eventId: string) {
+  try {
+    const eventRef = doc(db, 'calendar_events', eventId);
+    await deleteDoc(eventRef);
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error deleting event:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Get calendar events within a date range
+ */
+export async function getCalendarEvents(startDate: string, endDate: string, userId?: string) {
+  try {
+    const eventsRef = collection(db, 'calendar_events');
+    let q = query(
+      eventsRef,
+      where('start_time', '>=', startDate),
+      where('start_time', '<=', endDate),
+      orderBy('start_time', 'asc')
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    const events: CalendarEvent[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      events.push({
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+      } as CalendarEvent);
+    });
+
+    return { data: events, error: null };
+  } catch (error: any) {
+    console.error('Error fetching events:', error);
+    return { data: null, error: error.message };
+  }
+}
+
+/**
+ * Get upcoming events (next 30 days)
+ */
+export async function getUpcomingEvents(limitCount = 10) {
+  try {
+    const now = new Date().toISOString();
+    const thirtyDaysLater = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    const eventsRef = collection(db, 'calendar_events');
+    const q = query(
+      eventsRef,
+      where('start_time', '>=', now),
+      where('start_time', '<=', thirtyDaysLater),
+      where('status', '==', 'scheduled'),
+      orderBy('start_time', 'asc'),
+      limit(limitCount)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    const events: CalendarEvent[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      events.push({
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+      } as CalendarEvent);
+    });
+
+    return { data: events, error: null };
+  } catch (error: any) {
+    console.error('Error fetching upcoming events:', error);
+    return { data: null, error: error.message };
+  }
 }

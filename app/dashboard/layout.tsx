@@ -10,7 +10,8 @@ import {
   Users,
   LogOut,
   Menu,
-  X
+  X,
+  Rocket
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -47,6 +48,7 @@ export default function DashboardLayout({
     { name: "Overview", href: "/dashboard/overview", icon: LayoutDashboard },
     { name: "Issiah's Dashboard", href: "/dashboard/isaiah", icon: User },
     { name: "Soya's Dashboard", href: "/dashboard/soya", icon: Users },
+    { name: "Phase 4 Features", href: "/dashboard/phase4", icon: Rocket },
   ];
 
   if (loading) {

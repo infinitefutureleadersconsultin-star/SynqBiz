@@ -374,22 +374,36 @@ export async function savePartnershipAgreement(agreement: Omit<PartnershipAgreem
 
 /**
  * Get current partnership agreement
+ * Simplified query to avoid Firestore index requirements
  */
 export async function getCurrentAgreement() {
   try {
     const agreementRef = collection(db, 'partnership_agreements');
-    const q = query(agreementRef, where('status', '!=', 'archived'), orderBy('created_at', 'desc'), limit(1));
+    // Simple query without composite index requirement
+    const q = query(agreementRef, orderBy('created_at', 'desc'), limit(10));
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
       return { data: null, error: null };
     }
 
-    const doc = querySnapshot.docs[0];
-    const data = doc.data();
+    // Find first non-archived agreement
+    let agreementDoc = null;
+    for (const docSnapshot of querySnapshot.docs) {
+      const data = docSnapshot.data();
+      if (data.status !== 'archived') {
+        agreementDoc = docSnapshot;
+        break;
+      }
+    }
 
+    if (!agreementDoc) {
+      return { data: null, error: null };
+    }
+
+    const data = agreementDoc.data();
     const agreement: PartnershipAgreement = {
-      id: doc.id,
+      id: agreementDoc.id,
       ...data,
       created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
       updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),

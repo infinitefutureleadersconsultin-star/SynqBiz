@@ -7,7 +7,8 @@ import { PARTNERSHIP_AGREEMENT_CONTENT, AGREEMENT_VERSION } from "@/lib/partners
 import type { PartnershipAgreement as AgreementType } from "@/types";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { FileText, CheckCircle, AlertCircle, PenTool } from "lucide-react";
+import Input from "@/components/ui/Input";
+import { FileText, CheckCircle, AlertCircle, PenTool, Type } from "lucide-react";
 
 export default function PartnershipAgreement() {
   const [agreement, setAgreement] = useState<AgreementType | null>(null);
@@ -19,11 +20,20 @@ export default function PartnershipAgreement() {
   const [ipAddress, setIpAddress] = useState<string>('');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [signatureType, setSignatureType] = useState<'draw' | 'type'>('type');
+  const [typedName, setTypedName] = useState<string>('');
 
   useEffect(() => {
     loadAgreementAndUser();
     fetchIPAddress();
   }, []);
+
+  // Render typed signature to canvas whenever typedName changes
+  useEffect(() => {
+    if (signatureType === 'type' && typedName && canvasRef.current) {
+      renderTypedSignature();
+    }
+  }, [typedName, signatureType]);
 
   async function loadAgreementAndUser() {
     setLoading(true);
@@ -34,7 +44,11 @@ export default function PartnershipAgreement() {
         setUserRole((user.user_metadata?.role || 'issiah') as 'issiah' | 'soya');
       }
 
-      const { data } = await getCurrentAgreement();
+      const { data, error } = await getCurrentAgreement();
+      if (error) {
+        console.error('Error loading agreement:', error);
+      }
+
       if (data) {
         setAgreement(data);
       } else {
@@ -43,24 +57,31 @@ export default function PartnershipAgreement() {
       }
     } catch (error) {
       console.error('Error loading agreement:', error);
+      alert('Error loading agreement. Please refresh the page.');
     } finally {
       setLoading(false);
     }
   }
 
   async function createInitialAgreement() {
-    const newAgreement = {
-      version: AGREEMENT_VERSION,
-      content: PARTNERSHIP_AGREEMENT_CONTENT,
-      signatures: {
-        issiah: { signed: false },
-        soya: { signed: false },
-      },
-      status: 'pending' as const,
-    };
+    try {
+      const newAgreement = {
+        version: AGREEMENT_VERSION,
+        content: PARTNERSHIP_AGREEMENT_CONTENT,
+        signatures: {
+          issiah: { signed: false },
+          soya: { signed: false },
+        },
+        status: 'pending' as const,
+      };
 
-    await savePartnershipAgreement(newAgreement);
-    await loadAgreementAndUser();
+      const result = await savePartnershipAgreement(newAgreement);
+      if (result.success) {
+        await loadAgreementAndUser();
+      }
+    } catch (error) {
+      console.error('Error creating agreement:', error);
+    }
   }
 
   async function fetchIPAddress() {
@@ -74,8 +95,31 @@ export default function PartnershipAgreement() {
     }
   }
 
+  // Render typed name in cursive font on canvas
+  const renderTypedSignature = () => {
+    const canvas = canvasRef.current;
+    if (!canvas || !typedName) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Set cursive font style
+    ctx.font = '48px "Brush Script MT", "Lucida Handwriting", cursive';
+    ctx.fillStyle = '#000';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Draw text in center
+    ctx.fillText(typedName, canvas.width / 2, canvas.height / 2);
+  };
+
   // Canvas drawing functions
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (signatureType !== 'draw') return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -89,7 +133,7 @@ export default function PartnershipAgreement() {
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
+    if (!isDrawing || signatureType !== 'draw') return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -117,17 +161,22 @@ export default function PartnershipAgreement() {
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setTypedName('');
+  };
+
+  const handleSignatureTypeChange = (type: 'draw' | 'type') => {
+    setSignatureType(type);
+    clearSignature();
   };
 
   const handleSign = async () => {
     if (!userRole || !agreement || !canvasRef.current) return;
 
     const canvas = canvasRef.current;
-    const signatureData = canvas.toDataURL('image/png');
-
-    // Check if signature is empty
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // Check if signature exists
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const isEmpty = !imageData.data.some(channel => channel !== 0);
 
@@ -136,14 +185,24 @@ export default function PartnershipAgreement() {
       return;
     }
 
+    // Check if other co-founder has signed already
+    const otherRole = userRole === 'issiah' ? 'soya' : 'issiah';
+    const otherSigned = agreement.signatures[otherRole]?.signed;
+
     setSigning(true);
 
     try {
+      const signatureData = canvas.toDataURL('image/png');
       const result = await signAgreement(agreement.id, userRole, signatureData, ipAddress);
 
       if (result.success) {
-        alert('Agreement signed successfully! 🎉');
+        if (otherSigned) {
+          alert('Agreement fully signed! 🎉 Both co-founders have now signed the partnership agreement.');
+        } else {
+          alert('Your signature has been recorded! ✅ Waiting for your co-founder to sign.');
+        }
         setShowSignature(false);
+        setTypedName('');
         await loadAgreementAndUser();
       } else {
         alert(`Failed to sign: ${result.error}`);
@@ -160,7 +219,8 @@ export default function PartnershipAgreement() {
     return (
       <Card>
         <CardContent className="py-12 text-center">
-          <p className="text-gray-600">Loading agreement...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-3"></div>
+          <p className="text-gray-600">Loading partnership agreement...</p>
         </CardContent>
       </Card>
     );
@@ -171,7 +231,10 @@ export default function PartnershipAgreement() {
       <Card>
         <CardContent className="py-12 text-center">
           <AlertCircle className="w-12 h-12 mx-auto mb-3 text-amber-600" />
-          <p className="text-gray-600">No partnership agreement found.</p>
+          <p className="text-gray-600 mb-4">No partnership agreement found.</p>
+          <Button onClick={() => createInitialAgreement()}>
+            Create Agreement
+          </Button>
         </CardContent>
       </Card>
     );
@@ -193,10 +256,15 @@ export default function PartnershipAgreement() {
                 <p className="text-sm text-gray-600 mt-1">Version {agreement.version} • 50/50 Equal Partnership</p>
               </div>
             </div>
-            {bothSigned && (
-              <div className="flex items-center gap-2 text-green-700 font-semibold">
+            {bothSigned ? (
+              <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 font-semibold rounded-lg">
                 <CheckCircle className="w-5 h-5" />
-                Fully Signed
+                ✅ Fully Signed & Complete
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-lg">
+                <AlertCircle className="w-5 h-5" />
+                ⏳ Awaiting Signatures
               </div>
             )}
           </div>
@@ -211,12 +279,12 @@ export default function PartnershipAgreement() {
                 {agreement.signatures.issiah.signed ? (
                   <>
                     <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span className="text-sm text-green-700 font-medium">Signed</span>
+                    <span className="text-sm text-green-700 font-medium">✅ Signed</span>
                   </>
                 ) : (
                   <>
                     <AlertCircle className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">Pending</span>
+                    <span className="text-sm text-gray-600">⏳ Pending</span>
                   </>
                 )}
               </div>
@@ -235,12 +303,12 @@ export default function PartnershipAgreement() {
                 {agreement.signatures.soya.signed ? (
                   <>
                     <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span className="text-sm text-green-700 font-medium">Signed</span>
+                    <span className="text-sm text-green-700 font-medium">✅ Signed</span>
                   </>
                 ) : (
                   <>
                     <AlertCircle className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm text-gray-600">Pending</span>
+                    <span className="text-sm text-gray-600">⏳ Pending</span>
                   </>
                 )}
               </div>
@@ -252,14 +320,31 @@ export default function PartnershipAgreement() {
             </div>
           </div>
 
+          {!bothSigned && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-blue-900 font-medium">⚠️ Agreement Not Complete</p>
+              <p className="text-xs text-blue-800 mt-1">
+                This partnership agreement requires signatures from BOTH co-founders to be legally binding and complete.
+                {!hasUserSigned && userRole && " Please sign below to record your agreement."}
+                {hasUserSigned && " Waiting for your co-founder to sign."}
+              </p>
+            </div>
+          )}
+
           {!hasUserSigned && userRole && (
             <Button
               onClick={() => setShowSignature(true)}
               className="w-full"
             >
               <PenTool className="w-4 h-4 mr-2" />
-              Sign Agreement
+              Sign Agreement Now
             </Button>
+          )}
+
+          {hasUserSigned && !bothSigned && (
+            <div className="text-center py-4 text-green-700 font-medium">
+              ✅ You have signed! Waiting for your co-founder to complete the agreement.
+            </div>
           )}
         </CardContent>
       </Card>
@@ -267,7 +352,7 @@ export default function PartnershipAgreement() {
       {/* Agreement Content */}
       <Card>
         <CardHeader>
-          <CardTitle>Agreement Terms</CardTitle>
+          <CardTitle>Partnership Agreement - Full Legal Document</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="prose prose-sm max-w-none">
@@ -287,21 +372,69 @@ export default function PartnershipAgreement() {
             <CardHeader className="bg-primary-50">
               <CardTitle>Sign Partnership Agreement</CardTitle>
               <p className="text-sm text-gray-600 mt-1">
-                Please sign below to acknowledge your agreement to all terms and conditions.
+                Choose your signature method and sign below to legally bind yourself to this agreement.
               </p>
             </CardHeader>
             <CardContent className="pt-4">
               <div className="space-y-4">
+                {/* Signature Type Selector */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Your Signature
+                    Signature Method
                   </label>
-                  <div className="border-2 border-gray-300 rounded-lg">
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => handleSignatureTypeChange('type')}
+                      className={`flex-1 py-3 px-4 rounded-lg border-2 transition-colors ${
+                        signatureType === 'type'
+                          ? 'border-primary-500 bg-primary-50 text-primary-700'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      <Type className="w-5 h-5 mx-auto mb-1" />
+                      <span className="text-sm font-medium">Type Name (Cursive)</span>
+                    </button>
+                    <button
+                      onClick={() => handleSignatureTypeChange('draw')}
+                      className={`flex-1 py-3 px-4 rounded-lg border-2 transition-colors ${
+                        signatureType === 'draw'
+                          ? 'border-primary-500 bg-primary-50 text-primary-700'
+                          : 'border-gray-300 hover:border-gray-400'
+                      }`}
+                    >
+                      <PenTool className="w-5 h-5 mx-auto mb-1" />
+                      <span className="text-sm font-medium">Draw Signature</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Typed Signature Input */}
+                {signatureType === 'type' && (
+                  <div>
+                    <Input
+                      label="Type Your Full Name"
+                      value={typedName}
+                      onChange={(e) => setTypedName(e.target.value)}
+                      placeholder="e.g., Issiah McLean"
+                      className="text-lg"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Your name will appear in elegant cursive font below
+                    </p>
+                  </div>
+                )}
+
+                {/* Signature Canvas */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {signatureType === 'type' ? 'Preview (Cursive)' : 'Draw Your Signature'}
+                  </label>
+                  <div className="border-2 border-gray-300 rounded-lg bg-white">
                     <canvas
                       ref={canvasRef}
                       width={600}
                       height={200}
-                      className="w-full cursor-crosshair bg-white rounded-lg"
+                      className={`w-full rounded-lg ${signatureType === 'draw' ? 'cursor-crosshair' : 'cursor-default'}`}
                       onMouseDown={startDrawing}
                       onMouseMove={draw}
                       onMouseUp={stopDrawing}
@@ -309,15 +442,18 @@ export default function PartnershipAgreement() {
                     />
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
-                    Draw your signature using your mouse or trackpad
+                    {signatureType === 'draw'
+                      ? 'Draw your signature using your mouse or trackpad'
+                      : 'Your typed name appears automatically in cursive handwriting'}
                   </p>
                 </div>
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-sm text-blue-900 font-medium">Legal Confirmation</p>
+                  <p className="text-sm text-blue-900 font-medium">⚖️ Legal Confirmation</p>
                   <p className="text-xs text-blue-800 mt-1">
                     By signing, you confirm that you have read, understood, and agree to be legally bound by all terms
-                    of this Partnership Agreement. Your signature will be recorded with timestamp and IP address for legal purposes.
+                    of this 50/50 Partnership Agreement. Your signature will be recorded with timestamp and IP address for legal validity.
+                    <strong className="block mt-2">Note: This agreement is NOT complete until BOTH co-founders have signed.</strong>
                   </p>
                 </div>
 
@@ -332,12 +468,17 @@ export default function PartnershipAgreement() {
                     onClick={handleSign}
                     isLoading={signing}
                     className="flex-1"
+                    disabled={signatureType === 'type' && !typedName.trim()}
                   >
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Sign & Submit
                   </Button>
                   <Button
-                    onClick={() => setShowSignature(false)}
+                    onClick={() => {
+                      setShowSignature(false);
+                      setTypedName('');
+                      clearSignature();
+                    }}
                     variant="outline"
                     disabled={signing}
                   >

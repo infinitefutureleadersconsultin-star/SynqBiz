@@ -22,6 +22,19 @@ export interface ParsedCalendarEvent {
   reminder_minutes: number;
 }
 
+export interface ParsedTask {
+  title: string;
+  description?: string;
+  owner: 'issiah' | 'soya';
+  due_date: string; // YYYY-MM-DD
+  priority: 'low' | 'medium' | 'high';
+  category?: string;
+  metrics_impact?: {
+    metric_type?: string;
+    metric_value?: number;
+  };
+}
+
 export interface ParsedMetrics {
   issiahMetrics: {
     outreach_contacts?: number;
@@ -46,6 +59,7 @@ export interface ParsedMetrics {
     features_shipped?: number;
   };
   calendarEvents: ParsedCalendarEvent[];
+  tasks: ParsedTask[];
   date?: string;
   notes?: string;
 }
@@ -509,6 +523,115 @@ function parseCalendarEvents(text: string): ParsedCalendarEvent[] {
 }
 
 /**
+ * Parse tasks from message
+ * Detects patterns like:
+ * - "Add task: Contact 5 sponsors by Friday"
+ * - "Task for Issiah: Send partnership emails"
+ * - "Todo: Fix login bug (high priority)"
+ * - "Reminder for Soya: Deploy new feature by Monday"
+ */
+function parseTasks(text: string): ParsedTask[] {
+  const tasks: ParsedTask[] = [];
+  const lowerText = text.toLowerCase();
+
+  // Task trigger words
+  const triggers = [
+    'add task', 'task:', 'todo:', 'to do:', 'reminder:',
+    'create task', 'new task', 'task for', 'todo for'
+  ];
+
+  const hasTrigger = triggers.some(trigger => lowerText.includes(trigger));
+  if (!hasTrigger) {
+    return tasks;
+  }
+
+  // Extract task title
+  let title = 'Untitled Task';
+
+  // Pattern: "add task: TITLE" or "task: TITLE" or "todo: TITLE"
+  const taskMatch = text.match(/(?:add\s+task|task|todo|to\s+do|reminder|create\s+task|new\s+task):\s*([^()\n]+)/i);
+  if (taskMatch) {
+    title = taskMatch[1].trim();
+    // Remove "by DATE" from title if present
+    title = title.replace(/\s+by\s+(monday|tuesday|wednesday|thursday|friday|saturday|sunday|tomorrow|next\s+week|next\s+\w+|\d)/i, '').trim();
+  }
+
+  // Determine owner
+  let owner: 'issiah' | 'soya' = 'issiah'; // Default
+  if (lowerText.includes('for issiah') || lowerText.includes('issiah:')) {
+    owner = 'issiah';
+  } else if (lowerText.includes('for soya') || lowerText.includes('soya:')) {
+    owner = 'soya';
+  } else {
+    // Detect based on content
+    const role = detectRole(text);
+    if (role === 'soya') {
+      owner = 'soya';
+    }
+  }
+
+  // Extract due date
+  const { date } = extractDateTime(text);
+  const dueDate = date.toISOString().split('T')[0];
+
+  // Extract priority
+  let priority: 'low' | 'medium' | 'high' = 'medium'; // Default
+  if (lowerText.includes('high priority') || lowerText.includes('urgent') || lowerText.includes('asap')) {
+    priority = 'high';
+  } else if (lowerText.includes('low priority') || lowerText.includes('when you can')) {
+    priority = 'low';
+  }
+
+  // Extract category based on keywords
+  let category: string | undefined;
+  if (lowerText.includes('outreach') || lowerText.includes('contact') || lowerText.includes('sponsor')) {
+    category = 'outreach';
+  } else if (lowerText.includes('develop') || lowerText.includes('code') || lowerText.includes('feature') || lowerText.includes('bug')) {
+    category = 'development';
+  } else if (lowerText.includes('marketing') || lowerText.includes('social') || lowerText.includes('post')) {
+    category = 'marketing';
+  } else if (lowerText.includes('revenue') || lowerText.includes('sales')) {
+    category = 'revenue';
+  }
+
+  // Try to detect metrics impact
+  let metricsImpact: { metric_type?: string; metric_value?: number } | undefined;
+
+  // Check if task involves metrics (e.g., "contact 5 sponsors" -> outreach_contacts: 5)
+  if (owner === 'issiah') {
+    const extractedMetrics = extractMetrics(text, ISSIAH_PATTERNS);
+    if (Object.keys(extractedMetrics).length > 0) {
+      const [metricType, metricValue] = Object.entries(extractedMetrics)[0];
+      metricsImpact = {
+        metric_type: metricType,
+        metric_value: metricValue as number,
+      };
+    }
+  } else {
+    const extractedMetrics = extractMetrics(text, SOYA_PATTERNS);
+    if (Object.keys(extractedMetrics).length > 0) {
+      const [metricType, metricValue] = Object.entries(extractedMetrics)[0];
+      metricsImpact = {
+        metric_type: metricType,
+        metric_value: metricValue as number,
+      };
+    }
+  }
+
+  tasks.push({
+    title: title.charAt(0).toUpperCase() + title.slice(1),
+    description: text,
+    owner,
+    due_date: dueDate,
+    priority,
+    category,
+    metrics_impact: metricsImpact,
+  });
+
+  return tasks;
+}
+
+/**
  * Main parser function - analyzes text and extracts metrics and calendar events
  */
 export function parseMessage(message: string): ParsedMetrics {
@@ -519,6 +642,7 @@ export function parseMessage(message: string): ParsedMetrics {
     issiahMetrics: {},
     soyaMetrics: {},
     calendarEvents: [],
+    tasks: [],
     date,
     notes: message,
   };
@@ -535,6 +659,9 @@ export function parseMessage(message: string): ParsedMetrics {
 
   // Extract calendar events
   result.calendarEvents = parseCalendarEvents(message);
+
+  // Extract tasks
+  result.tasks = parseTasks(message);
 
   return result;
 }
@@ -595,6 +722,13 @@ export function getSuggestions(partialText: string): string[] {
     suggestions.push('Due date for contract review on Wednesday');
   }
 
+  // Task suggestions
+  if (lowerText.includes('task') || lowerText.includes('todo') || lowerText.includes('to do')) {
+    suggestions.push('Add task: Contact 5 sponsors by Friday');
+    suggestions.push('Task for Issiah: Send partnership emails by Monday');
+    suggestions.push('Todo: Fix login bug (high priority)');
+  }
+
   return suggestions.slice(0, 5); // Return top 5
 }
 
@@ -605,5 +739,6 @@ export function hasValidMetrics(parsed: ParsedMetrics): boolean {
   const hasIssiahMetrics = Object.keys(parsed.issiahMetrics).length > 0;
   const hasSoyaMetrics = Object.keys(parsed.soyaMetrics).length > 0;
   const hasCalendarEvents = parsed.calendarEvents.length > 0;
-  return hasIssiahMetrics || hasSoyaMetrics || hasCalendarEvents;
+  const hasTasks = parsed.tasks.length > 0;
+  return hasIssiahMetrics || hasSoyaMetrics || hasCalendarEvents || hasTasks;
 }

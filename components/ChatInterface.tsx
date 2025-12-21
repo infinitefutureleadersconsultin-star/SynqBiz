@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from "react";
 import { parseMessage, getSuggestions, hasValidMetrics } from "@/lib/chatParser";
 import type { ParsedMetrics } from "@/lib/chatParser";
-import { saveIssiahMetrics, saveSoyaMetrics, createCalendarEvent } from "@/lib/firestore";
+import { saveIssiahMetrics, saveSoyaMetrics, createCalendarEvent, createTask } from "@/lib/firestore";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { Send, Sparkles, CheckCircle, AlertCircle, Calendar } from "lucide-react";
+import { Send, Sparkles, CheckCircle, AlertCircle, Calendar, CheckSquare } from "lucide-react";
 
 interface ChatInterfaceProps {
   userId: string;
@@ -95,6 +95,25 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
         }
       }
 
+      // Save tasks if present
+      if (parsedResult.tasks && parsedResult.tasks.length > 0) {
+        for (const task of parsedResult.tasks) {
+          promises.push(
+            createTask({
+              owner: task.owner,
+              title: task.title,
+              description: task.description,
+              due_date: task.due_date,
+              priority: task.priority,
+              status: 'pending',
+              category: task.category,
+              metrics_impact: task.metrics_impact,
+              created_by: userId,
+            })
+          );
+        }
+      }
+
       const results = await Promise.all(promises);
       const allSuccess = results.every(r => r.success);
 
@@ -116,14 +135,14 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
 
         const hasMetrics = Object.keys(parsedResult.issiahMetrics).length > 0 || Object.keys(parsedResult.soyaMetrics).length > 0;
         const hasEvents = parsedResult.calendarEvents && parsedResult.calendarEvents.length > 0;
+        const hasTasks = parsedResult.tasks && parsedResult.tasks.length > 0;
 
-        if (hasMetrics && hasEvents) {
-          alert(`✅ Metrics and ${parsedResult.calendarEvents.length} calendar event(s) saved successfully!`);
-        } else if (hasEvents) {
-          alert(`📅 ${parsedResult.calendarEvents.length} calendar event(s) saved successfully!`);
-        } else {
-          alert("✅ Metrics saved successfully!");
-        }
+        const messages = [];
+        if (hasMetrics) messages.push('✅ Metrics');
+        if (hasEvents) messages.push(`📅 ${parsedResult.calendarEvents.length} event(s)`);
+        if (hasTasks) messages.push(`✔️ ${parsedResult.tasks.length} task(s)`);
+
+        alert(`${messages.join(', ')} saved successfully!`);
       } else {
         throw new Error("Failed to save some data");
       }
@@ -273,6 +292,51 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
                     </div>
                   </div>
                 )}
+
+                {parsedResult.tasks && parsedResult.tasks.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
+                      <CheckSquare className="w-3 h-3" />
+                      Tasks ({parsedResult.tasks.length}):
+                    </p>
+                    <div className="space-y-2">
+                      {parsedResult.tasks.map((task, idx) => (
+                        <div key={idx} className="bg-white px-3 py-2 rounded border border-purple-200">
+                          <p className="text-sm font-semibold text-gray-800">{task.title}</p>
+                          <p className="text-xs text-gray-600 mt-1">
+                            Due: {new Date(task.due_date).toLocaleDateString('en-US', {
+                              weekday: 'short',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </p>
+                          <div className="flex gap-2 mt-1">
+                            <span className={`text-xs px-2 py-0.5 rounded ${
+                              task.priority === 'high' ? 'bg-red-100 text-red-700' :
+                              task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                              'bg-green-100 text-green-700'
+                            }`}>
+                              {task.priority}
+                            </span>
+                            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">
+                              {task.owner}
+                            </span>
+                            {task.category && (
+                              <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">
+                                {task.category}
+                              </span>
+                            )}
+                          </div>
+                          {task.metrics_impact && (
+                            <p className="text-xs text-purple-600 mt-1">
+                              ⚡ Completes: {task.metrics_impact.metric_type?.replace(/_/g, ' ')} +{task.metrics_impact.metric_value}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -360,13 +424,21 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
             </ul>
           </div>
 
-          <div>
+          <div className="mb-3">
             <p className="text-xs font-semibold text-purple-700 mb-1">📅 Calendar Events:</p>
             <ul className="text-xs text-gray-600 space-y-1">
               <li>• "Scheduled meeting with sponsor tomorrow at 2pm"</li>
               <li>• "Call with event host on Friday at 10am"</li>
               <li>• "Deadline for proposal next Monday"</li>
-              <li>• "Reminder to follow up with partner on Wednesday"</li>
+            </ul>
+          </div>
+
+          <div>
+            <p className="text-xs font-semibold text-green-700 mb-1">✔️ Tasks:</p>
+            <ul className="text-xs text-gray-600 space-y-1">
+              <li>• "Add task: Contact 5 sponsors by Friday"</li>
+              <li>• "Task for Issiah: Send partnership emails by Monday"</li>
+              <li>• "Todo: Fix login bug (high priority)"</li>
             </ul>
           </div>
         </CardContent>

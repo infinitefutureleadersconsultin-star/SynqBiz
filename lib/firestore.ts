@@ -942,14 +942,15 @@ export async function createSharedNote(note: Omit<SharedNote, 'id' | 'created_at
     const notesRef = collection(db, 'shared_notes');
 
     // Initialize acknowledgments - creator automatically acknowledges their own note
+    // Note: Firestore doesn't accept undefined, so we conditionally include acknowledged_at
     const acknowledgments: SharedNote['acknowledgments'] = {
       issiah: {
         acknowledged: note.created_by_name === 'issiah',
-        acknowledged_at: note.created_by_name === 'issiah' ? new Date().toISOString() : undefined,
+        ...(note.created_by_name === 'issiah' && { acknowledged_at: new Date().toISOString() }),
       },
       soya: {
         acknowledged: note.created_by_name === 'soya',
-        acknowledged_at: note.created_by_name === 'soya' ? new Date().toISOString() : undefined,
+        ...(note.created_by_name === 'soya' && { acknowledged_at: new Date().toISOString() }),
       },
     };
 

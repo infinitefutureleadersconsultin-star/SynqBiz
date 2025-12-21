@@ -693,3 +693,236 @@ export async function getUpcomingEvents(limitCount = 10) {
     return { data: null, error: error.message };
   }
 }
+
+// ============================================
+// WEEKLY TASKS
+// ============================================
+
+/**
+ * Helper: Get Monday of current week
+ */
+function getMondayOfWeek(date: Date = new Date()): string {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is Sunday
+  const monday = new Date(d.setDate(diff));
+  return monday.toISOString().split('T')[0];
+}
+
+/**
+ * Create a task
+ */
+export async function createTask(task: Omit<Task, 'id' | 'created_at' | 'updated_at' | 'week_of'>) {
+  try {
+    const tasksRef = collection(db, 'tasks');
+    const week_of = getMondayOfWeek(new Date(task.due_date));
+
+    const docRef = await addDoc(tasksRef, {
+      ...task,
+      week_of,
+      created_at: Timestamp.now(),
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, id: docRef.id, error: null };
+  } catch (error: any) {
+    console.error('Error creating task:', error);
+    return { success: false, id: null, error: error.message };
+  }
+}
+
+/**
+ * Update a task
+ */
+export async function updateTask(taskId: string, updates: Partial<Task>) {
+  try {
+    const taskRef = doc(db, 'tasks', taskId);
+    await updateDoc(taskRef, {
+      ...updates,
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error updating task:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Complete a task and update related metrics
+ */
+export async function completeTask(taskId: string, userId: string) {
+  try {
+    const taskRef = doc(db, 'tasks', taskId);
+    const taskSnap = await getDoc(taskRef);
+
+    if (!taskSnap.exists()) {
+      return { success: false, error: 'Task not found' };
+    }
+
+    const task = taskSnap.data() as Task;
+
+    // Update task status
+    await updateDoc(taskRef, {
+      status: 'completed',
+      completed_at: new Date().toISOString(),
+      updated_at: Timestamp.now(),
+    });
+
+    // If task has metrics_impact, update the relevant metrics
+    if (task.metrics_impact && task.metrics_impact.metric_type && task.metrics_impact.metric_value) {
+      const today = new Date().toISOString().split('T')[0];
+      const metricType = task.metrics_impact.metric_type;
+      const metricValue = task.metrics_impact.metric_value;
+
+      // Update metrics based on owner
+      if (task.owner === 'issiah') {
+        // Get or create today's metrics
+        const metricsRef = collection(db, 'isaiah_metrics');
+        const q = query(metricsRef, where('user_id', '==', userId), where('date', '==', today));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          // Create new metrics entry
+          await saveIssiahMetrics(userId, today, {
+            [metricType]: metricValue,
+            notes: `Completed task: ${task.title}`,
+          });
+        } else {
+          // Update existing metrics
+          const metricDoc = querySnapshot.docs[0];
+          const existingValue = metricDoc.data()[metricType] || 0;
+          await updateDoc(metricDoc.ref, {
+            [metricType]: existingValue + metricValue,
+            updated_at: Timestamp.now(),
+          });
+        }
+      } else if (task.owner === 'soya') {
+        // Similar logic for Soya's metrics
+        const metricsRef = collection(db, 'soya_metrics');
+        const q = query(metricsRef, where('user_id', '==', userId), where('date', '==', today));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          await saveSoyaMetrics(userId, today, {
+            [metricType]: metricValue,
+            notes: `Completed task: ${task.title}`,
+          });
+        } else {
+          const metricDoc = querySnapshot.docs[0];
+          const existingValue = metricDoc.data()[metricType] || 0;
+          await updateDoc(metricDoc.ref, {
+            [metricType]: existingValue + metricValue,
+            updated_at: Timestamp.now(),
+          });
+        }
+      }
+    }
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error completing task:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Delete a task
+ */
+export async function deleteTask(taskId: string) {
+  try {
+    const taskRef = doc(db, 'tasks', taskId);
+    await deleteDoc(taskRef);
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error deleting task:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Get tasks for current week
+ */
+export async function getCurrentWeekTasks(owner?: CoFounder) {
+  try {
+    const week_of = getMondayOfWeek();
+    const tasksRef = collection(db, 'tasks');
+
+    let q;
+    if (owner) {
+      q = query(
+        tasksRef,
+        where('week_of', '==', week_of),
+        where('owner', '==', owner),
+        orderBy('due_date', 'asc')
+      );
+    } else {
+      q = query(
+        tasksRef,
+        where('week_of', '==', week_of),
+        orderBy('due_date', 'asc')
+      );
+    }
+
+    const querySnapshot = await getDocs(q);
+
+    const tasks: Task[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      tasks.push({
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+        completed_at: data.completed_at || undefined,
+      } as Task);
+    });
+
+    return { data: tasks, error: null };
+  } catch (error: any) {
+    console.error('Error fetching tasks:', error);
+    return { data: null, error: error.message };
+  }
+}
+
+/**
+ * Get all tasks with optional filtering
+ */
+export async function getAllTasks(filterBy?: { owner?: CoFounder; status?: Task['status']; week_of?: string }) {
+  try {
+    const tasksRef = collection(db, 'tasks');
+    let q = query(tasksRef, orderBy('due_date', 'asc'));
+
+    if (filterBy?.owner) {
+      q = query(tasksRef, where('owner', '==', filterBy.owner), orderBy('due_date', 'asc'));
+    }
+
+    const querySnapshot = await getDocs(q);
+
+    const tasks: Task[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const task = {
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+        completed_at: data.completed_at || undefined,
+      } as Task;
+
+      // Filter by status if provided
+      if (!filterBy?.status || task.status === filterBy.status) {
+        // Filter by week_of if provided
+        if (!filterBy?.week_of || task.week_of === filterBy.week_of) {
+          tasks.push(task);
+        }
+      }
+    });
+
+    return { data: tasks, error: null };
+  } catch (error: any) {
+    console.error('Error fetching tasks:', error);
+    return { data: null, error: error.message };
+  }
+}

@@ -151,3 +151,25 @@ export interface CalendarEvent {
   created_at: string;
   updated_at: string;
 }
+
+// Weekly Tasks
+export interface Task {
+  id: string;
+  owner: CoFounder;
+  title: string;
+  description?: string;
+  due_date: string; // YYYY-MM-DD
+  week_of: string; // YYYY-MM-DD (Monday of that week)
+  priority: "low" | "medium" | "high";
+  status: "pending" | "in_progress" | "completed";
+  category?: string; // e.g., "outreach", "development", "marketing"
+  metrics_impact?: {
+    // When completed, which metrics to increment
+    metric_type?: string;
+    metric_value?: number;
+  };
+  completed_at?: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}

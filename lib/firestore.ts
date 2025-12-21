@@ -954,16 +954,27 @@ export async function createSharedNote(note: Omit<SharedNote, 'id' | 'created_at
       },
     };
 
-    const docRef = await addDoc(notesRef, {
+    const docData = {
       ...note,
       acknowledgments,
       created_at: Timestamp.now(),
       updated_at: Timestamp.now(),
+    };
+
+    console.log('Attempting to create shared note in Firestore...', {
+      collection: 'shared_notes',
+      created_by: note.created_by,
+      created_by_name: note.created_by_name,
     });
 
+    const docRef = await addDoc(notesRef, docData);
+
+    console.log('Shared note created successfully with ID:', docRef.id);
     return { success: true, id: docRef.id, error: null };
   } catch (error: any) {
     console.error('Error creating shared note:', error);
+    console.error('Error code:', error.code);
+    console.error('Error details:', error);
     return { success: false, id: null, error: error.message };
   }
 }

@@ -86,6 +86,14 @@ export default function SharedNotes({ currentUser }: SharedNotesProps) {
       return;
     }
 
+    // Log data being sent for debugging
+    console.log('Creating note with data:', {
+      userId,
+      userCoFounder,
+      title: formData.title,
+      contentLength: formData.content.length,
+    });
+
     const { success, error } = await createSharedNote({
       title: formData.title,
       content: formData.content,
@@ -96,11 +104,13 @@ export default function SharedNotes({ currentUser }: SharedNotesProps) {
     });
 
     if (success) {
+      console.log('Note created successfully');
       setFormData({ title: "", content: "", category: "general" });
       setShowCreateForm(false);
       await loadNotes(userCoFounder);
     } else {
-      alert(`Failed to create note: ${error}`);
+      console.error('Failed to create note:', error);
+      alert(`Failed to create note: ${error}\n\nMost likely cause: Firestore rules not published to Firebase Console.\n\nPlease deploy the rules from firestore.rules file.`);
     }
   };
 

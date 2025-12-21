@@ -173,3 +173,26 @@ export interface Task {
   created_at: string;
   updated_at: string;
 }
+
+// Shared Notes - Knowledge base with acknowledgments
+export interface SharedNote {
+  id: string;
+  title: string;
+  content: string; // Large text content
+  created_by: string; // user_id
+  created_by_name: CoFounder;
+  created_at: string;
+  updated_at: string;
+  acknowledgments: {
+    issiah?: {
+      acknowledged: boolean;
+      acknowledged_at?: string;
+    };
+    soya?: {
+      acknowledged: boolean;
+      acknowledged_at?: string;
+    };
+  };
+  category?: "idea" | "note" | "thought" | "general";
+  tags?: string[];
+}

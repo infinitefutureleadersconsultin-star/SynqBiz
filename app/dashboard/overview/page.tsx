@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/firebase";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import TaskList from "@/components/TaskList";
+import SharedNotes from "@/components/SharedNotes";
 import {
   TrendingUp,
   TrendingDown,
@@ -33,6 +34,7 @@ interface MetricsSummary {
 export default function OverviewPage() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string>('');
+  const [userCoFounder, setUserCoFounder] = useState<'issiah' | 'soya' | null>(null);
   const [metrics, setMetrics] = useState<MetricsSummary>({
     isaiah: { totalOutreach: 0, weeklyOutreach: 0, totalMeetings: 0, weeklyMeetings: 0 },
     soya: { totalRevenue: 0, totalSignups: 0, weeklySignups: 0, weeklyTickets: 0 },
@@ -47,6 +49,9 @@ export default function OverviewPage() {
       const user = await getCurrentUser();
       if (user) {
         setUserId(user.uid);
+        // Determine co-founder based on email or other identifier
+        const coFounder = user.email?.includes('issiah') ? 'issiah' : 'soya';
+        setUserCoFounder(coFounder);
       }
 
       // This will be replaced with actual database queries once Supabase is set up
@@ -156,6 +161,9 @@ export default function OverviewPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Shared Notes & Ideas */}
+      <SharedNotes currentUser={userCoFounder || undefined} />
 
       {/* Weekly Tasks - All Co-Founders */}
       {userId && (

@@ -23,7 +23,8 @@ import type {
   Milestone,
   CalendarEvent,
   Task,
-  CoFounder
+  CoFounder,
+  SharedNote
 } from '@/types';
 
 // ============================================
@@ -926,5 +927,135 @@ export async function getAllTasks(filterBy?: { owner?: CoFounder; status?: Task[
   } catch (error: any) {
     console.error('Error fetching tasks:', error);
     return { data: null, error: error.message };
+  }
+}
+
+// ============================================
+// SHARED NOTES
+// ============================================
+
+/**
+ * Create a shared note
+ */
+export async function createSharedNote(note: Omit<SharedNote, 'id' | 'created_at' | 'updated_at' | 'acknowledgments'>) {
+  try {
+    const notesRef = collection(db, 'shared_notes');
+
+    // Initialize acknowledgments - creator automatically acknowledges their own note
+    const acknowledgments: SharedNote['acknowledgments'] = {
+      issiah: {
+        acknowledged: note.created_by_name === 'issiah',
+        acknowledged_at: note.created_by_name === 'issiah' ? new Date().toISOString() : undefined,
+      },
+      soya: {
+        acknowledged: note.created_by_name === 'soya',
+        acknowledged_at: note.created_by_name === 'soya' ? new Date().toISOString() : undefined,
+      },
+    };
+
+    const docRef = await addDoc(notesRef, {
+      ...note,
+      acknowledgments,
+      created_at: Timestamp.now(),
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, id: docRef.id, error: null };
+  } catch (error: any) {
+    console.error('Error creating shared note:', error);
+    return { success: false, id: null, error: error.message };
+  }
+}
+
+/**
+ * Acknowledge a shared note (mark as "I've seen this")
+ */
+export async function acknowledgeNote(noteId: string, coFounder: CoFounder) {
+  try {
+    const noteRef = doc(db, 'shared_notes', noteId);
+
+    await updateDoc(noteRef, {
+      [`acknowledgments.${coFounder}.acknowledged`]: true,
+      [`acknowledgments.${coFounder}.acknowledged_at`]: new Date().toISOString(),
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error acknowledging note:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Get all shared notes with optional filtering
+ */
+export async function getAllSharedNotes(filterBy?: {
+  unread_by?: CoFounder; // Show only notes not acknowledged by this person
+  category?: string;
+}) {
+  try {
+    const notesRef = collection(db, 'shared_notes');
+    const q = query(notesRef, orderBy('created_at', 'desc'));
+    const querySnapshot = await getDocs(q);
+
+    const notes: SharedNote[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const note: SharedNote = {
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+      } as SharedNote;
+
+      // Filter by unread status if specified
+      if (filterBy?.unread_by) {
+        const isUnread = !note.acknowledgments[filterBy.unread_by]?.acknowledged;
+        if (isUnread) {
+          notes.push(note);
+        }
+      } else {
+        notes.push(note);
+      }
+    });
+
+    return { data: notes, error: null };
+  } catch (error: any) {
+    console.error('Error fetching shared notes:', error);
+    return { data: null, error: error.message };
+  }
+}
+
+/**
+ * Update a shared note
+ */
+export async function updateSharedNote(noteId: string, updates: Partial<Pick<SharedNote, 'title' | 'content' | 'category' | 'tags'>>) {
+  try {
+    const noteRef = doc(db, 'shared_notes', noteId);
+
+    await updateDoc(noteRef, {
+      ...updates,
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error updating note:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Delete a shared note
+ */
+export async function deleteSharedNote(noteId: string) {
+  try {
+    const noteRef = doc(db, 'shared_notes', noteId);
+    await deleteDoc(noteRef);
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error deleting note:', error);
+    return { success: false, error: error.message };
   }
 }

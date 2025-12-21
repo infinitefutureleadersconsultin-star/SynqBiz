@@ -36,6 +36,7 @@ export default function SharedNotes({ currentUser }: SharedNotesProps) {
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
   const [userId, setUserId] = useState<string>("");
   const [userCoFounder, setUserCoFounder] = useState<CoFounder | null>(null);
+  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
 
   const [formData, setFormData] = useState({
     title: "",
@@ -178,6 +179,27 @@ export default function SharedNotes({ currentUser }: SharedNotesProps) {
     const other = getOtherCoFounder();
     if (!other) return false;
     return note.acknowledgments[other]?.acknowledged || false;
+  };
+
+  const toggleNoteExpansion = (noteId: string) => {
+    setExpandedNotes((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(noteId)) {
+        newSet.delete(noteId);
+      } else {
+        newSet.add(noteId);
+      }
+      return newSet;
+    });
+  };
+
+  const isNoteExpanded = (noteId: string) => {
+    return expandedNotes.has(noteId);
+  };
+
+  const isContentLong = (content: string) => {
+    // Consider content "long" if more than 300 characters or more than 4 lines
+    return content.length > 300 || content.split('\n').length > 4;
   };
 
   if (loading) {
@@ -380,9 +402,26 @@ export default function SharedNotes({ currentUser }: SharedNotesProps) {
 
                     {/* Content */}
                     <div className="mb-3">
-                      <p className="text-gray-700 text-sm whitespace-pre-wrap">
-                        {note.content}
-                      </p>
+                      <div className="relative">
+                        <p
+                          className={`text-gray-700 text-sm whitespace-pre-wrap ${
+                            !isNoteExpanded(note.id) && isContentLong(note.content)
+                              ? "line-clamp-4"
+                              : ""
+                          }`}
+                        >
+                          {note.content}
+                        </p>
+
+                        {isContentLong(note.content) && (
+                          <button
+                            onClick={() => toggleNoteExpansion(note.id)}
+                            className="mt-2 text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                          >
+                            {isNoteExpanded(note.id) ? "See Less" : "See More"}
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {/* Footer */}

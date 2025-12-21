@@ -21,7 +21,9 @@ import type {
   IdeaComment,
   PartnershipAgreement,
   Milestone,
-  CalendarEvent
+  CalendarEvent,
+  Task,
+  CoFounder
 } from '@/types';
 
 // ============================================

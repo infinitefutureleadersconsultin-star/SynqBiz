@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import ChatInterface from "@/components/ChatInterface";
 import MetricsHistory from "@/components/MetricsHistory";
+import TaskList from "@/components/TaskList";
 import {
   DollarSign,
   Users,
@@ -304,6 +305,16 @@ export default function SoyaDashboard() {
         <ChatInterface
           userId={userId}
           onMetricsSaved={() => loadMetrics(userId)}
+        />
+      )}
+
+      {/* Weekly Tasks */}
+      {userId && (
+        <TaskList
+          userId={userId}
+          owner="soya"
+          title="Soya's Tasks This Week"
+          onTaskCompleted={() => loadMetrics(userId)}
         />
       )}
 

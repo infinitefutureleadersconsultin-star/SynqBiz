@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getCurrentUser } from "@/lib/firebase";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import TaskList from "@/components/TaskList";
 import {
   TrendingUp,
   TrendingDown,
@@ -31,6 +32,7 @@ interface MetricsSummary {
 
 export default function OverviewPage() {
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string>('');
   const [metrics, setMetrics] = useState<MetricsSummary>({
     isaiah: { totalOutreach: 0, weeklyOutreach: 0, totalMeetings: 0, weeklyMeetings: 0 },
     soya: { totalRevenue: 0, totalSignups: 0, weeklySignups: 0, weeklyTickets: 0 },
@@ -42,6 +44,11 @@ export default function OverviewPage() {
 
   async function loadMetrics() {
     try {
+      const user = await getCurrentUser();
+      if (user) {
+        setUserId(user.uid);
+      }
+
       // This will be replaced with actual database queries once Supabase is set up
       // For now, using placeholder data
       setMetrics({
@@ -149,6 +156,14 @@ export default function OverviewPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Weekly Tasks - All Co-Founders */}
+      {userId && (
+        <TaskList
+          userId={userId}
+          title="All Tasks This Week (Issiah & Soya)"
+        />
+      )}
 
       {/* Co-Founder Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

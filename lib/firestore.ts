@@ -420,6 +420,25 @@ export async function getCurrentAgreement() {
 }
 
 /**
+ * Update the content of an existing partnership agreement
+ */
+export async function updateAgreementContent(agreementId: string, newContent: string, newVersion: string) {
+  try {
+    const agreementRef = doc(db, 'partnership_agreements', agreementId);
+    await updateDoc(agreementRef, {
+      content: newContent,
+      version: newVersion,
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error updating agreement content:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Sign partnership agreement
  */
 export async function signAgreement(

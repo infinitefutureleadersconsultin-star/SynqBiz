@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { getCurrentUser } from "@/lib/firebase";
-import { getCurrentAgreement, signAgreement, savePartnershipAgreement } from "@/lib/firestore";
+import { getCurrentAgreement, signAgreement, savePartnershipAgreement, updateAgreementContent } from "@/lib/firestore";
 import { PARTNERSHIP_AGREEMENT_CONTENT, AGREEMENT_VERSION } from "@/lib/partnershipAgreement";
 import { generateAgreementPDF } from "@/lib/pdfGenerator";
 import type { PartnershipAgreement as AgreementType } from "@/types";
@@ -16,6 +16,7 @@ export default function PartnershipAgreement() {
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [signing, setSigning] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const [showSignature, setShowSignature] = useState(false);
   const [userRole, setUserRole] = useState<'issiah' | 'soya' | null>(null);
   const [userId, setUserId] = useState<string>('');
@@ -90,6 +91,31 @@ export default function PartnershipAgreement() {
       alert('❌ Error creating agreement. Please try again.');
     } finally {
       setCreating(false);
+    }
+  }
+
+  async function updateExistingAgreement() {
+    if (!agreement) return;
+
+    setUpdating(true);
+    try {
+      const result = await updateAgreementContent(
+        agreement.id,
+        PARTNERSHIP_AGREEMENT_CONTENT,
+        AGREEMENT_VERSION
+      );
+
+      if (result.success) {
+        alert('✅ Partnership Agreement updated successfully! Refreshing...');
+        await loadAgreementAndUser();
+      } else {
+        alert(`❌ Failed to update agreement: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error updating agreement:', error);
+      alert('❌ Error updating agreement. Please try again.');
+    } finally {
+      setUpdating(false);
     }
   }
 
@@ -381,6 +407,17 @@ export default function PartnershipAgreement() {
               <Download className="w-4 h-4" />
               Download PDF
             </Button>
+
+            {agreement.version !== AGREEMENT_VERSION && (
+              <Button
+                onClick={updateExistingAgreement}
+                isLoading={updating}
+                disabled={updating}
+                className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700"
+              >
+                {updating ? 'Updating...' : `Update to V${AGREEMENT_VERSION}`}
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>

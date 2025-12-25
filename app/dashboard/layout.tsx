@@ -11,7 +11,8 @@ import {
   LogOut,
   Menu,
   X,
-  Rocket
+  Rocket,
+  TrendingUp
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -48,6 +49,7 @@ export default function DashboardLayout({
     { name: "Overview", href: "/dashboard/overview", icon: LayoutDashboard },
     { name: "Issiah's Dashboard", href: "/dashboard/isaiah", icon: User },
     { name: "Soya's Dashboard", href: "/dashboard/soya", icon: Users },
+    { name: "Competitor Analysis", href: "/dashboard/competitors", icon: TrendingUp },
     { name: "Phase 4 Features", href: "/dashboard/phase4", icon: Rocket },
   ];
 

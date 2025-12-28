@@ -471,10 +471,15 @@ def create_action_items_tab(ws):
         cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
 
     high_priority = [
-        ["Sponsor Matching", "Build excellent AI matching algorithm", "Our 12% commission must feel justified by quality matches", "HIGH"],
-        ["Verification System", "Robust photo upload + attendance tracking", "Sponsors need proof their money worked", "HIGH"],
-        ["Dashboard Savings Display", "Show subscribers monthly savings vs 5%", "Psychological win every month", "HIGH"],
-        ["Ambassador Visibility", "Prominently feature program in UI", "Users won't discover it unless we surface it", "HIGH"]
+        ["✓ Sponsor Matching", "Build excellent AI matching algorithm", "Our 12% commission must feel justified by quality matches", "COMPLETED"],
+        ["✓ Verification System", "Robust photo upload + attendance tracking", "Sponsors need proof their money worked", "COMPLETED"],
+        ["✓ Dashboard Savings Display", "Show subscribers monthly savings vs 5%", "Psychological win every month", "COMPLETED"],
+        ["Ambassador Visibility", "Prominently feature program in UI", "Users won't discover it unless we surface it", "HIGH"],
+        ["Event Collaboration/Co-hosting", "Multi-host event collaboration system:\n• Primary & secondary event hosts\n• Real-time ticket revenue tracking for all hosts\n• Customizable revenue split (50/50, 60/40, etc.)\n• Primary host controls fund distribution\n• Venue payment tracking/metrics\n• Multi-city tour dashboard\n• Track all events under one tour umbrella", "Game-changer for large-scale events and tours. Creates network effects - hosts bring other hosts. Differentiates us from all competitors who only support single-host events.", "HIGH"],
+        ["Promoter Referral System", "Role-based promoter program:\n• Event hosts assign 'promoter' roles\n• Unique tracking links/QR codes per promoter\n• Track ticket sales by promoter link\n• Automatic commission payouts\n• Works like affiliate program but for event promotion\n• Promoters share on Instagram/TikTok stories", "Viral growth engine. Turns every event into distributed sales team. Promoters are incentivized to drive ticket sales. Event hosts get free marketing.", "HIGH"],
+        ["Landing Page Overhaul", "PRICING: Only 2 tiers:\n• Free: Unlimited events, basic features\n• $100/mo: Money-making features (was $19)\n\nMESSAGING:\n• Focus on ROI, not features\n• 'Save X, Make Y' psychology\n• Fewer words, clearer value\n• Show savings/earnings potential per feature\n\nCOMPETITOR COMPARISON:\n• REMOVE from landing page entirely\n• Move to post-signup dashboard\n• Only show after they're already users\n• Prevent competitors from copying our strategy", "Simplicity converts better. People don't want subscriptions - they want to 'pay when they get paid' or see clear ROI. Hiding competitor intel protects our competitive advantage.", "HIGH"],
+        ["Venue Partnership System", "Venue integration features:\n• Venues can create accounts\n• Event hosts connect their venue\n• Transparent revenue sharing dashboard\n• Track bar/food/door splits in real-time\n• Simple fund distribution\n\nVENUE LOCK-IN STRATEGY:\n• Partner with venues to require SponsorSynq\n• 'Want to use our venue? Use SponsorSynq'\n• Creates vendor lock-in\n• Eliminates competition with Eventbrite/Posh\n• Market domination through venue partnerships", "This is the ULTIMATE competitive moat. If venues require SponsorSynq, event hosts have no choice. We stop competing on features and own the distribution channel. Venue adoption = market domination.", "HIGH"],
+        ["Revenue Stream Documentation", "Comprehensive revenue analysis:\n• Document ALL current revenue streams\n• Platform fee, processing, sponsorship commission, etc.\n• Strategy for free events (no ticket sales)\n• How to monetize users who don't charge for tickets?\n• Options: Sponsorship-only commission, require subscription, tiered free limits\n• Question: Is free platform usage okay if it brings brand awareness?\n• Alternative revenue from free event hosts?", "Need clarity on business model edge cases. Free events still have value (brand awareness, sponsor discovery) but need strategy to ensure sustainable revenue. Must balance growth with monetization.", "HIGH"]
     ]
 
     row = 10
@@ -483,6 +488,13 @@ def create_action_items_tab(ws):
         ws[f'B{row}'] = item[1]
         ws[f'C{row}'] = item[2]
         ws[f'D{row}'] = item[3]
+
+        # Style completed items differently
+        if item[3] == "COMPLETED":
+            completed_fill = PatternFill(start_color="E2EFDA", end_color="E2EFDA", fill_type="solid")
+            for col in range(1, 5):
+                ws.cell(row, col).fill = completed_fill
+                ws.cell(row, col).font = Font(color="70AD47", italic=True)
 
         for col in range(1, 5):
             cell = ws.cell(row, col)
@@ -495,6 +507,10 @@ def create_action_items_tab(ws):
             )
 
         row += 1
+
+    # Set row heights for high priority items (more content now)
+    for i in range(10, row):
+        ws.row_dimensions[i].height = 120
 
     # Spacing
     ws.row_dimensions[row].height = 5

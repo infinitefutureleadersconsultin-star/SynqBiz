@@ -13,7 +13,7 @@ export default function CompetitorsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Competitor Analysis</h1>
-          <p className="text-gray-600 mt-1">SponsorSynq vs Eventbrite & Market Competitors</p>
+          <p className="text-gray-600 mt-1">SponsorSynq vs Eventbrite, Posh & Market Competitors</p>
         </div>
         <a
           href="/SponsorSynq_Competitor_Comparison.xlsx"
@@ -120,25 +120,26 @@ function TabButton({
 
 function QuickComparisonTab() {
   const comparisons = [
-    { feature: "Processing Fee", us: "~3% + $0.30", them: "~6.6% + $1.79", winner: "us" },
-    { feature: "Platform Fee", us: "5% (waivable)", them: "~6.6% + $1.79 (not waivable)", winner: "us" },
-    { feature: "First Event", us: "FREE", them: "Fees apply", winner: "us" },
-    { feature: "Subscription Waives Fees?", us: "YES", them: "NO (double-dip)", winner: "us" },
-    { feature: "Sponsor Marketplace", us: "YES (built-in)", them: "NO", winner: "us" },
-    { feature: "Sponsor Matching AI", us: "YES", them: "NO", winner: "us" },
-    { feature: "Instant Payout", us: "YES (1.5%)", them: "NO", winner: "us" },
-    { feature: "Pricing Changes Since 2007", us: "0 (we're new)", them: "11 times", winner: "us" },
-    { feature: "Referral Program Cap", us: "UNLIMITED + rev share", them: "$50 max", winner: "us" },
-    { feature: "Free Event Posting", us: "YES", them: "YES (restored after backlash)", winner: "tie" },
-    { feature: "Brand Recognition", us: "New/Unknown", them: "Industry Leader", winner: "them" },
-    { feature: "Enterprise Clients", us: "Building", them: "Established", winner: "them" },
-    { feature: "Global Infrastructure", us: "Building", them: "180+ countries", winner: "them" },
+    { feature: "Processing Fee", us: "~3% + $0.30", eventbrite: "~6.6% + $1.79", posh: "10% + $0.99", winner: "us" },
+    { feature: "Platform Fee", us: "5% (waivable)", eventbrite: "Included in 6.6%", posh: "Included in 10%", winner: "us" },
+    { feature: "Subscription to Waive Fees", us: "$100/mo waives 5%", eventbrite: "NO fee waiver", posh: "No subscription", winner: "us" },
+    { feature: "Sponsor Marketplace", us: "YES (AI-powered)", eventbrite: "NO", posh: "NO", winner: "us" },
+    { feature: "Sponsor Matching AI", us: "YES", eventbrite: "NO", posh: "NO", winner: "us" },
+    { feature: "Event Collaboration", us: "YES (multi-host)", eventbrite: "NO", posh: "NO", winner: "us" },
+    { feature: "Venue Partnerships", us: "YES (lock-in strategy)", eventbrite: "NO", posh: "NO", winner: "us" },
+    { feature: "Promoter/Affiliate System", us: "YES ($100 tier)", eventbrite: "NO", posh: "YES (Kickback)", winner: "tie" },
+    { feature: "Daily Payouts", us: "NO (3-5 days)", eventbrite: "NO (5 days)", posh: "YES (automatic)", winner: "posh" },
+    { feature: "SMS Marketing", us: "Planned ($100 tier)", eventbrite: "Limited", posh: "YES (all users)", winner: "posh" },
+    { feature: "Mobile App", us: "NO (web)", eventbrite: "YES", posh: "YES (social)", winner: "them" },
+    { feature: "Team Permissions", us: "Planned", eventbrite: "YES", posh: "YES (role-based)", winner: "them" },
+    { feature: "Tables/Bottle Service", us: "NO", eventbrite: "NO", posh: "YES", winner: "posh" },
+    { feature: "Brand Recognition", us: "New/Unknown", eventbrite: "Industry Leader", posh: "Nightlife Leader", winner: "them" },
   ];
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Head-to-Head: SponsorSynq vs Eventbrite</CardTitle>
+        <CardTitle>Head-to-Head: SponsorSynq vs Eventbrite & Posh</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -148,6 +149,7 @@ function QuickComparisonTab() {
                 <th className="text-left py-3 px-4 font-semibold text-gray-900">Feature</th>
                 <th className="text-left py-3 px-4 font-semibold text-primary-700">SponsorSynq</th>
                 <th className="text-left py-3 px-4 font-semibold text-gray-700">Eventbrite</th>
+                <th className="text-left py-3 px-4 font-semibold text-purple-700">Posh</th>
                 <th className="text-center py-3 px-4 font-semibold text-gray-900">Winner</th>
               </tr>
             </thead>
@@ -156,7 +158,8 @@ function QuickComparisonTab() {
                 <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="py-3 px-4 font-medium text-gray-900">{comp.feature}</td>
                   <td className="py-3 px-4 text-gray-700">{comp.us}</td>
-                  <td className="py-3 px-4 text-gray-700">{comp.them}</td>
+                  <td className="py-3 px-4 text-gray-700">{comp.eventbrite}</td>
+                  <td className="py-3 px-4 text-gray-700">{comp.posh}</td>
                   <td className="py-3 px-4 text-center">
                     {comp.winner === "us" && (
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
@@ -168,6 +171,12 @@ function QuickComparisonTab() {
                       <span className="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
                         <XCircle className="w-3 h-3" />
                         Them
+                      </span>
+                    )}
+                    {comp.winner === "posh" && (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">
+                        <AlertCircle className="w-3 h-3" />
+                        Posh
                       </span>
                     )}
                     {comp.winner === "tie" && (
@@ -182,10 +191,14 @@ function QuickComparisonTab() {
             </tbody>
           </table>
         </div>
-        <div className="mt-6 grid grid-cols-3 gap-4">
+        <div className="mt-6 grid grid-cols-4 gap-4">
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <div className="text-3xl font-bold text-green-700">9</div>
+            <div className="text-3xl font-bold text-green-700">7</div>
             <div className="text-sm text-green-600 font-medium">We Win</div>
+          </div>
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div className="text-3xl font-bold text-purple-700">3</div>
+            <div className="text-sm text-purple-600 font-medium">Posh Wins</div>
           </div>
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <div className="text-3xl font-bold text-yellow-700">1</div>
@@ -204,40 +217,46 @@ function QuickComparisonTab() {
 function RevenueStreamsTab() {
   const streams = [
     {
-      name: "Processing Fee",
-      us: "~3% + $0.30 per ticket\nPassed to attendee at checkout\nBoth Free & $100 tiers",
-      eventbrite: "3.7% + $1.79 service fee\nPLUS 2.9% processing\nTotal: ~6.6% + $1.79",
-      win: "Significantly cheaper\nTransparent pricing\nNo hidden fees"
+      name: "Total Fees Comparison",
+      us: "Free tier: ~8% + $0.30 total\n$100 tier: ~3% + $0.30 total\nOn $20 ticket: $1.90 (Free) or $0.90 (Paid)",
+      eventbrite: "~6.6% + $1.79 total\nOn $20 ticket: $3.11\nNever gets cheaper",
+      posh: "10% + $0.99 total\nOn $20 ticket: $2.99\nNever gets cheaper",
+      win: "We're cheapest on Free tier\nEVEN CHEAPER on $100 tier\n500 tickets at $30 = save $845 vs Posh"
     },
     {
-      name: "Platform Fee",
-      us: "5% of ticket revenue (Free tier only)\nCompletely WAIVED for $100/mo subscribers\nBreakeven: $2,000/mo in sales",
-      eventbrite: "~6.6% + $1.79 per ticket\nNEVER waived\nSubscription doesn't reduce fees\nDouble-dipping on customers",
-      win: "Our subscription SAVES money\nEventbrite charges subscription AND fees\nWe don't double-dip"
+      name: "Sponsor Marketplace (BIGGEST DIFFERENTIATOR)",
+      us: "12% commission on sponsor deals\n$100 sponsor = $12 to us, $88 to host\nAI matching, automated offers\nBoth Free & $100 tiers",
+      eventbrite: "NOTHING\nNo sponsor marketplace\nHosts cold email alone",
+      posh: "NOTHING\nNo sponsor marketplace\nHosts find sponsors manually",
+      win: "ONLY PLATFORM with sponsor marketplace\nNeither competitor can match\n12% vs 15-25% traditional agencies\nThis is our moat"
     },
     {
-      name: "Subscription ($100/mo)",
-      us: "$100/month\nWaives 5% platform fee entirely\nIncludes re-engagement, promoters, collaboration\nBreakeven at $2K/mo ticket sales",
-      eventbrite: "$15-100/month\nDoes NOT waive fees\nOnly adds email/marketing features\nYou pay subscription AND all fees",
-      win: "Ours actually saves money\nTheirs is pure additional cost\nWe reward active hosts"
+      name: "Subscription Value",
+      us: "$100/month\nWaives 5% platform fee entirely\nIncludes re-engagement, promoters, collaboration\nBreakeven: $2K/mo, saves more above that",
+      eventbrite: "$15-100/month\nDoes NOT waive fees\nDouble-dipping\nPay subscription AND all fees",
+      posh: "NO SUBSCRIPTION\nCannot reduce 10% fee\nNo way to save money",
+      win: "We reward high-volume hosts\nPosh locks everyone at 10% forever\nEventbrite charges both subscription + fees"
     },
     {
-      name: "Sponsor Commission",
-      us: "12% of sponsor allocations\nTaken before host payout\n$100 sponsor = $12 to us, $88 to host\nBoth Free & $100 tiers",
-      eventbrite: "NOTHING\nNo sponsor marketplace exists\nHosts cold email alone\nNo matching, no automation",
-      win: "ONLY platform with sponsor marketplace\nEventbrite literally can't compete\n12% vs 15-25% traditional agencies"
+      name: "Event Collaboration Revenue",
+      us: "Multi-host events with revenue splits\nAutomatic fund distribution\nTour dashboard grouping\nVenue payment tracking",
+      eventbrite: "NO collaboration features\nManual coordination required",
+      posh: "NO collaboration features\nManual coordination required",
+      win: "ONLY PLATFORM with native collaboration\nCreates network effects\nHosts bring other hosts"
     },
     {
-      name: "Promoter Commission",
-      us: "Small % of ticket sales through promoter links\nHost sets commission rate\nWe facilitate tracking & payout\nOnly $100/mo tier has access",
-      eventbrite: "NOTHING\nNo promoter tracking system\nHosts manually track sales\nProne to errors and disputes",
-      win: "Automated affiliate system for events\nTurns host's network into sales team\nOnly costs when sales happen"
+      name: "Promoter/Affiliate Commission",
+      us: "Planned for $100 tier\nHost-set commission rates\nAutomatic tracking & payout\nQR codes + links",
+      eventbrite: "NOTHING\nManual tracking only",
+      posh: "Kickback system (mature)\nPublic + private affiliates\nAuto payouts 1-2 days\n20% platform fee on commissions",
+      win: "POSH WINS HERE (for now)\nThey have 11% avg revenue from Kickback\nWe need to match or exceed"
     },
     {
-      name: "Instant Payout",
-      us: "1.5% of payout, capped at $15 max\n$500 payout = $7.50 fee\n$10,000 payout = $15 fee (not $150)\nAvailable to both Free & $100 tiers",
-      eventbrite: "Standard: 5 business days\nNO instant option available\nNeed money faster? Too bad.",
-      win: "We offer it - Eventbrite doesn't\n$15 cap makes it affordable for large events\nCompetitive with PayPal (1.75%)"
+      name: "Payout Speed",
+      us: "Standard: 3-5 days (free)\nInstant: 1.5% capped at $15 (optional)",
+      eventbrite: "Standard: 5 days only\nNo instant option",
+      posh: "DAILY automatic payouts\nAs tickets sell\nCash flow advantage",
+      win: "POSH WINS HERE\nDaily payouts critical for hosts\nWe need to add this feature"
     }
   ];
 
@@ -249,17 +268,21 @@ function RevenueStreamsTab() {
             <CardTitle>{stream.name}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-3 gap-6 mt-4">
+            <div className="grid md:grid-cols-4 gap-4 mt-4">
               <div>
-                <h4 className="font-semibold text-primary-700 mb-2">What We Charge</h4>
+                <h4 className="font-semibold text-primary-700 mb-2">SponsorSynq</h4>
                 <p className="text-sm text-gray-700 whitespace-pre-line">{stream.us}</p>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-700 mb-2">What Eventbrite Charges</h4>
+                <h4 className="font-semibold text-gray-700 mb-2">Eventbrite</h4>
                 <p className="text-sm text-gray-700 whitespace-pre-line">{stream.eventbrite}</p>
               </div>
+              <div>
+                <h4 className="font-semibold text-purple-700 mb-2">Posh</h4>
+                <p className="text-sm text-gray-700 whitespace-pre-line">{stream.posh}</p>
+              </div>
               <div className="bg-green-50 rounded-lg p-4">
-                <h4 className="font-semibold text-green-800 mb-2">Where We Win</h4>
+                <h4 className="font-semibold text-green-800 mb-2">Analysis</h4>
                 <p className="text-sm text-green-700 whitespace-pre-line">{stream.win}</p>
               </div>
             </div>
@@ -395,29 +418,34 @@ function RevenueSummaryTab() {
 function ActionItemsTab() {
   const highPriority = [
     {
+      area: "Daily Payouts (CRITICAL - Posh Has This)",
+      task: "Automatic daily payouts as tickets sell:\n• Hosts receive money daily instead of waiting 3-5 days\n• Critical cash flow advantage for hosts paying vendors/venues upfront\n• Include in $100/mo tier or offer as separate option\n• Posh has this as standard - hosts will see our 3-5 day as downgrade\n\nIMPLEMENTATION:\n• Integrate with Stripe's scheduled payouts\n• Allow hosts to choose daily vs standard\n• Track payout history and show next payout date",
+      why: "CRITICAL GAP vs Posh. Their hosts get money daily. Ours wait 3-5 days. This is a major switching barrier. Without this, Posh hosts won't move to us even with sponsor marketplace advantage."
+    },
+    {
+      area: "SMS Marketing (CRITICAL - Posh Has This)",
+      task: "SMS broadcast capabilities matching Posh:\n• Send SMS blasts to past attendees about new events\n• Segment by event category, location, purchase history\n• Track conversion rates (Posh claims 32% of inventory sold via SMS)\n• Automated notifications when new events match attendee interests\n• Include in $100/mo tier\n\nIMPLEMENTATION:\n• Integrate Twilio or similar SMS API\n• Build audience segmentation tools\n• Track SMS → ticket conversion",
+      why: "CRITICAL GAP vs Posh. They sell 32% of tickets through SMS blasts. This is a proven, high-ROI re-engagement channel. Without it, our $100 tier is incomplete compared to Posh's free features."
+    },
+    {
+      area: "Promoter System Enhancement (Match Posh Kickback)",
+      task: "Enhanced promoter/affiliate system matching Posh Kickback:\n• PUBLIC Kickback: All ticket buyers get referral link automatically\n• PRIVATE Kickback: Invite-only for influencers/partners\n• Automatic commission tracking via unique links + QR codes\n• Automatic payouts every 1-2 business days\n• Detailed analytics showing sales/conversions per promoter\n• Host sets commission (flat fee or %)\n\nNOTE: Posh gets 11% avg additional revenue from Kickback\nNOTE: Posh charges 20% platform fee on Kickback commissions",
+      why: "Posh's Kickback is mature and proven ($35K additional revenue for top events). Our planned promoter system must match or exceed this. Public kickback (all buyers become affiliates) is genius for viral growth."
+    },
+    {
       area: "Event Collaboration/Co-hosting",
       task: "Multi-host event collaboration system:\n• Primary & secondary event hosts\n• Real-time ticket revenue tracking for all hosts\n• Customizable revenue split (50/50, 60/40, etc.)\n• Primary host controls fund distribution\n• Venue payment tracking/metrics\n• Multi-city tour dashboard\n• Track all events under one tour umbrella",
-      why: "Game-changer for large-scale events and tours. Creates network effects - hosts bring other hosts. Differentiates us from all competitors who only support single-host events."
+      why: "UNIQUE DIFFERENTIATOR. Neither Eventbrite nor Posh have this. Creates network effects - hosts bring other hosts. Game-changer for tours and large-scale events."
     },
     {
-      area: "Promoter Referral System",
-      task: "Role-based promoter program:\n• Event hosts assign 'promoter' roles\n• Unique tracking links/QR codes per promoter\n• Track ticket sales by promoter link\n• Automatic commission payouts\n• Works like affiliate program but for event promotion\n• Promoters share on Instagram/TikTok stories",
-      why: "Viral growth engine. Turns every event into distributed sales team. Promoters are incentivized to drive ticket sales. Event hosts get free marketing."
+      area: "Venue Partnership System (ULTIMATE MOAT)",
+      task: "Venue integration + lock-in strategy:\n• Venues can create accounts\n• Event hosts connect their venue\n• Transparent revenue sharing dashboard\n• Track bar/food/door splits in real-time\n• Simple fund distribution\n\nVENUE LOCK-IN STRATEGY:\n• Partner with venues to require SponsorSynq\n• 'Want to use our venue? Use SponsorSynq'\n• Creates vendor lock-in\n• Eliminates competition with Eventbrite/Posh",
+      why: "ULTIMATE COMPETITIVE MOAT. Neither competitor has this. If venues require SponsorSynq, hosts have no choice. We stop competing on features and own the distribution channel. Market domination strategy."
     },
     {
-      area: "Landing Page Overhaul",
-      task: "PRICING: Only 2 tiers:\n• Free: Unlimited events, basic features\n• $100/mo: Money-making features (was $19)\n\nMESSAGING:\n• Focus on ROI, not features\n• 'Save X, Make Y' psychology\n• Fewer words, clearer value\n• Show savings/earnings potential per feature\n\nCOMPETITOR COMPARISON:\n• REMOVE from landing page entirely\n• Move to post-signup dashboard\n• Only show after they're already users\n• Prevent competitors from copying our strategy",
-      why: "Simplicity converts better. People don't want subscriptions - they want to 'pay when they get paid' or see clear ROI. Hiding competitor intel protects our competitive advantage."
-    },
-    {
-      area: "Venue Partnership System",
-      task: "Venue integration features:\n• Venues can create accounts\n• Event hosts connect their venue\n• Transparent revenue sharing dashboard\n• Track bar/food/door splits in real-time\n• Simple fund distribution\n\nVENUE LOCK-IN STRATEGY:\n• Partner with venues to require SponsorSynq\n• 'Want to use our venue? Use SponsorSynq'\n• Creates vendor lock-in\n• Eliminates competition with Eventbrite/Posh\n• Market domination through venue partnerships",
-      why: "This is the ULTIMATE competitive moat. If venues require SponsorSynq, event hosts have no choice. We stop competing on features and own the distribution channel. Venue adoption = market domination."
-    },
-    {
-      area: "Revenue Stream Documentation",
-      task: "Comprehensive revenue analysis:\n• Document ALL current revenue streams\n• Platform fee, processing, sponsorship commission, etc.\n• Strategy for free events (no ticket sales)\n• How to monetize users who don't charge for tickets?\n• Options: Sponsorship-only commission, require subscription, tiered free limits\n• Question: Is free platform usage okay if it brings brand awareness?\n• Alternative revenue from free event hosts?",
-      why: "Need clarity on business model edge cases. Free events still have value (brand awareness, sponsor discovery) but need strategy to ensure sustainable revenue. Must balance growth with monetization."
+      area: "Team Permissions (CRITICAL - Both Competitors Have This)",
+      task: "Role-based team access:\n• Admin: Full access to everything\n• Finance: Revenue, payouts, refunds only\n• Marketing: SMS, promotions, analytics only\n• Door Staff: Check-in only\n• Custom roles with granular permissions\n\nUSE CASE: Large events have teams - promoters, door staff, marketing, finance\nPosh and Eventbrite both have robust team management",
+      why: "TABLE STAKES feature both competitors have. Professional events need team collaboration. Without this, we look amateur compared to Posh/Eventbrite."
     },
   ];
 

@@ -205,27 +205,39 @@ function RevenueStreamsTab() {
   const streams = [
     {
       name: "Processing Fee",
-      us: "~3% + $0.30 per ticket\nPassed to attendee",
+      us: "~3% + $0.30 per ticket\nPassed to attendee at checkout\nBoth Free & $100 tiers",
       eventbrite: "3.7% + $1.79 service fee\nPLUS 2.9% processing\nTotal: ~6.6% + $1.79",
       win: "Significantly cheaper\nTransparent pricing\nNo hidden fees"
     },
     {
       name: "Platform Fee",
-      us: "5% of ticket revenue\nOnly on 2nd+ events\n1st event FREE\nWaived with $19/mo",
-      eventbrite: "~6.6% + $1.79 per ticket\nChanged pricing 11 times\nRemoved free tier in 2023",
-      win: "Simple & transparent\nFirst event free builds trust\nSubscription waives entirely"
+      us: "5% of ticket revenue (Free tier only)\nCompletely WAIVED for $100/mo subscribers\nBreakeven: $2,000/mo in sales",
+      eventbrite: "~6.6% + $1.79 per ticket\nNEVER waived\nSubscription doesn't reduce fees\nDouble-dipping on customers",
+      win: "Our subscription SAVES money\nEventbrite charges subscription AND fees\nWe don't double-dip"
+    },
+    {
+      name: "Subscription ($100/mo)",
+      us: "$100/month\nWaives 5% platform fee entirely\nIncludes re-engagement, promoters, collaboration\nBreakeven at $2K/mo ticket sales",
+      eventbrite: "$15-100/month\nDoes NOT waive fees\nOnly adds email/marketing features\nYou pay subscription AND all fees",
+      win: "Ours actually saves money\nTheirs is pure additional cost\nWe reward active hosts"
     },
     {
       name: "Sponsor Commission",
-      us: "12% of sponsor allocations\nTaken before host payout\n$100 = $12 to us, $88 to host",
-      eventbrite: "NOTHING\nNo sponsor marketplace\nHosts find sponsors alone",
-      win: "ONLY platform with sponsor marketplace\nEventbrite can't compete here\n12% vs 15-25% agencies"
+      us: "12% of sponsor allocations\nTaken before host payout\n$100 sponsor = $12 to us, $88 to host\nBoth Free & $100 tiers",
+      eventbrite: "NOTHING\nNo sponsor marketplace exists\nHosts cold email alone\nNo matching, no automation",
+      win: "ONLY platform with sponsor marketplace\nEventbrite literally can't compete\n12% vs 15-25% traditional agencies"
+    },
+    {
+      name: "Promoter Commission",
+      us: "Small % of ticket sales through promoter links\nHost sets commission rate\nWe facilitate tracking & payout\nOnly $100/mo tier has access",
+      eventbrite: "NOTHING\nNo promoter tracking system\nHosts manually track sales\nProne to errors and disputes",
+      win: "Automated affiliate system for events\nTurns host's network into sales team\nOnly costs when sales happen"
     },
     {
       name: "Instant Payout",
-      us: "1.5% of payout amount\nSame-day deposit\nStandard (3-5 days) is free",
-      eventbrite: "Standard: 5 business days\nNO instant option\nNeed money faster? Too bad",
-      win: "We offer it - Eventbrite doesn't\nCompetitive with PayPal\nMeaningful differentiation"
+      us: "1.5% of payout, capped at $15 max\n$500 payout = $7.50 fee\n$10,000 payout = $15 fee (not $150)\nAvailable to both Free & $100 tiers",
+      eventbrite: "Standard: 5 business days\nNO instant option available\nNeed money faster? Too bad.",
+      win: "We offer it - Eventbrite doesn't\n$15 cap makes it affordable for large events\nCompetitive with PayPal (1.75%)"
     }
   ];
 
@@ -263,32 +275,37 @@ function DifferentiatorsTab() {
     {
       name: "SPONSOR MARKETPLACE",
       means: "We have one. They don't.",
-      matters: "• Hosts make money they'd never find otherwise\n• This is our #1 differentiator\n• Eventbrite literally cannot compete"
+      matters: "• Hosts make money they'd never find otherwise\n• This is our #1 differentiator\n• Eventbrite literally cannot compete\n• 12% commission vs 15-25% traditional agencies"
     },
     {
       name: "REVENUE PLATFORM vs TICKETING PLATFORM",
       means: "We help hosts MAKE money\nThey just help hosts SELL tickets",
-      matters: "• Different value proposition entirely\n• We're not a cheaper Eventbrite\n• We're a different category"
+      matters: "• Different value proposition entirely\n• We're not a cheaper Eventbrite\n• We're a different category\n• Sponsors + tickets + collaboration + promoters"
     },
     {
-      name: "SUBSCRIPTION ACTUALLY SAVES MONEY",
-      means: "Our $19/mo waives fees\nTheir $15-100/mo doesn't",
-      matters: "• Eventbrite double-dips\n• We reward active hosts\n• Clear economic value"
+      name: "PAY WHEN YOU GET PAID",
+      means: "Free tier = pay nothing upfront\nOnly pay when money flows through platform",
+      matters: "• Zero risk to try unlimited events\n• Perfect for occasional hosts\n• No subscription anxiety\n• We succeed when they succeed"
     },
     {
-      name: "FIRST EVENT FREE",
-      means: "Zero risk to try\nExperience value before paying",
-      matters: "• Builds trust\n• Removes 'what if it doesn't work' anxiety\n• Converts skeptics"
+      name: "SUBSCRIPTION THAT ACTUALLY SAVES MONEY",
+      means: "$100/mo waives 5% platform fee entirely\nBreakeven at $2,000/mo in ticket sales\nEventbrite's subscription doesn't waive fees",
+      matters: "• Sell $5K/mo = save $250, pay $100 = net $150 savings\n• Eventbrite double-dips (subscription + fees)\n• We reward active hosts\n• Clear ROI, not just features"
+    },
+    {
+      name: "PROMOTER REFERRAL SYSTEM",
+      means: "Turn host's network into distributed sales team\nUnique tracking links, QR codes, auto commissions\nOnly $100/mo tier",
+      matters: "• Viral growth engine for events\n• Free marketing that only costs when sales happen\n• Eventbrite has nothing like this\n• Unlocks Instagram/TikTok promotion"
+    },
+    {
+      name: "VENUE LOCK-IN STRATEGY",
+      means: "Partner with venues to require SponsorSynq\n'Want our venue? Use our platform'\nOwn the distribution channel",
+      matters: "• Ultimate competitive moat\n• Eliminates choice, creates necessity\n• Eventbrite/Posh can't compete\n• We own infrastructure, not just features"
     },
     {
       name: "PRICING STABILITY",
-      means: "We won't surprise users\nThey've changed 11 times",
-      matters: "• Eventbrite destroyed trust\n• We can win on reliability\n• Public commitment matters"
-    },
-    {
-      name: "AMBASSADOR PROGRAM",
-      means: "Tiered rewards + revenue share\nTheirs caps at $50",
-      matters: "• Creates true evangelists\n• Ongoing stake in platform success\n• Organic growth engine"
+      means: "We won't surprise users\nThey've changed 11 times since 2007",
+      matters: "• Eventbrite destroyed trust\n• We can win on reliability\n• Public commitment matters\n• Hosts need predictability"
     }
   ];
 
@@ -319,16 +336,16 @@ function DifferentiatorsTab() {
 
 function RevenueSummaryTab() {
   const revenues = [
-    { stream: "Processing Fee", whoPays: "Attendee", amount: "~3% + $0.30", trigger: "Every ticket", competitive: "YES - but higher", unique: false },
-    { stream: "Platform Fee", whoPays: "Host", amount: "5%", trigger: "2nd+ event, non-subscriber", competitive: "YES - but not waivable", unique: false },
-    { stream: "Subscription", whoPays: "Host", amount: "$19/month", trigger: "Optional, waives 5% fee", competitive: "YES - but doesn't waive fees", unique: false },
-    { stream: "Sponsor Commission", whoPays: "Sponsor", amount: "12%", trigger: "Every sponsorship deal", competitive: "NO - we're the only one", unique: true },
-    { stream: "Featured Placement", whoPays: "Sponsor", amount: "$29", trigger: "Optional add-on", competitive: "NO - unique product", unique: true },
-    { stream: "Instant Payout", whoPays: "Host", amount: "1.5%", trigger: "Optional, on-demand", competitive: "NO - Eventbrite doesn't offer", unique: true },
-    { stream: "Premium Analytics", whoPays: "Host", amount: "$7/month", trigger: "Optional (free w/ Pro)", competitive: "PARTIAL - bundled only", unique: false },
-    { stream: "Event Boost", whoPays: "Host", amount: "$15", trigger: "Optional, per event", competitive: "NO - unique to sponsors", unique: true },
-    { stream: "Enterprise License", whoPays: "University", amount: "$10K-25K/year", trigger: "Annual contract", competitive: "YES - but no sponsor integration", unique: false },
-    { stream: "Ambassador Program", whoPays: "N/A (we pay)", amount: "Credits + rev share", trigger: "Successful referrals", competitive: "WEAK - Eventbrite caps at $50", unique: false },
+    { stream: "Processing Fee", whoPays: "Attendee", amount: "~3% + $0.30", trigger: "Every ticket (both tiers)", competitive: "YES - but higher", unique: false },
+    { stream: "Platform Fee", whoPays: "Host (Free tier)", amount: "5% of revenue", trigger: "All ticket sales on Free tier", competitive: "YES - but not waivable", unique: false },
+    { stream: "Subscription", whoPays: "Host", amount: "$100/month", trigger: "Optional upgrade, waives 5% fee entirely", competitive: "YES - but theirs doesn't waive fees", unique: false },
+    { stream: "Sponsor Commission", whoPays: "Sponsor", amount: "12%", trigger: "Every sponsorship deal (both tiers)", competitive: "NO - we're the only one", unique: true },
+    { stream: "Promoter Commission", whoPays: "Event sales via promoter", amount: "% of sale", trigger: "When promoter link/QR code used ($100 tier only)", competitive: "NO - unique automated system", unique: true },
+    { stream: "Instant Payout Fee", whoPays: "Host", amount: "1.5% (max $15)", trigger: "Optional same-day payout (both tiers)", competitive: "NO - Eventbrite doesn't offer", unique: true },
+    { stream: "Event Boost", whoPays: "Host (Free tier)", amount: "$15/7 days", trigger: "Optional sponsor visibility boost", competitive: "NO - unique to sponsor discovery", unique: true },
+    { stream: "Featured Placement", whoPays: "Sponsor", amount: "$29/14 days", trigger: "Optional priority placement", competitive: "NO - unique product", unique: true },
+    { stream: "Enterprise License", whoPays: "University", amount: "$10K-25K/year", trigger: "Annual contract with compliance features", competitive: "YES - but no sponsor integration", unique: false },
+    { stream: "Ambassador Program", whoPays: "N/A (we pay)", amount: "Credits + rev share", trigger: "Successful host referrals", competitive: "WEAK - Eventbrite caps at $50", unique: false },
   ];
 
   return (
@@ -417,8 +434,8 @@ function ActionItemsTab() {
     },
     {
       area: "Annual Subscription",
-      task: "WHAT: Yearly payment option for Pro subscription\n\nWHERE: Pricing page and subscription settings\n\nWHEN: Event hosts choose subscription plan (currently $19/month only)\n\nHOW IT WORKS:\n• Current: $19/month only ($228/year)\n• Add option: $190/year (save $38, ~17% discount)\n• Locks in user for 12 months\n• Same benefits: Waives 5% platform fee, includes Premium Analytics\n• Auto-renewal with option to cancel\n\nWHY: Annual commitments improve revenue predictability and reduce churn. Users who pay annually are more invested in the platform. Industry standard pricing psychology.",
-      why: "Annual subscriptions lock in committed hosts, reduce monthly churn, and improve financial predictability. Users who pay upfront are more likely to actively use the platform to justify their investment."
+      task: "WHAT: Yearly payment option for $100/mo subscription\n\nWHERE: Pricing page and subscription settings\n\nWHEN: Event hosts choose subscription plan (currently $100/month only)\n\nHOW IT WORKS:\n• Current: $100/month only ($1,200/year)\n• Add option: $1,000/year (save $200, ~17% discount)\n• Locks in user for 12 months\n• Same benefits: Waives 5% platform fee, re-engagement, promoters, collaboration, premium analytics\n• Auto-renewal with option to cancel\n\nWHY: Annual commitments improve revenue predictability and reduce churn. Users who pay upfront are more invested in the platform. Industry standard pricing psychology.",
+      why: "Annual subscriptions lock in committed hosts, reduce monthly churn, and improve financial predictability. $200 discount incentivizes yearly commitment while maintaining strong revenue per customer."
     },
     {
       area: "Tiered Boost Options",

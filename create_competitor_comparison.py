@@ -70,19 +70,27 @@ def create_revenue_streams_tab(ws):
         },
         {
             "name": "2. Platform Fee",
-            "we_charge": "5% of ticket revenue\nOnly on 2nd+ events\n1st event FREE\nWaived with $19/mo subscription",
-            "eventbrite": "~6.6% + $1.79 per ticket\nChanged pricing 11 times\nRemoved free tier in 2023\nConfusing structure",
+            "we_charge": "5% of ticket revenue (Free tier only)\nCompletely WAIVED for $100/mo subscribers\nBreakeven: $2,000/mo in sales\nClear ROI proposition",
+            "eventbrite": "~6.6% + $1.79 per ticket\nNEVER waived\nSubscription doesn't reduce fees\nDouble-dipping on customers",
             "others": "Meetup: $16-22/mo required\nFacebook Events: Free (no ticketing)\nEventcube: Similar to us",
-            "win": "• Simple & transparent\n• Cheaper than Eventbrite\n• First event free builds trust\n• Subscription waives entirely",
-            "improve": "• Publicly commit to pricing stability\n• Never surprise users like Eventbrite did\n• Emphasize 'pay only when you win'"
+            "win": "• Our subscription SAVES money\n• Eventbrite charges subscription AND fees\n• We don't double-dip\n• Rewards active hosts",
+            "improve": "• Show live savings calculator on dashboard\n• 'You saved $150 this month by subscribing'\n• Make ROI extremely visible"
         },
         {
             "name": "3. Monthly Subscription",
-            "we_charge": "$19/month for Pro\nWaives 5% fee entirely\nIncludes Premium Analytics ($7 value)\nBreakeven: $380/mo in sales",
-            "eventbrite": "Pro plans: $15-100/month\nFor email marketing limits\nDoes NOT waive fees\nYou pay subscription AND fees",
+            "we_charge": "$100/month\nWaives 5% fee entirely\nIncludes re-engagement, promoters, collaboration, premium analytics\nBreakeven: $2,000/mo in sales\n$5K sales = $150 net savings",
+            "eventbrite": "Pro plans: $15-100/month\nDoes NOT waive fees\nOnly adds email/marketing features\nYou pay subscription AND all fees",
             "others": "Meetup: $16-22/mo required\nNo free tier\nPay even if event flops",
-            "win": "• Subscription SAVES money\n• Eventbrite double-dips\n• Meetup charges even with no revenue\n• We reward active hosts",
-            "improve": "• Offer annual discount ($190/yr vs $228)\n• Show savings in dashboard monthly\n• Turn subscription into psychological win"
+            "win": "• Subscription SAVES money (theirs doesn't)\n• Eventbrite double-dips\n• We include money-making tools\n• Clear economic value",
+            "improve": "• Offer annual discount ($1,000/yr vs $1,200)\n• Show savings in dashboard monthly\n• Emphasize tools that make money, not just save it"
+        },
+        {
+            "name": "3b. Promoter Commission",
+            "we_charge": "Small % of sales via promoter links\nHost sets commission rate\nWe facilitate tracking & payout\nOnly $100/mo tier",
+            "eventbrite": "NOTHING\nNo promoter tracking system\nHosts manually track sales\nProne to errors and disputes",
+            "others": "Traditional affiliate platforms\nNot event-specific\nRequire separate integration",
+            "win": "• Automated affiliate system for events\n• Turns host's network into sales team\n• Only costs when sales happen\n• Unlocks Instagram/TikTok viral marketing",
+            "improve": "• Show promoter ROI data\n• Case studies of successful promoter campaigns\n• Gamification for top promoters"
         },
         {
             "name": "4. Sponsor Commission",
@@ -102,11 +110,11 @@ def create_revenue_streams_tab(ws):
         },
         {
             "name": "6. Instant Payout",
-            "we_charge": "1.5% of payout amount\nSame-day deposit\nStandard (3-5 days) is free\nCompletely optional",
-            "eventbrite": "Standard: 5 business days\nNO instant option\nNeed money faster? Too bad.",
+            "we_charge": "1.5% of payout, CAPPED at $15 max\n$500 payout = $7.50 fee\n$10,000 payout = $15 fee (not $150)\nAvailable to both Free & $100 tiers",
+            "eventbrite": "Standard: 5 business days\nNO instant option available\nNeed money faster? Too bad.",
             "others": "Stripe direct: 1%\nDoorDash: $1.99 flat\nUber: $0.85\nPayPal: 1.75%",
-            "win": "• We offer it - Eventbrite doesn't\n• Competitive with PayPal\n• Meaningful differentiation",
-            "improve": "• Consider flat fee for large payouts\n• Implement cap: 1.5% max $15\n• Communicate value: 'Pay DJ tonight'"
+            "win": "• We offer it - Eventbrite doesn't\n• $15 cap makes it affordable for large events\n• Competitive with PayPal\n• Available to everyone, not just subscribers",
+            "improve": "• Communicate value: 'Pay your DJ tonight'\n• Show savings vs uncapped fee\n• Emphasize flexibility"
         },
         {
             "name": "7. Premium Analytics",
@@ -279,32 +287,37 @@ def create_core_differentiators_tab(ws):
         {
             "name": "1. SPONSOR MARKETPLACE",
             "means": "We have one. They don't.",
-            "matters": "• Hosts make money they'd never find otherwise\n• This is our #1 differentiator\n• Eventbrite literally cannot compete"
+            "matters": "• Hosts make money they'd never find otherwise\n• This is our #1 differentiator\n• Eventbrite literally cannot compete\n• 12% commission vs 15-25% traditional agencies"
         },
         {
             "name": "2. REVENUE PLATFORM vs TICKETING PLATFORM",
             "means": "We help hosts MAKE money\nThey just help hosts SELL tickets",
-            "matters": "• Different value proposition entirely\n• We're not a cheaper Eventbrite\n• We're a different category"
+            "matters": "• Different value proposition entirely\n• We're not a cheaper Eventbrite\n• We're a different category\n• Sponsors + tickets + collaboration + promoters"
         },
         {
-            "name": "3. SUBSCRIPTION ACTUALLY SAVES MONEY",
-            "means": "Our $19/mo waives fees\nTheir $15-100/mo doesn't",
-            "matters": "• Eventbrite double-dips\n• We reward active hosts\n• Clear economic value"
+            "name": "3. PAY WHEN YOU GET PAID",
+            "means": "Free tier = pay nothing upfront\nOnly pay when money flows through platform",
+            "matters": "• Zero risk to try unlimited events\n• Perfect for occasional hosts\n• No subscription anxiety\n• We succeed when they succeed"
         },
         {
-            "name": "4. FIRST EVENT FREE",
-            "means": "Zero risk to try\nExperience value before paying",
-            "matters": "• Builds trust\n• Removes 'what if it doesn't work' anxiety\n• Converts skeptics"
+            "name": "4. SUBSCRIPTION THAT ACTUALLY SAVES MONEY",
+            "means": "$100/mo waives 5% platform fee entirely\nBreakeven at $2,000/mo in ticket sales\nEventbrite's subscription doesn't waive fees",
+            "matters": "• Sell $5K/mo = save $250, pay $100 = net $150 savings\n• Eventbrite double-dips (subscription + fees)\n• We reward active hosts\n• Clear ROI, not just features"
         },
         {
-            "name": "5. PRICING STABILITY",
-            "means": "We won't surprise users\nThey've changed 11 times",
-            "matters": "• Eventbrite destroyed trust\n• We can win on reliability\n• Public commitment matters"
+            "name": "5. PROMOTER REFERRAL SYSTEM",
+            "means": "Turn host's network into distributed sales team\nUnique tracking links, QR codes, auto commissions\nOnly $100/mo tier",
+            "matters": "• Viral growth engine for events\n• Free marketing that only costs when sales happen\n• Eventbrite has nothing like this\n• Unlocks Instagram/TikTok promotion"
         },
         {
-            "name": "6. AMBASSADOR PROGRAM",
-            "means": "Tiered rewards + revenue share\nTheirs caps at $50",
-            "matters": "• Creates true evangelists\n• Ongoing stake in platform success\n• Organic growth engine"
+            "name": "6. VENUE LOCK-IN STRATEGY",
+            "means": "Partner with venues to require SponsorSynq\n'Want our venue? Use our platform'\nOwn the distribution channel",
+            "matters": "• Ultimate competitive moat\n• Eliminates choice, creates necessity\n• Eventbrite/Posh can't compete\n• We own infrastructure, not just features"
+        },
+        {
+            "name": "7. PRICING STABILITY",
+            "means": "We won't surprise users\nThey've changed 11 times since 2007",
+            "matters": "• Eventbrite destroyed trust\n• We can win on reliability\n• Public commitment matters\n• Hosts need predictability"
         }
     ]
 
@@ -362,16 +375,16 @@ def create_revenue_summary_tab(ws):
 
     # Revenue summary data
     revenues = [
-        ["Processing Fee", "Attendee", "~3% + $0.30", "Every ticket", "YES - but higher"],
-        ["Platform Fee", "Host", "5%", "2nd+ event, non-subscriber", "YES - but not waivable"],
-        ["Subscription", "Host", "$19/month", "Optional, waives 5% fee", "YES - but doesn't waive fees"],
-        ["Sponsor Commission", "Sponsor", "12%", "Every sponsorship deal", "NO - we're the only one"],
-        ["Featured Placement", "Sponsor", "$29", "Optional add-on", "NO - unique product"],
-        ["Instant Payout", "Host", "1.5%", "Optional, on-demand", "NO - Eventbrite doesn't offer"],
-        ["Premium Analytics", "Host", "$7/month", "Optional (free w/ Pro)", "PARTIAL - bundled only"],
-        ["Event Boost", "Host", "$15", "Optional, per event", "NO - unique to sponsors"],
-        ["Enterprise License", "University", "$10K-25K/year", "Annual contract", "YES - but no sponsor integration"],
-        ["Ambassador Program", "N/A (we pay)", "Credits + rev share", "Successful referrals", "WEAK - Eventbrite caps at $50"]
+        ["Processing Fee", "Attendee", "~3% + $0.30", "Every ticket (both tiers)", "YES - but higher"],
+        ["Platform Fee", "Host (Free tier)", "5% of revenue", "All ticket sales on Free tier", "YES - but not waivable"],
+        ["Subscription", "Host", "$100/month", "Optional upgrade, waives 5% fee entirely", "YES - but theirs doesn't waive fees"],
+        ["Sponsor Commission", "Sponsor", "12%", "Every sponsorship deal (both tiers)", "NO - we're the only one"],
+        ["Promoter Commission", "Event sales via promoter", "% of sale", "When promoter link/QR code used ($100 tier only)", "NO - unique automated system"],
+        ["Instant Payout Fee", "Host", "1.5% (max $15)", "Optional same-day payout (both tiers)", "NO - Eventbrite doesn't offer"],
+        ["Event Boost", "Host (Free tier)", "$15/7 days", "Optional sponsor visibility boost", "NO - unique to sponsor discovery"],
+        ["Featured Placement", "Sponsor", "$29/14 days", "Optional priority placement", "NO - unique product"],
+        ["Enterprise License", "University", "$10K-25K/year", "Annual contract with compliance features", "YES - but no sponsor integration"],
+        ["Ambassador Program", "N/A (we pay)", "Credits + rev share", "Successful host referrals", "WEAK - Eventbrite caps at $50"]
     ]
 
     row = 2
@@ -531,7 +544,7 @@ def create_action_items_tab(ws):
     medium_priority = [
         ["Performance Tracking", "WHAT: Analytics dashboard tracking ROI of paid features\n\nWHERE: Event host dashboard - 'Marketing Performance' section\n\nWHEN: After event hosts use Event Boost ($15) or Featured Placement ($29)\n\nHOW IT WORKS:\n• Track views, clicks, sponsor offers received\n• Compare boosted vs non-boosted events\n• Show ROI: 'You spent $15, received 3 sponsor offers worth $500'\n• Export performance reports\n\nWHY: Event hosts won't pay for Boost/Featured unless they see proof it works. Need data to justify these upgrades and show clear ROI.", "Users need proof that paying for Boost/Featured actually brings more sponsors. Without tracking, they won't trust these features are worth the money. Data-driven justification drives adoption.", "MEDIUM"],
         ["Instant Payout Cap", "WHAT: Maximum fee limit on instant payout feature\n\nWHERE: Payout settings page when event host requests instant transfer\n\nWHEN: Event host clicks 'Get Paid Now' instead of waiting 3-5 days\n\nHOW IT WORKS:\n• Current: 1.5% of payout (unlimited)\n• Updated: 1.5% of payout, capped at $15 max\n• Example: $10,000 payout = $15 fee (not $150)\n• Small payouts: $500 = $7.50 (still 1.5%)\n\nWHY: Large event hosts avoid instant payout because 1.5% of $10K = $150 fee. With a $15 cap, they'll actually use it. Makes feature attractive to high-revenue events.", "Without a cap, high-earning event hosts see instant payout as too expensive ($150 on $10K). A $15 cap makes it affordable for large events while maintaining revenue on smaller payouts.", "MEDIUM"],
-        ["Annual Subscription", "WHAT: Yearly payment option for Pro subscription\n\nWHERE: Pricing page and subscription settings\n\nWHEN: Event hosts choose subscription plan (currently $19/month only)\n\nHOW IT WORKS:\n• Current: $19/month only ($228/year)\n• Add option: $190/year (save $38, ~17% discount)\n• Locks in user for 12 months\n• Same benefits: Waives 5% platform fee, includes Premium Analytics\n• Auto-renewal with option to cancel\n\nWHY: Annual commitments improve revenue predictability and reduce churn. Users who pay annually are more invested in the platform. Industry standard pricing psychology.", "Annual subscriptions lock in committed hosts, reduce monthly churn, and improve financial predictability. Users who pay upfront are more likely to actively use the platform to justify their investment.", "MEDIUM"],
+        ["Annual Subscription", "WHAT: Yearly payment option for $100/mo subscription\n\nWHERE: Pricing page and subscription settings\n\nWHEN: Event hosts choose subscription plan (currently $100/month only)\n\nHOW IT WORKS:\n• Current: $100/month only ($1,200/year)\n• Add option: $1,000/year (save $200, ~17% discount)\n• Locks in user for 12 months\n• Same benefits: Waives 5% platform fee, re-engagement, promoters, collaboration, premium analytics\n• Auto-renewal with option to cancel\n\nWHY: Annual commitments improve revenue predictability and reduce churn. Users who pay upfront are more invested in the platform. Industry standard pricing psychology.", "Annual subscriptions lock in committed hosts, reduce monthly churn, and improve financial predictability. $200 discount incentivizes yearly commitment while maintaining strong revenue per customer.", "MEDIUM"],
         ["Tiered Boost Options", "WHAT: Multiple Event Boost pricing tiers based on duration\n\nWHERE: Event creation/editing page - 'Promote Your Event' section\n\nWHEN: Event host wants to attract sponsors faster\n\nHOW IT WORKS:\n• Current: $15 for 7 days only\n• Add tiers:\n  - Quick Boost: $10 for 3 days (last-minute events)\n  - Standard Boost: $15 for 7 days (current option)\n  - Extended Boost: $25 for 14 days (early planning)\n• Shows estimated sponsor reach per tier\n• Can purchase multiple boosts per event\n\nWHY: Different events have different timelines. Club events (short notice) need 3-day boost. Corporate events (planned ahead) benefit from 14-day visibility. Flexibility increases adoption.", "One-size-fits-all doesn't work. Last-minute events need short boosts, planned events need extended visibility. Tiered pricing captures different customer segments and increases total boost revenue.", "MEDIUM"]
     ]
 

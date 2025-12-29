@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { FileSpreadsheet, TrendingUp, Target, Award, CheckCircle2, XCircle } from "lucide-react";
+import { FileSpreadsheet, TrendingUp, Target, Award, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
 export default function CompetitorsPage() {
   const [activeTab, setActiveTab] = useState<"quick" | "revenue" | "differentiators" | "summary">("quick");

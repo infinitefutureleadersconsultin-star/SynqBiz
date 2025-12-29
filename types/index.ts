@@ -196,3 +196,23 @@ export interface SharedNote {
   category?: "idea" | "note" | "thought" | "general";
   tags?: string[];
 }
+
+// Action Item Approvals - Dual approval system for completing action items
+export interface ActionItemApproval {
+  id: string; // matches action item identifier (area)
+  area: string; // the action item area for reference
+  approvals: {
+    issiah?: {
+      approved: boolean;
+      approved_at?: string;
+    };
+    soya?: {
+      approved: boolean;
+      approved_at?: string;
+    };
+  };
+  completed: boolean; // true when both co-founders approve
+  completed_at?: string;
+  created_at: string;
+  updated_at: string;
+}

@@ -180,7 +180,7 @@ export default function OverviewPage() {
             View Shared Notes
           </button>
         </div>
-        <ActionItems />
+        <ActionItems currentUser={userCoFounder || undefined} />
       </div>
 
       {/* Shared Notes Modal */}

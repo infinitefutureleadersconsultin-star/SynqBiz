@@ -1,9 +1,88 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { CheckCircle, Circle, Users } from "lucide-react";
+import { getAllActionItemApprovals, toggleActionItemApproval } from "@/lib/firestore";
+import { getCurrentUser } from "@/lib/firebase";
+import type { ActionItemApproval, CoFounder } from "@/types";
 
-export default function ActionItems() {
-  const highPriority = [
+interface ActionItemsProps {
+  currentUser?: CoFounder;
+}
+
+interface ActionItem {
+  area: string;
+  task: string;
+  why: string;
+}
+
+export default function ActionItems({ currentUser }: ActionItemsProps) {
+  const [approvals, setApprovals] = useState<ActionItemApproval[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [userCoFounder, setUserCoFounder] = useState<CoFounder | null>(null);
+
+  useEffect(() => {
+    loadUserAndApprovals();
+  }, []);
+
+  async function loadUserAndApprovals() {
+    setLoading(true);
+    const user = await getCurrentUser();
+    if (user) {
+      const coFounder = currentUser || (user.email?.includes('issiah') ? 'issiah' : 'soya');
+      setUserCoFounder(coFounder);
+    }
+    await loadApprovals();
+    setLoading(false);
+  }
+
+  async function loadApprovals() {
+    const { data, error } = await getAllActionItemApprovals();
+    if (error) {
+      console.error("Error loading approvals:", error);
+    } else if (data) {
+      setApprovals(data);
+    }
+  }
+
+  async function handleToggleApproval(area: string) {
+    if (!userCoFounder) return;
+
+    // Create a unique ID from the area (sanitized)
+    const itemId = area.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    const { success, data } = await toggleActionItemApproval(itemId, area, userCoFounder);
+    if (success && data) {
+      // Update local state
+      setApprovals(prev => {
+        const existing = prev.find(a => a.id === itemId);
+        if (existing) {
+          return prev.map(a => a.id === itemId ? data : a);
+        } else {
+          return [...prev, data];
+        }
+      });
+    }
+  }
+
+  function getApprovalStatus(area: string) {
+    const itemId = area.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const approval = approvals.find(a => a.id === itemId);
+    return {
+      issiahApproved: approval?.approvals.issiah?.approved || false,
+      soyaApproved: approval?.approvals.soya?.approved || false,
+      completed: approval?.completed || false,
+      currentUserApproved: approval?.approvals[userCoFounder as CoFounder]?.approved || false
+    };
+  }
+
+  const highPriority: ActionItem[] = [
+    {
+      area: "Customer Presentation vs Internal Transactions",
+      task: "Define clear distinction between customer-facing and internal views:\n\nCUSTOMER-FACING (Event Pages, Sponsor Pages, Marketing):\n• Simple, benefit-focused messaging\n• Trust-building language\n• ROI and value propositions\n• Clean, minimal transaction details\n• Focus on 'what you get' not 'how it works'\n\nINTERNAL PLATFORM (Dashboard, Admin, Business Transactions):\n• Detailed transaction breakdowns\n• Compliance-focused documentation\n• Full accounting transparency\n• Technical specifications\n• Audit trails and detailed reporting\n\nIMPLEMENTATION:\n• Create separate components for public vs internal views\n• Document messaging guidelines for each context\n• Ensure consistency but contextual appropriateness",
+      why: "Customers and event hosts need different levels of detail. External presentation should be clean and benefit-driven to build trust and drive conversions. Internal platform should be transparent and detailed for accounting, compliance, and operational clarity. Mixing these creates confusion and erodes trust."
+    },
     {
       area: "Daily Payouts (CRITICAL - Posh Has This)",
       task: "Automatic daily payouts as tickets sell:\n• Hosts receive money daily instead of waiting 3-5 days\n• Critical cash flow advantage for hosts paying vendors/venues upfront\n• Include in $100/mo tier or offer as separate option\n• Posh has this as standard - hosts will see our 3-5 day as downgrade\n\nIMPLEMENTATION:\n• Integrate with Stripe's scheduled payouts\n• Allow hosts to choose daily vs standard\n• Track payout history and show next payout date",
@@ -36,7 +115,7 @@ export default function ActionItems() {
     },
   ];
 
-  const mediumPriority = [
+  const mediumPriority: ActionItem[] = [
     {
       area: "Performance Tracking",
       task: "WHAT: Analytics dashboard tracking ROI of paid features\n\nWHERE: Event host dashboard - 'Marketing Performance' section\n\nWHEN: After event hosts use Event Boost ($15) or Featured Placement ($29)\n\nHOW IT WORKS:\n• Track views, clicks, sponsor offers received\n• Compare boosted vs non-boosted events\n• Show ROI: 'You spent $15, received 3 sponsor offers worth $500'\n• Export performance reports\n\nWHY: Event hosts won't pay for Boost/Featured unless they see proof it works. Need data to justify these upgrades and show clear ROI.",
@@ -59,7 +138,7 @@ export default function ActionItems() {
     },
   ];
 
-  const lowPriority = [
+  const lowPriority: ActionItem[] = [
     {
       area: "Enterprise Compliance",
       task: "WHAT: University-specific admin features for event oversight\n\nWHERE: Admin dashboard for university administrators\n\nWHEN: Universities require institutional control before allowing student event hosting\n\nHOW IT WORKS:\n• Approval Workflows: Student org submits event → admin reviews/approves before going live\n• Audit Trails: Track who created/edited/approved each event, timestamp everything\n• SIS Integration: Connect to Student Information System to verify student status, majors, orgs\n• Budget Controls: Set spending limits per org, require multi-level approval for large events\n• Compliance Reports: Export event data for Title IX, liability, budget reviews\n\nWHY: Universities won't adopt without institutional oversight. Legal/compliance departments require approval chains and audit capabilities. This unlocks $10K-25K/year enterprise contracts.",
@@ -72,70 +151,152 @@ export default function ActionItems() {
     },
   ];
 
+  // Separate completed and active items
+  const activeHighPriority = highPriority.filter(item => !getApprovalStatus(item.area).completed);
+  const activeMediumPriority = mediumPriority.filter(item => !getApprovalStatus(item.area).completed);
+  const activeLowPriority = lowPriority.filter(item => !getApprovalStatus(item.area).completed);
+
+  const completedItems = [...highPriority, ...mediumPriority, ...lowPriority].filter(
+    item => getApprovalStatus(item.area).completed
+  );
+
+  function renderActionItem(item: ActionItem, priorityColor: string, priorityLabel: string) {
+    const status = getApprovalStatus(item.area);
+
+    return (
+      <div key={item.area} className={`bg-${priorityColor}-50 border border-${priorityColor}-200 rounded-lg p-4`}>
+        <div className="flex justify-between items-start mb-2">
+          <h4 className={`font-semibold text-${priorityColor}-900 flex-1`}>{item.area}</h4>
+          <div className="flex items-center gap-2 ml-4">
+            <span className={`px-2 py-1 bg-${priorityColor}-200 text-${priorityColor}-800 text-xs font-bold rounded`}>
+              {priorityLabel}
+            </span>
+          </div>
+        </div>
+        <p className="text-sm text-gray-900 mb-2 whitespace-pre-line"><strong>Task:</strong> {item.task}</p>
+        <p className="text-sm text-gray-700 whitespace-pre-line mb-3"><strong>Why:</strong> {item.why}</p>
+
+        {/* Approval Section */}
+        <div className="border-t border-gray-200 pt-3 mt-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-gray-600" />
+                <span className="text-sm text-gray-600">Approvals:</span>
+              </div>
+              <div className="flex items-center gap-1">
+                {status.issiahApproved ? (
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                ) : (
+                  <Circle className="w-4 h-4 text-gray-300" />
+                )}
+                <span className={`text-xs ${status.issiahApproved ? 'text-green-700 font-semibold' : 'text-gray-500'}`}>
+                  Issiah
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                {status.soyaApproved ? (
+                  <CheckCircle className="w-4 h-4 text-green-600" />
+                ) : (
+                  <Circle className="w-4 h-4 text-gray-300" />
+                )}
+                <span className={`text-xs ${status.soyaApproved ? 'text-green-700 font-semibold' : 'text-gray-500'}`}>
+                  Soya
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => handleToggleApproval(item.area)}
+              disabled={loading || !userCoFounder}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                status.currentUserApproved
+                  ? 'bg-green-600 text-white hover:bg-green-700'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {status.currentUserApproved ? '✓ Approved' : 'Mark Complete'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return <div className="text-center py-8 text-gray-600">Loading action items...</div>;
+  }
+
   return (
     <div className="space-y-6">
       {/* High Priority */}
-      <Card className="border-2 border-red-600">
-        <CardHeader className="bg-red-600">
-          <CardTitle className="text-white">HIGH PRIORITY</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4 mt-4">
-            {highPriority.map((item, index) => (
-              <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-red-900">{item.area}</h4>
-                  <span className="px-2 py-1 bg-red-200 text-red-800 text-xs font-bold rounded">HIGH</span>
-                </div>
-                <p className="text-sm text-gray-900 mb-2 whitespace-pre-line"><strong>Task:</strong> {item.task}</p>
-                <p className="text-sm text-gray-700 whitespace-pre-line"><strong>Why:</strong> {item.why}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {activeHighPriority.length > 0 && (
+        <Card className="border-2 border-red-600">
+          <CardHeader className="bg-red-600">
+            <CardTitle className="text-white">HIGH PRIORITY</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4 mt-4">
+              {activeHighPriority.map(item => renderActionItem(item, 'red', 'HIGH'))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Medium Priority */}
-      <Card className="border-2 border-yellow-600">
-        <CardHeader className="bg-yellow-600">
-          <CardTitle className="text-white">MEDIUM PRIORITY</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4 mt-4">
-            {mediumPriority.map((item, index) => (
-              <div key={index} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-yellow-900">{item.area}</h4>
-                  <span className="px-2 py-1 bg-yellow-200 text-yellow-800 text-xs font-bold rounded">MEDIUM</span>
-                </div>
-                <p className="text-sm text-gray-900 mb-2 whitespace-pre-line"><strong>Task:</strong> {item.task}</p>
-                <p className="text-sm text-gray-700 whitespace-pre-line"><strong>Why:</strong> {item.why}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {activeMediumPriority.length > 0 && (
+        <Card className="border-2 border-yellow-600">
+          <CardHeader className="bg-yellow-600">
+            <CardTitle className="text-white">MEDIUM PRIORITY</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4 mt-4">
+              {activeMediumPriority.map(item => renderActionItem(item, 'yellow', 'MEDIUM'))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Low Priority */}
-      <Card className="border-2 border-green-600">
-        <CardHeader className="bg-green-600">
-          <CardTitle className="text-white">LOW PRIORITY</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4 mt-4">
-            {lowPriority.map((item, index) => (
-              <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-green-900">{item.area}</h4>
-                  <span className="px-2 py-1 bg-green-200 text-green-800 text-xs font-bold rounded">LOW</span>
+      {activeLowPriority.length > 0 && (
+        <Card className="border-2 border-green-600">
+          <CardHeader className="bg-green-600">
+            <CardTitle className="text-white">LOW PRIORITY</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4 mt-4">
+              {activeLowPriority.map(item => renderActionItem(item, 'green', 'LOW'))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Completed Items */}
+      {completedItems.length > 0 && (
+        <Card className="border-2 border-blue-600">
+          <CardHeader className="bg-blue-600">
+            <CardTitle className="text-white flex items-center gap-2">
+              <CheckCircle className="w-5 h-5" />
+              COMPLETED ({completedItems.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4 mt-4">
+              {completedItems.map(item => (
+                <div key={item.area} className="bg-blue-50 border border-blue-200 rounded-lg p-4 opacity-75">
+                  <div className="flex justify-between items-start mb-2">
+                    <h4 className="font-semibold text-blue-900 flex-1">{item.area}</h4>
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  </div>
+                  <p className="text-sm text-gray-700 mb-2 whitespace-pre-line"><strong>Task:</strong> {item.task}</p>
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-blue-200">
+                    <span className="text-xs text-blue-700 font-semibold">✓ Approved by both co-founders</span>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-900 mb-2 whitespace-pre-line"><strong>Task:</strong> {item.task}</p>
-                <p className="text-sm text-gray-700 whitespace-pre-line"><strong>Why:</strong> {item.why}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

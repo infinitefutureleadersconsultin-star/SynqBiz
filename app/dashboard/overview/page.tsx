@@ -6,14 +6,16 @@ import { getCurrentUser } from "@/lib/firebase";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import TaskList from "@/components/TaskList";
-import SharedNotes from "@/components/SharedNotes";
+import ActionItems from "@/components/ActionItems";
+import SharedNotesModal from "@/components/SharedNotesModal";
 import {
   TrendingUp,
   TrendingDown,
   ArrowRight,
   Target,
   Users,
-  Briefcase
+  Briefcase,
+  MessageSquare
 } from "lucide-react";
 
 interface MetricsSummary {
@@ -35,6 +37,7 @@ export default function OverviewPage() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string>('');
   const [userCoFounder, setUserCoFounder] = useState<'issiah' | 'soya' | null>(null);
+  const [notesModalOpen, setNotesModalOpen] = useState(false);
   const [metrics, setMetrics] = useState<MetricsSummary>({
     isaiah: { totalOutreach: 0, weeklyOutreach: 0, totalMeetings: 0, weeklyMeetings: 0 },
     soya: { totalRevenue: 0, totalSignups: 0, weeklySignups: 0, weeklyTickets: 0 },
@@ -162,8 +165,30 @@ export default function OverviewPage() {
         </Card>
       </div>
 
-      {/* Shared Notes & Ideas */}
-      <SharedNotes currentUser={userCoFounder || undefined} />
+      {/* Action Items from Competitor Analysis */}
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Action Items</h2>
+            <p className="text-gray-600 mt-1">Technical priorities from competitor analysis</p>
+          </div>
+          <button
+            onClick={() => setNotesModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            <MessageSquare className="w-4 h-4" />
+            View Shared Notes
+          </button>
+        </div>
+        <ActionItems />
+      </div>
+
+      {/* Shared Notes Modal */}
+      <SharedNotesModal
+        isOpen={notesModalOpen}
+        onClose={() => setNotesModalOpen(false)}
+        currentUser={userCoFounder || undefined}
+      />
 
       {/* Weekly Tasks - All Co-Founders */}
       {userId && (

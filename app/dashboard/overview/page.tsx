@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/firebase";
+import { getAllActionItems, toggleActionItemApproval } from "@/lib/firestore";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import TaskList from "@/components/TaskList";
 import SharedNotes from "@/components/SharedNotes";
+import type { ActionItem, CoFounder } from "@/types";
 import {
   TrendingUp,
   TrendingDown,
@@ -18,7 +20,9 @@ import {
   Smartphone,
   BarChart3,
   Globe,
-  DollarSign
+  DollarSign,
+  CheckCircle,
+  Circle
 } from "lucide-react";
 
 interface MetricsSummary {
@@ -44,9 +48,12 @@ export default function OverviewPage() {
     isaiah: { totalOutreach: 0, weeklyOutreach: 0, totalMeetings: 0, weeklyMeetings: 0 },
     soya: { totalRevenue: 0, totalSignups: 0, weeklySignups: 0, weeklyTickets: 0 },
   });
+  const [actionItems, setActionItems] = useState<ActionItem[]>([]);
+  const [actionItemsLoading, setActionItemsLoading] = useState(true);
 
   useEffect(() => {
     loadMetrics();
+    loadActionItems();
   }, []);
 
   async function loadMetrics() {
@@ -82,12 +89,49 @@ export default function OverviewPage() {
     }
   }
 
+  async function loadActionItems() {
+    try {
+      const result = await getAllActionItems();
+      if (result.data) {
+        // Only show pending items (not completed)
+        const pendingItems = result.data.filter(item => item.status !== 'completed');
+        setActionItems(pendingItems);
+      }
+    } catch (error) {
+      console.error('Error loading action items:', error);
+    } finally {
+      setActionItemsLoading(false);
+    }
+  }
+
+  async function handleToggleApproval(itemId: string, cofounder: CoFounder) {
+    try {
+      const result = await toggleActionItemApproval(itemId, cofounder);
+      if (result.success) {
+        // Reload action items to reflect changes
+        await loadActionItems();
+      } else {
+        alert(`Error: ${result.error}`);
+      }
+    } catch (error) {
+      console.error('Error toggling approval:', error);
+      alert('Failed to update approval status');
+    }
+  }
+
+  // Group action items by priority
+  const groupedActionItems = {
+    high: actionItems.filter(item => item.priority === 'high'),
+    medium: actionItems.filter(item => item.priority === 'medium'),
+    low: actionItems.filter(item => item.priority === 'low'),
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Co-Founder Dashboard</h1>
-        <p className="text-gray-600 mt-1">Track progress and metrics for SponsorSynq</p>
+        <p className="text-gray-600 mt-1">Track progress and metrics for HEADLINER</p>
       </div>
 
       {/* Quick Stats Grid */}
@@ -229,160 +273,90 @@ export default function OverviewPage() {
         </Card>
       </div>
 
-      {/* Strategic Action Items - From HEADLINER */}
+      {/* Strategic Action Items - Database-Driven */}
       <Card className="border-2 border-purple-600">
         <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600">
           <CardTitle className="text-white flex items-center gap-2">
             <Zap className="w-6 h-6" />
-            Strategic Action Items - HEADLINER Insights
+            Strategic Action Items
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-6">
           <p className="text-sm text-gray-600 mb-6 italic">
-            These action items are informed by our complete marketplace strategy in the HEADLINER presentation. Each one directly supports our purple cow positioning, Sponsor-to-Pocket invention, and two-sided marketplace model.
+            Action items managed through AI chatbot. Both Issiah and Soya must approve before items are marked complete.
           </p>
 
-          {/* HIGH PRIORITY */}
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-bold text-red-700 mb-4 flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                HIGH PRIORITY - Critical for Launch
-              </h3>
-              <div className="space-y-4">
-                <ActionItem
-                  priority="high"
-                  icon={<Target className="w-5 h-5" />}
-                  title="Sponsor Marketplace Visibility"
-                  task="Make sponsor marketplace visible on day 1 - not hidden behind menus or settings"
-                  context="From HEADLINER Slide 16: 'Sponsor marketplace must be visible on day 1 → not hidden behind a menu'"
-                  impact="Our #1 differentiator vs Eventbrite. Hosts need to SEE sponsor opportunities immediately to understand our purple cow: 'We pay you to throw your event'"
-                />
-                <ActionItem
-                  priority="high"
-                  icon={<Smartphone className="w-5 h-5" />}
-                  title="Sponsor-to-Pocket QR/NFC System"
-                  task="Auto-generate QR code for every sponsorship deal. Track scans, conversions, email capture, retargeting pixel."
-                  context="From HEADLINER Slide 11: 'Our Netflix Moment' - trackable sponsorship with receipts"
-                  impact="This is our invention. Changes sponsorship from 'brand awareness' to 'direct response marketing.' Sponsors get exact customer counts, not just impressions. Justifies $250-$2,500 pricing tiers."
-                />
-                <ActionItem
-                  priority="high"
-                  icon={<Globe className="w-5 h-5" />}
-                  title="Free Tier Feature Parity"
-                  task="Match Eventbrite 1:1 on core features: unlimited events, ticketing, payouts, basic analytics, contracts"
-                  context="From HEADLINER Slide 3, 5: Without brand recognition, we can't justify friction. Competitors offer unlimited free events = industry standard."
-                  impact="A paywall after 1 event = dead on arrival. At scale, paid ads bring users who decide in 30 seconds. Landing page must remove ALL objections."
-                />
-                <ActionItem
-                  priority="high"
-                  icon={<Zap className="w-5 h-5" />}
-                  title="Two Landing Pages - Purple Cow Messaging"
-                  task="Build separate landing pages: (1) Hosts: 'We Pay You to Throw Your Event' (2) Sponsors: 'We Found the Events. You Just Pick Which Ones to Sponsor.'"
-                  context="From HEADLINER Slide 8, 9, 15: Purple cow messaging stops the scroll. Different value props for each side of marketplace."
-                  impact="Provocative, true, differentiated, memorable. Reframes conversation from 'cost' to 'revenue opportunity' for hosts. Solves 'discovery problem' for sponsors."
-                />
-              </div>
+          {actionItemsLoading ? (
+            <div className="text-center py-8 text-gray-500">
+              Loading action items...
             </div>
-
-            {/* MEDIUM PRIORITY */}
-            <div>
-              <h3 className="text-xl font-bold text-yellow-700 mb-4 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
-                MEDIUM PRIORITY - Post-Launch Enhancements
-              </h3>
-              <div className="space-y-4">
-                <ActionItem
-                  priority="medium"
-                  icon={<BarChart3 className="w-5 h-5" />}
-                  title="AI Sponsor Matching Algorithm"
-                  task="Build smart matching: analyze event type, demographics, location, past sponsor success. Recommend top 5 sponsors for each event."
-                  context="From HEADLINER Slide 7: Pro tier feature - 'AI-powered sponsor matching + priority visibility → 3x faster matches'"
-                  impact="Justifies our 12% commission. Free tier = browse manually. Pro tier = AI does the work. Avg. $100/mo Pro subscription pays for itself with 1 sponsorship deal."
-                />
-                <ActionItem
-                  priority="medium"
-                  icon={<Smartphone className="w-5 h-5" />}
-                  title="Sponsor Analytics Dashboard"
-                  task="Real-time dashboard for sponsors: exact scan count, conversion rate, customer emails captured, retargeting pixel stats, cost-per-acquisition"
-                  context="From HEADLINER Slide 11, 13: 'Sponsorship with a receipt. Know exactly how many customers you got.'"
-                  impact="Solves ROI problem. Traditional sponsorships = 'pay and pray.' Our sponsorships = trackable. Sponsors can prove: 'I paid $1,000, got 40 customers, $25 CAC' → cheaper than Facebook ads ($30-50 CAC)."
-                />
-                <ActionItem
-                  priority="medium"
-                  icon={<DollarSign className="w-5 h-5" />}
-                  title="Outcome-Based Pricing Page"
-                  task="Rewrite pricing page: don't list features, list financial outcomes. Every Pro feature needs $ value or time saved."
-                  context="From HEADLINER Slide 6: 'Hosts don't pay for features. They pay for outcomes. Our pricing page must speak in dollars, not bullets.'"
-                  impact="Example: Bad: 'Unlimited promoters' → Good: 'Scale ticket sales with unlimited promoters (avg. 40% more tickets sold).' Increases Pro conversions."
-                />
-                <ActionItem
-                  priority="medium"
-                  icon={<Globe className="w-5 h-5" />}
-                  title="Self-Serve Sponsor Checkout"
-                  task="Build Bronze/Silver/Gold/Platinum checkout flow. Sponsors pick tier, select events, pay instantly. No sales calls needed until $10K+ deals."
-                  context="From HEADLINER Slide 15, 16: 'Landing page removes all friction → Self-serve browse for sponsors. No sales calls. Easy checkout.'"
-                  impact="Reduces sales friction. Small/local brands can afford $250-$2,500 sponsorships without agency. Democratizes experiential marketing (agencies charge $50K+)."
-                />
-                <ActionItem
-                  priority="medium"
-                  icon={<Users className="w-5 h-5" />}
-                  title="Marketing Engine - Warm Leads"
-                  task="Email everyone who attended similar events in the host's city. 'You went to [similar event], you'll love this.' Avg. 1,000+ warm leads per event."
-                  context="From HEADLINER Slide 7: Pro tier feature - 'Built-in marketing engine → Sell out 2x faster'"
-                  impact="💰 MAKE MONEY: Hosts on Pro tier sell more tickets faster. Network effects: more events = more attendee data = better recommendations = more ticket sales."
-                />
-              </div>
+          ) : actionItems.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No pending action items. Use the AI chatbot to add new items!
             </div>
+          ) : (
+            <div className="space-y-6">
+              {/* HIGH PRIORITY */}
+              {groupedActionItems.high.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-bold text-red-700 mb-4 flex items-center gap-2">
+                    <Target className="w-5 h-5" />
+                    HIGH PRIORITY - Critical for Launch ({groupedActionItems.high.length})
+                  </h3>
+                  <div className="space-y-4">
+                    {groupedActionItems.high.map((item) => (
+                      <DatabaseActionItem
+                        key={item.id}
+                        item={item}
+                        userCoFounder={userCoFounder}
+                        onToggleApproval={handleToggleApproval}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-            {/* LOW PRIORITY */}
-            <div>
-              <h3 className="text-xl font-bold text-green-700 mb-4 flex items-center gap-2">
-                <Briefcase className="w-5 h-5" />
-                LOW PRIORITY - Future Revenue Streams
-              </h3>
-              <div className="space-y-4">
-                <ActionItem
-                  priority="low"
-                  icon={<Users className="w-5 h-5" />}
-                  title="Promoter Commission Management"
-                  task="Free tier: up to 4-5 promoters. Pro tier: unlimited promoters. Track which promoters drive most revenue. Auto-split commissions."
-                  context="From HEADLINER Slide 4, 7: Revenue stream #3 - We take a cut of every ticket sold by promoters. More promoters = more sales."
-                  impact="Avg. hosts see 40% more tickets sold with unlimited promoters. Pro tier pays for itself. We earn from increased transaction volume."
-                />
-                <ActionItem
-                  priority="low"
-                  icon={<Briefcase className="w-5 h-5" />}
-                  title="Venue Subscription Model"
-                  task="Venues running ALL events exclusively through SynqBiz. Monthly subscription for priority placement + analytics."
-                  context="From HEADLINER Slide 4: Revenue stream #4 - Recurring venue revenue + guaranteed event volume on our platform"
-                  impact="Predictable MRR. Venues book 10-50 events/year. Lock in transaction volume. Builds moat vs competitors."
-                />
-                <ActionItem
-                  priority="low"
-                  icon={<DollarSign className="w-5 h-5" />}
-                  title="Expense Tracking & Auto-Splits"
-                  task="Track who owes what. Auto-calculate profit margins. Split payouts by % for co-hosts. No spreadsheets, no manual Venmo."
-                  context="From HEADLINER Slide 7: Pro tier feature - '⏱️ SAVE TIME: Run events with partners. Auto-split payouts by %.'"
-                  impact="Removes friction for hosts running events with multiple organizers. Keeps more hosts on platform (sticky feature)."
-                />
-              </div>
+              {/* MEDIUM PRIORITY */}
+              {groupedActionItems.medium.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-bold text-yellow-700 mb-4 flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" />
+                    MEDIUM PRIORITY - Post-Launch Enhancements ({groupedActionItems.medium.length})
+                  </h3>
+                  <div className="space-y-4">
+                    {groupedActionItems.medium.map((item) => (
+                      <DatabaseActionItem
+                        key={item.id}
+                        item={item}
+                        userCoFounder={userCoFounder}
+                        onToggleApproval={handleToggleApproval}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* LOW PRIORITY */}
+              {groupedActionItems.low.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-bold text-green-700 mb-4 flex items-center gap-2">
+                    <Briefcase className="w-5 h-5" />
+                    LOW PRIORITY - Future Revenue Streams ({groupedActionItems.low.length})
+                  </h3>
+                  <div className="space-y-4">
+                    {groupedActionItems.low.map((item) => (
+                      <DatabaseActionItem
+                        key={item.id}
+                        item={item}
+                        userCoFounder={userCoFounder}
+                        onToggleApproval={handleToggleApproval}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-
-          {/* Strategic Summary */}
-          <div className="mt-8 bg-purple-50 border-2 border-purple-600 rounded-lg p-6">
-            <h3 className="text-lg font-bold text-purple-900 mb-3">Strategic North Star (From HEADLINER Slide 17)</h3>
-            <p className="text-gray-800 mb-2">
-              <strong>Every product decision must ask:</strong> "Does this increase transaction volume?"
-            </p>
-            <p className="text-gray-800 mb-2">
-              <strong>Every landing page change must ask:</strong> "Does this remove friction or add value perception?"
-            </p>
-            <p className="text-gray-800">
-              <strong>Success = </strong> Hosts making money through sponsors + sponsors getting customers. Everything else is a distraction.
-            </p>
-          </div>
+          )}
         </CardContent>
       </Card>
 
@@ -420,20 +394,14 @@ function MetricRow({ label, value }: { label: string; value: string | number }) 
   );
 }
 
-function ActionItem({
-  priority,
-  icon,
-  title,
-  task,
-  context,
-  impact
+function DatabaseActionItem({
+  item,
+  userCoFounder,
+  onToggleApproval
 }: {
-  priority: "high" | "medium" | "low";
-  icon: React.ReactNode;
-  title: string;
-  task: string;
-  context: string;
-  impact: string;
+  item: ActionItem;
+  userCoFounder: CoFounder | null;
+  onToggleApproval: (itemId: string, cofounder: CoFounder) => void;
 }) {
   const priorityColors = {
     high: "bg-red-50 border-red-300",
@@ -454,29 +422,75 @@ function ActionItem({
   };
 
   return (
-    <div className={`border-2 rounded-lg p-5 ${priorityColors[priority]}`}>
+    <div className={`border-2 rounded-lg p-5 ${priorityColors[item.priority]}`}>
       <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center gap-3">
-          <div className={priorityTextColors[priority]}>{icon}</div>
-          <h4 className={`font-bold text-lg ${priorityTextColors[priority]}`}>{title}</h4>
+        <div className="flex-1">
+          <h4 className={`font-bold text-lg ${priorityTextColors[item.priority]} mb-2`}>{item.title}</h4>
         </div>
-        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${priorityBadges[priority]}`}>
-          {priority}
+        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${priorityBadges[item.priority]}`}>
+          {item.priority}
         </span>
       </div>
-      <div className="space-y-3">
+
+      <div className="space-y-3 mb-4">
         <div>
           <p className="text-sm font-semibold text-gray-700 mb-1">What to Build:</p>
-          <p className="text-sm text-gray-800">{task}</p>
+          <p className="text-sm text-gray-800 whitespace-pre-line">{item.task}</p>
         </div>
         <div>
           <p className="text-sm font-semibold text-gray-700 mb-1">Strategic Context:</p>
-          <p className="text-sm text-gray-700 italic">{context}</p>
+          <p className="text-sm text-gray-700 italic">{item.context}</p>
         </div>
         <div>
           <p className="text-sm font-semibold text-gray-700 mb-1">Business Impact:</p>
-          <p className="text-sm text-gray-800">{impact}</p>
+          <p className="text-sm text-gray-800 whitespace-pre-line">{item.impact}</p>
         </div>
+      </div>
+
+      {/* Approvals Section */}
+      <div className="border-t border-gray-300 pt-4">
+        <p className="text-xs font-semibold text-gray-600 mb-2">Approvals (Both required to complete):</p>
+        <div className="flex gap-4">
+          <button
+            onClick={() => userCoFounder && onToggleApproval(item.id, 'issiah')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              item.approvals.issiah
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            } ${userCoFounder !== 'issiah' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            disabled={userCoFounder !== 'issiah'}
+          >
+            {item.approvals.issiah ? (
+              <CheckCircle className="w-4 h-4" />
+            ) : (
+              <Circle className="w-4 h-4" />
+            )}
+            <span className="text-sm font-medium">Issiah</span>
+          </button>
+
+          <button
+            onClick={() => userCoFounder && onToggleApproval(item.id, 'soya')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              item.approvals.soya
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            } ${userCoFounder !== 'soya' ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+            disabled={userCoFounder !== 'soya'}
+          >
+            {item.approvals.soya ? (
+              <CheckCircle className="w-4 h-4" />
+            ) : (
+              <Circle className="w-4 h-4" />
+            )}
+            <span className="text-sm font-medium">Soya</span>
+          </button>
+        </div>
+        <p className="text-xs text-gray-500 mt-2">
+          {item.approvals.issiah && item.approvals.soya
+            ? '✓ Both approved - This item will be removed on next refresh'
+            : `${item.approvals.issiah ? 'Issiah' : ''} ${item.approvals.issiah && !item.approvals.soya ? 'approved,' : ''} ${item.approvals.soya ? 'Soya approved' : ''} ${!item.approvals.issiah && !item.approvals.soya ? 'Waiting for approvals' : ''}`
+          }
+        </p>
       </div>
     </div>
   );

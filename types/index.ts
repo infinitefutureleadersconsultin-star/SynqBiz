@@ -215,3 +215,23 @@ export interface Expense {
   created_at: string;
   updated_at: string;
 }
+
+// Strategic Action Items - Database-driven action items for Overview dashboard
+export interface ActionItem {
+  id: string;
+  title: string;
+  task: string; // What to build
+  context: string; // Strategic context (e.g., "From HEADLINER Slide 11")
+  impact: string; // Business impact
+  priority: "high" | "medium" | "low";
+  status: "pending" | "completed";
+  approvals: {
+    issiah: boolean;
+    soya: boolean;
+  };
+  created_by: string; // user_id
+  created_by_name: CoFounder;
+  created_at: string;
+  updated_at: string;
+  completed_at?: string; // when BOTH cofounders approved
+}

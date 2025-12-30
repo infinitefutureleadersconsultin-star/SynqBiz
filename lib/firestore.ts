@@ -25,7 +25,8 @@ import type {
   Task,
   CoFounder,
   SharedNote,
-  Expense
+  Expense,
+  ActionItem
 } from '@/types';
 
 // ============================================
@@ -1191,6 +1192,142 @@ export async function deleteExpense(expenseId: string) {
     return { success: true, error: null };
   } catch (error: any) {
     console.error('Error deleting expense:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================
+// STRATEGIC ACTION ITEMS
+// ============================================
+
+/**
+ * Create a new action item
+ */
+export async function createActionItem(
+  actionItem: Omit<ActionItem, 'id' | 'created_at' | 'updated_at' | 'status' | 'approvals' | 'completed_at'>
+) {
+  try {
+    const actionItemsRef = collection(db, 'action_items');
+    const docRef = await addDoc(actionItemsRef, {
+      ...actionItem,
+      status: 'pending',
+      approvals: {
+        issiah: false,
+        soya: false,
+      },
+      created_at: Timestamp.now(),
+      updated_at: Timestamp.now(),
+    });
+    return { success: true, id: docRef.id, error: null };
+  } catch (error: any) {
+    console.error('Error creating action item:', error);
+    return { success: false, id: null, error: error.message };
+  }
+}
+
+/**
+ * Get all action items
+ */
+export async function getAllActionItems(limitCount = 100) {
+  try {
+    const actionItemsRef = collection(db, 'action_items');
+    const q = query(
+      actionItemsRef,
+      orderBy('priority', 'asc'), // high first, then medium, then low
+      orderBy('created_at', 'desc'),
+      limit(limitCount)
+    );
+    const querySnapshot = await getDocs(q);
+
+    const actionItems: ActionItem[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      actionItems.push({
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+        completed_at: data.completed_at || undefined,
+      } as ActionItem);
+    });
+
+    return { data: actionItems, error: null };
+  } catch (error: any) {
+    console.error('Error fetching action items:', error);
+    return { data: null, error: error.message };
+  }
+}
+
+/**
+ * Toggle approval for an action item (Issiah or Soya)
+ */
+export async function toggleActionItemApproval(
+  actionItemId: string,
+  cofounder: CoFounder
+) {
+  try {
+    const actionItemRef = doc(db, 'action_items', actionItemId);
+    const actionItemSnap = await getDoc(actionItemRef);
+
+    if (!actionItemSnap.exists()) {
+      return { success: false, error: 'Action item not found' };
+    }
+
+    const data = actionItemSnap.data() as ActionItem;
+    const currentApproval = data.approvals[cofounder];
+    const newApprovals = {
+      ...data.approvals,
+      [cofounder]: !currentApproval,
+    };
+
+    // Check if BOTH cofounders have approved
+    const bothApproved = newApprovals.issiah && newApprovals.soya;
+
+    await updateDoc(actionItemRef, {
+      approvals: newApprovals,
+      status: bothApproved ? 'completed' : 'pending',
+      completed_at: bothApproved ? new Date().toISOString() : null,
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error toggling action item approval:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Update an action item
+ */
+export async function updateActionItem(
+  actionItemId: string,
+  updates: Partial<Pick<ActionItem, 'title' | 'task' | 'context' | 'impact' | 'priority'>>
+) {
+  try {
+    const actionItemRef = doc(db, 'action_items', actionItemId);
+    await updateDoc(actionItemRef, {
+      ...updates,
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error updating action item:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Delete an action item
+ */
+export async function deleteActionItem(actionItemId: string) {
+  try {
+    const actionItemRef = doc(db, 'action_items', actionItemId);
+    await deleteDoc(actionItemRef);
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error deleting action item:', error);
     return { success: false, error: error.message };
   }
 }

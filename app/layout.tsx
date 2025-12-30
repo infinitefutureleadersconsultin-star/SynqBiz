@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SynqBiz - Co-Founder Accountability Dashboard",
-  description: "Track progress, metrics, and partnership commitments for SponsorSynq co-founders",
+  description: "Track progress, metrics, and partnership commitments for HEADLINER co-founders",
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
 # SynqBiz - Co-Founder Accountability Dashboard
 
-A modern accountability dashboard built for SponsorSynq co-founders Issiah McLean and Soya Diaoune to track progress, metrics, and stay aligned on their journey.
+A modern accountability dashboard built for HEADLINER co-founders Issiah McLean and Soya Diaoune to track progress, metrics, and stay aligned on their journey.
 
 ## 🚀 Features (Phase 1)
 
@@ -176,4 +176,4 @@ Private - All Rights Reserved
 
 ---
 
-Built with ❤️ for the SponsorSynq team
+Built with ❤️ for the HEADLINER team

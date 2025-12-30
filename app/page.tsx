@@ -15,7 +15,7 @@ export default function Home() {
         </div>
 
         <p className="text-lg text-gray-700 mb-8 leading-relaxed">
-          Track progress, manage metrics, and stay aligned on your journey to building SponsorSynq.
+          Track progress, manage metrics, and stay aligned on your journey to building HEADLINER.
         </p>
 
         <div className="flex gap-4 justify-center">

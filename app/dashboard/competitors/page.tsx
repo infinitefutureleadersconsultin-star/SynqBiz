@@ -13,10 +13,10 @@ export default function CompetitorsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Competitor Analysis</h1>
-          <p className="text-gray-600 mt-1">SponsorSynq vs Eventbrite & Market Competitors</p>
+          <p className="text-gray-600 mt-1">HEADLINER vs Eventbrite & Market Competitors</p>
         </div>
         <a
-          href="/SponsorSynq_Competitor_Comparison.xlsx"
+          href="/HEADLINER_Competitor_Comparison.xlsx"
           download
           className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
@@ -130,7 +130,7 @@ function QuickComparisonTab() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Head-to-Head: SponsorSynq vs Eventbrite</CardTitle>
+        <CardTitle>Head-to-Head: HEADLINER vs Eventbrite</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
@@ -138,7 +138,7 @@ function QuickComparisonTab() {
             <thead>
               <tr className="border-b-2 border-gray-200">
                 <th className="text-left py-3 px-4 font-semibold text-gray-900">Feature</th>
-                <th className="text-left py-3 px-4 font-semibold text-primary-700">SponsorSynq</th>
+                <th className="text-left py-3 px-4 font-semibold text-primary-700">HEADLINER</th>
                 <th className="text-left py-3 px-4 font-semibold text-gray-700">Eventbrite</th>
                 <th className="text-center py-3 px-4 font-semibold text-gray-900">Winner</th>
               </tr>

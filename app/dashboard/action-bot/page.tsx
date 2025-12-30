@@ -74,7 +74,8 @@ export default function ActionBotPage() {
       if (!titleMatch) {
         const lines = section.split('\n').filter(l => l.trim());
         if (lines.length > 0) {
-          titleMatch = [null, lines[0]];
+          // Create valid match array: [fullMatch, captureGroup1]
+          titleMatch = [lines[0], lines[0]] as RegExpMatchArray;
         }
       }
 

@@ -22,7 +22,9 @@ import {
   Globe,
   DollarSign,
   CheckCircle,
-  Circle
+  Circle,
+  MessageSquare,
+  X
 } from "lucide-react";
 
 interface MetricsSummary {
@@ -50,6 +52,7 @@ export default function OverviewPage() {
   });
   const [actionItems, setActionItems] = useState<ActionItem[]>([]);
   const [actionItemsLoading, setActionItemsLoading] = useState(true);
+  const [showNotesModal, setShowNotesModal] = useState(false);
 
   useEffect(() => {
     loadMetrics();
@@ -211,68 +214,6 @@ export default function OverviewPage() {
         </Card>
       </div>
 
-      {/* Shared Notes & Ideas */}
-      <SharedNotes currentUser={userCoFounder || undefined} />
-
-      {/* Weekly Tasks - All Co-Founders */}
-      {userId && (
-        <TaskList
-          userId={userId}
-          title="All Tasks This Week (Issiah & Soya)"
-        />
-      )}
-
-      {/* Co-Founder Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Issiah Section */}
-        <Card>
-          <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b">
-            <div className="flex items-center justify-between">
-              <CardTitle>Issiah's Progress</CardTitle>
-              <span className="px-3 py-1 bg-blue-200 text-blue-800 text-xs font-semibold rounded-full">
-                Business
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3 pt-4">
-              <MetricRow label="Outreach Contacts" value={metrics.isaiah.totalOutreach} />
-              <MetricRow label="Meetings Scheduled" value={metrics.isaiah.totalMeetings} />
-              <MetricRow label="This Week" value={metrics.isaiah.weeklyOutreach} />
-            </div>
-            <Link href="/dashboard/isaiah">
-              <Button variant="outline" className="w-full mt-4">
-                View Full Dashboard <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-
-        {/* Soya Section */}
-        <Card>
-          <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 border-b">
-            <div className="flex items-center justify-between">
-              <CardTitle>Soya's Progress</CardTitle>
-              <span className="px-3 py-1 bg-purple-200 text-purple-800 text-xs font-semibold rounded-full">
-                Technical
-              </span>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3 pt-4">
-              <MetricRow label="User Signups" value={metrics.soya.totalSignups} />
-              <MetricRow label="Revenue" value={`$${metrics.soya.totalRevenue}`} />
-              <MetricRow label="Support Tickets" value={metrics.soya.weeklyTickets} />
-            </div>
-            <Link href="/dashboard/soya">
-              <Button variant="outline" className="w-full mt-4">
-                View Full Dashboard <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Strategic Action Items - Database-Driven */}
       <Card className="border-2 border-purple-600">
         <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600">
@@ -359,6 +300,100 @@ export default function OverviewPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Weekly Tasks - All Co-Founders */}
+      {userId && (
+        <TaskList
+          userId={userId}
+          title="All Tasks This Week (Issiah & Soya)"
+        />
+      )}
+
+      {/* Co-Founder Sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Issiah Section */}
+        <Card>
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b">
+            <div className="flex items-center justify-between">
+              <CardTitle>Issiah's Progress</CardTitle>
+              <span className="px-3 py-1 bg-blue-200 text-blue-800 text-xs font-semibold rounded-full">
+                Business
+              </span>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3 pt-4">
+              <MetricRow label="Outreach Contacts" value={metrics.isaiah.totalOutreach} />
+              <MetricRow label="Meetings Scheduled" value={metrics.isaiah.totalMeetings} />
+              <MetricRow label="This Week" value={metrics.isaiah.weeklyOutreach} />
+            </div>
+            <Link href="/dashboard/isaiah">
+              <Button variant="outline" className="w-full mt-4">
+                View Full Dashboard <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        {/* Soya Section */}
+        <Card>
+          <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 border-b">
+            <div className="flex items-center justify-between">
+              <CardTitle>Soya's Progress</CardTitle>
+              <span className="px-3 py-1 bg-purple-200 text-purple-800 text-xs font-semibold rounded-full">
+                Technical
+              </span>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3 pt-4">
+              <MetricRow label="User Signups" value={metrics.soya.totalSignups} />
+              <MetricRow label="Revenue" value={`$${metrics.soya.totalRevenue}`} />
+              <MetricRow label="Support Tickets" value={metrics.soya.weeklyTickets} />
+            </div>
+            <Link href="/dashboard/soya">
+              <Button variant="outline" className="w-full mt-4">
+                View Full Dashboard <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Floating Button for Shared Notes */}
+      <button
+        onClick={() => setShowNotesModal(true)}
+        className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-110 transition-all duration-200 flex items-center justify-center z-40"
+        title="View Shared Notes"
+      >
+        <MessageSquare className="w-7 h-7" />
+      </button>
+
+      {/* Shared Notes Modal */}
+      {showNotesModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b bg-gradient-to-r from-indigo-50 to-purple-50">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-6 h-6 text-indigo-600" />
+                <h2 className="text-2xl font-bold text-gray-900">Shared Notes & Ideas</h2>
+              </div>
+              <button
+                onClick={() => setShowNotesModal(false)}
+                className="text-gray-500 hover:text-gray-700 transition-colors p-2 hover:bg-white rounded-lg"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            {/* Modal Body - Scrollable */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <SharedNotes currentUser={userCoFounder || undefined} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Getting Started Guide */}
       {!loading && metrics.isaiah.totalOutreach === 0 && metrics.soya.totalSignups === 0 && (

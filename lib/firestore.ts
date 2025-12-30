@@ -24,7 +24,8 @@ import type {
   CalendarEvent,
   Task,
   CoFounder,
-  SharedNote
+  SharedNote,
+  Expense
 } from '@/types';
 
 // ============================================
@@ -1068,6 +1069,128 @@ export async function deleteSharedNote(noteId: string) {
     return { success: true, error: null };
   } catch (error: any) {
     console.error('Error deleting note:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================
+// SHARED EXPENSES
+// ============================================
+
+/**
+ * Create a new expense
+ */
+export async function createExpense(expense: Omit<Expense, 'id' | 'created_at' | 'updated_at' | 'status' | 'confirmed_at'>) {
+  try {
+    const expensesRef = collection(db, 'shared_expenses');
+    const docRef = await addDoc(expensesRef, {
+      ...expense,
+      status: 'pending',
+      created_at: Timestamp.now(),
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, id: docRef.id, error: null };
+  } catch (error: any) {
+    console.error('Error creating expense:', error);
+    return { success: false, id: null, error: error.message };
+  }
+}
+
+/**
+ * Get all expenses
+ */
+export async function getAllExpenses(limitCount = 100) {
+  try {
+    const expensesRef = collection(db, 'shared_expenses');
+    const q = query(expensesRef, orderBy('date', 'desc'), limit(limitCount));
+    const querySnapshot = await getDocs(q);
+
+    const expenses: Expense[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      expenses.push({
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+        confirmed_at: data.confirmed_at || undefined,
+      } as Expense);
+    });
+
+    return { data: expenses, error: null };
+  } catch (error: any) {
+    console.error('Error fetching expenses:', error);
+    return { data: null, error: error.message };
+  }
+}
+
+/**
+ * Mark expense as paid by partner
+ */
+export async function markExpenseAsPaid(expenseId: string, paymentProof: string) {
+  try {
+    const expenseRef = doc(db, 'shared_expenses', expenseId);
+    await updateDoc(expenseRef, {
+      status: 'paid_by_partner',
+      payment_proof: paymentProof,
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error marking expense as paid:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Confirm expense received (by creator)
+ */
+export async function confirmExpenseReceived(expenseId: string) {
+  try {
+    const expenseRef = doc(db, 'shared_expenses', expenseId);
+    await updateDoc(expenseRef, {
+      status: 'completed',
+      confirmed_at: new Date().toISOString(),
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error confirming expense:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Update an expense
+ */
+export async function updateExpense(expenseId: string, updates: Partial<Pick<Expense, 'amount' | 'description' | 'category' | 'date'>>) {
+  try {
+    const expenseRef = doc(db, 'shared_expenses', expenseId);
+    await updateDoc(expenseRef, {
+      ...updates,
+      updated_at: Timestamp.now(),
+    });
+
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error updating expense:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Delete an expense
+ */
+export async function deleteExpense(expenseId: string) {
+  try {
+    const expenseRef = doc(db, 'shared_expenses', expenseId);
+    await deleteDoc(expenseRef);
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error deleting expense:', error);
     return { success: false, error: error.message };
   }
 }

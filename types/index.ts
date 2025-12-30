@@ -196,3 +196,22 @@ export interface SharedNote {
   category?: "idea" | "note" | "thought" | "general";
   tags?: string[];
 }
+
+// Shared Expenses - Co-founder expense tracking and reimbursement
+export interface Expense {
+  id: string;
+  created_by: string; // user_id of person who paid the expense
+  created_by_name: CoFounder; // "issiah" or "soya" - who paid it
+  amount: number; // total amount paid
+  description: string;
+  category: "software" | "marketing" | "infrastructure" | "equipment" | "office" | "travel" | "other";
+  date: string; // YYYY-MM-DD when expense occurred
+  status: "pending" | "paid_by_partner" | "completed";
+  // pending: waiting for partner to pay their half
+  // paid_by_partner: partner marked as paid
+  // completed: creator confirmed receipt
+  payment_proof?: string; // note from partner when they mark as paid (e.g., "Sent via Venmo")
+  confirmed_at?: string; // when creator confirmed receipt
+  created_at: string;
+  updated_at: string;
+}

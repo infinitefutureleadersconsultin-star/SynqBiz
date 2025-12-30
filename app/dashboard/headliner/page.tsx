@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, DollarSign, TrendingUp, Users, Zap, Target, Award, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, DollarSign, TrendingUp, Users, Zap, Target, Award, ChevronDown, Smartphone, BarChart3, Sparkles } from "lucide-react";
 
 const slides = [
   {
@@ -213,7 +213,7 @@ const slides = [
   },
   {
     id: 8,
-    title: "Our Purple Cow",
+    title: "Host Purple Cow",
     subtitle: "The Message That Stops the Scroll",
     content: [
       "Every other platform takes money from hosts",
@@ -238,72 +238,265 @@ const slides = [
   },
   {
     id: 9,
+    title: "Sponsor Purple Cow",
+    subtitle: "The Other Side of the Marketplace",
+    content: [
+      "Brands spend thousands on ads people skip",
+      "They want to reach customers at events — but can't find them",
+      "Local events aren't on Google, Eventbrite, or anywhere",
+      "We solve the discovery problem"
+    ],
+    purpleCow: "We Found the Events. You Just Pick Which Ones to Sponsor.",
+    explanation: "Underground parties, college events, cookouts, pop-ups — the events your customers actually go to. We curate them. You sponsor them.",
+    callout: "\"Sponsor events you'll never find on Google.\"",
+    why: {
+      title: "Why Sponsors Care:",
+      points: [
+        "They CAN'T find local/underground events on their own → no search engine, no listings",
+        "They DON'T trust random DMs from hosts → no credibility, no vetting",
+        "They CAN'T measure ROI → traditional sponsorship is 'pay and pray'",
+        "The process is MESSY → back-and-forth emails, no contracts, sketchy payments",
+        "We remove ALL friction → curated events, instant checkout, built-in tracking"
+      ]
+    },
+    icon: Target,
+    gradient: "from-orange-500 to-red-600",
+  },
+  {
+    id: 10,
+    title: "The Sponsor's Current Problem",
+    subtitle: "Why They Need Us",
+    content: [
+      {
+        title: "Discovery Problem",
+        desc: "Local brands want to sponsor events but don't know where to find them. Underground events don't show up on Google."
+      },
+      {
+        title: "Trust Problem",
+        desc: "Random DMs from event hosts have no credibility. Is this event real? Will 50 people show up or 500?"
+      },
+      {
+        title: "ROI Problem",
+        desc: "Traditional sponsorships are 'pay and hope.' No tracking. No conversion data. No proof it worked."
+      },
+      {
+        title: "Process Problem",
+        desc: "Back-and-forth emails, unclear deliverables, sketchy payment methods, no contracts."
+      }
+    ],
+    why: {
+      title: "What This Means:",
+      points: [
+        "Big brands have agencies to solve this → they pay $50K+ for experiential marketing activations",
+        "Small/local brands are locked out → can't afford agencies, can't find events themselves",
+        "We democratize experiential marketing → same results, 1/100th the cost",
+        "Our platform IS the solution → discovery, vetting, contracts, payments, tracking all in one place"
+      ]
+    },
+    icon: Users,
+    gradient: "from-red-500 to-pink-600",
+  },
+  {
+    id: 11,
+    title: "The Invention: Sponsor-to-Pocket",
+    subtitle: "Our Netflix Moment",
+    content: [
+      "Current sponsorships = passive. Logo on a wall. Hope someone remembers.",
+      "Our sponsorships = active. Instant connection. Trackable conversions.",
+      "We change the relationship from 'brand awareness' to 'direct response.'"
+    ],
+    why: {
+      title: "How It Works:",
+      points: [
+        "Every event gets a QR code/NFC tap point (on banner, entrance, table)",
+        "Attendee taps/scans → takes 1 second, no app download",
+        "They instantly receive: discount code, link to order, digital coupon (expires 48hrs), giveaway entry",
+        "Sponsor gets: exact scan count, conversion rate, retargeting pixel, email/phone capture (opt-in)",
+        "This isn't brand awareness. This is direct response marketing at a live event."
+      ]
+    },
+    highlight: "Sponsorship with a receipt. Know exactly how many customers you got — not just how many people saw your logo.",
+    icon: Smartphone,
+    gradient: "from-blue-500 to-cyan-600",
+  },
+  {
+    id: 12,
+    title: "Why This Has Never Been Done",
+    subtitle: "We're the First to Connect All Three",
+    content: [
+      {
+        title: "1. Event Access",
+        desc: "We have the hosts. Nobody else has curated access to underground/local events at scale."
+      },
+      {
+        title: "2. Sponsor Budget",
+        desc: "Sponsors have money to spend — they just don't know where. We show them exactly where."
+      },
+      {
+        title: "3. Attendee Attention",
+        desc: "The event captures attention in person. We capture it digitally via QR/NFC. Then track the conversion."
+      }
+    ],
+    why: {
+      title: "The Netflix Comparison:",
+      points: [
+        "Netflix didn't just digitize DVDs → they changed the content/viewer relationship",
+        "From 'rent and return' → 'always available, personalized, data-driven'",
+        "We're doing the same for sponsorships",
+        "From 'logo on wall' → 'direct connection, immediate action, trackable conversion'",
+        "This is the sponsorship model that doesn't exist yet. We're inventing it."
+      ]
+    },
+    icon: Sparkles,
+    gradient: "from-purple-500 to-fuchsia-600",
+  },
+  {
+    id: 13,
+    title: "Sponsor Pricing Tiers",
+    subtitle: "How We Monetize Both Sides",
+    type: "comparison",
+    free: {
+      title: "SPONSOR PRICING",
+      subtitle: "Pay Based on Tracking Depth",
+      features: [
+        {
+          feature: "Bronze - $250",
+          why: "Logo placement only (old way). Passive brand awareness."
+        },
+        {
+          feature: "Silver - $500",
+          why: "Logo + QR code activation. Track scans, basic engagement."
+        },
+        {
+          feature: "Gold - $1,000",
+          why: "Logo + QR + email capture + retargeting pixel. Full funnel tracking."
+        },
+        {
+          feature: "Platinum - $2,500",
+          why: "All above + exclusive 'Presented By' + post-event analytics report + unlimited events/month."
+        }
+      ]
+    },
+    pro: {
+      title: "WHY SPONSORS PAY MORE",
+      subtitle: "Because We Deliver Customers, Not Awareness",
+      features: [
+        {
+          feature: "Trackable ROI",
+          why: "💰 They can prove it worked. 'I paid $1,000, got 40 customers. $25 CAC.'"
+        },
+        {
+          feature: "Cheaper than Ads",
+          why: "💰 Facebook/Instagram CAC = $30-50. Our CAC = $15-25. We win on math."
+        },
+        {
+          feature: "Real Engagement",
+          why: "💰 Not a scroll-by. People spend 2-4 hours under your banner, drinking, dancing, taking photos."
+        },
+        {
+          feature: "Retargeting Unlocked",
+          why: "💰 Pixel fires. Now they can run ads to everyone who scanned. Warm audience."
+        },
+        {
+          feature: "Recurring Revenue",
+          why: "💰 Once they see it works, they sponsor 10+ events. LTV >> CAC."
+        }
+      ]
+    },
+    gradient: "from-green-500 to-emerald-600",
+  },
+  {
+    id: 14,
+    title: "The Value Proposition to Sponsors",
+    subtitle: "What We Actually Sell",
+    content: [
+      "We don't sell banner space.",
+      "We don't sell brand awareness.",
+      "We sell customers."
+    ],
+    why: {
+      title: "The Pitch:",
+      points: [
+        "\"A banner at a 500-person HBCU party costs $500. That's $1 per impression.\"",
+        "\"But it's not a scroll-by impression. It's 4 hours of attention, photos, memories.\"",
+        "\"Plus you get QR scans → conversion data → retargeting → measurable customers.\"",
+        "\"That's worth 1,000 Instagram ads. And you can prove it.\"",
+        "\"We don't sell you a logo on a wall. We sell you customers in your store.\""
+      ]
+    },
+    purpleCow: "Stop Running Ads. Start Showing Up.",
+    explanation: "Your customers are at parties, cookouts, tailgates, and pop-ups this weekend. We put your brand in the room — not on their feed.",
+    icon: BarChart3,
+    gradient: "from-indigo-500 to-purple-600",
+  },
+  {
+    id: 15,
     title: "The Psychology Behind the Funnel",
     subtitle: "How This Works in Practice",
     content: [
       {
         step: "1. Purple Cow Stops the Scroll",
-        desc: "\"We pay you to throw your event\" → Curiosity click. They land on our page."
+        desc: "\"We pay you to throw your event\" (hosts) / \"Sponsor events you'll never find\" (sponsors) → Curiosity click."
       },
       {
         step: "2. Landing Page Removes All Friction",
-        desc: "Free forever. No credit card. Unlimited events. They sign up because there's no risk."
+        desc: "Free forever for hosts. Self-serve browse for sponsors. No sales calls. Easy checkout."
       },
       {
         step: "3. Product Experience Exceeds Expectations",
-        desc: "They discover cleaner UI than Eventbrite, better tools than Posh, and a sponsor marketplace no one else has."
+        desc: "Hosts: cleaner than Eventbrite, sponsor marketplace. Sponsors: events they couldn't find elsewhere."
       },
       {
-        step: "4. First Sponsor Match = Aha Moment",
-        desc: "A sponsor reaches out or they close their first $500 deal. Now they believe the purple cow wasn't hype."
+        step: "4. First Transaction = Aha Moment",
+        desc: "Host gets their first $500 sponsorship. Sponsor gets their first 30 QR scans → 8 conversions."
       },
       {
         step: "5. They Stay Because It Actually Works",
-        desc: "Platform is better + they're making money. Switching back to Eventbrite feels like a downgrade."
+        desc: "Hosts make money. Sponsors get customers. Platform becomes indispensable."
       },
       {
         step: "6. Revenue Flows Through the Ecosystem",
-        desc: "Ticket fees. Sponsorship cuts. Promoter commissions. Money is moving. We take our percentage."
+        desc: "Ticket fees. Sponsorship cuts. Promoter commissions. Conversion tracking upsells. Money is moving."
       }
     ],
     why: {
       title: "Why This Matters for the Landing Page:",
       points: [
-        "Step 1 & 2 are CRITICAL → if the landing page doesn't convert, nothing else matters",
-        "Purple cow must be above the fold → biggest, boldest text on the page",
-        "CTA must say 'Start Free Forever' → not 'Try Free' or 'Get Started'",
-        "Social proof must show sponsor success stories → not just event success",
-        "Every section must remove objections → 'Is this really free?' 'Will I get spammed?' 'Is setup hard?'"
+        "We need TWO landing pages → one for hosts, one for sponsors",
+        "Host page: 'We pay you' / Sponsor page: 'We found the events'",
+        "Both remove objections → hosts see 'free forever' / sponsors see 'self-serve, no sales calls'",
+        "Both promise outcomes → hosts: revenue / sponsors: customers",
+        "Both deliver proof → testimonials, case studies, conversion data"
       ]
     },
     gradient: "from-indigo-500 to-blue-600",
   },
   {
-    id: 10,
+    id: 16,
     title: "This Is How We Compete",
     subtitle: "Our Strategic Edge",
     content: [
-      "✓ Match the free entry every competitor offers → remove friction",
-      "✓ Give hosts a built-in sponsor marketplace → our unique moat",
-      "✓ Position as 'we pay you' instead of 'we charge you' → reframe the narrative",
-      "✓ Let people in without walls or limits → build network effects",
-      "✓ Let the marketplace generate revenue → transactions, not subscriptions"
+      "✓ Match the free entry every competitor offers → remove friction for hosts",
+      "✓ Give hosts a built-in sponsor marketplace → our unique moat (no competitor has this)",
+      "✓ Give sponsors access to events they can't find → solve discovery problem",
+      "✓ Add conversion tracking to sponsorships → solve ROI problem",
+      "✓ Let the marketplace generate revenue → transactions on both sides"
     ],
     why: {
       title: "What This Means for Development Priorities:",
       points: [
         "Sponsor marketplace must be visible on day 1 → not hidden behind a menu",
-        "Free tier must be feature-complete → no artificial limitations that feel cheap",
-        "Onboarding must showcase sponsor opportunities → not just 'create your first event'",
-        "Pro tier upgrade prompts must focus on $$ outcomes → not 'unlock more features'",
-        "Analytics must show 'potential sponsor revenue' → make the money visible"
+        "QR code generation must be automatic → every sponsorship gets a trackable link",
+        "Analytics dashboard for sponsors → show scans, conversions, ROI in real-time",
+        "Free tier for hosts must be feature-complete → match Eventbrite 1:1",
+        "Self-serve sponsor checkout → no sales team needed until $10K+ deals"
       ]
     },
     highlight: "The purple cow opens the door. The product keeps them in the room. The marketplace generates the money.",
     gradient: "from-green-500 to-emerald-600",
   },
   {
-    id: 11,
+    id: 17,
     title: "The Engine",
     subtitle: "What Drives Everything",
     type: "final",
@@ -314,8 +507,8 @@ const slides = [
         "Every product decision must ask: 'Does this increase transaction volume?'",
         "Every landing page change must ask: 'Does this remove friction or add value perception?'",
         "Every pricing page update must ask: 'Does this speak in outcomes, not features?'",
-        "Every email, ad, or campaign must lead with: 'We pay you to throw your event'",
-        "Success = hosts making money through sponsors. Everything else is a distraction."
+        "Every email/ad must lead with the purple cow → hosts: 'We pay you' / sponsors: 'We found the events'",
+        "Success = hosts making money through sponsors + sponsors getting customers. Everything else is a distraction."
       ]
     },
     gradient: "from-purple-600 via-pink-600 to-red-600",

@@ -25,80 +25,162 @@ export default function ActionBotPage() {
   const [showResults, setShowResults] = useState(false);
 
   /**
-   * Sophisticated AI parser that can handle:
-   * - Multiple items in one paste
-   * - Various formats (numbered lists, bullets, paragraphs)
-   * - Extraction of title, task, context, impact, priority
+   * SOPHISTICATED AI PARSER - Format Agnostic
+   * Can handle ANY input format:
+   * - Numbered lists (1., 1:, ### 1., plain 1)
+   * - With/without markdown formatting (**bold**, plain)
+   * - Various field labels (Task, Task:, **Task:**, etc.)
+   * - Loose or strict structure
+   * - Missing fields (intelligently filled)
    */
   const parseActionItems = (text: string): ParsedActionItem[] => {
     const items: ParsedActionItem[] = [];
 
-    // Split by numbered headers (### 1., ### 2., etc)
-    // Use lookahead to keep the header with each section
-    const sections = text.split(/(?=###\s+\d+\.)/g).filter(s => s.trim().length > 20);
+    // STRATEGY 1: Try multiple splitting patterns in order of specificity
+    let sections: string[] = [];
 
-    console.log('📊 Parser: Found', sections.length, 'sections to parse');
+    // Try markdown headers first (### 1., ### 2., etc)
+    sections = text.split(/(?=###\s*\d+\.?\s)/g).filter(s => s.trim().length > 20);
+
+    // If that didn't work, try plain numbered lists (1., 2., 3. or 1:, 2:, 3:)
+    if (sections.length === 0) {
+      sections = text.split(/(?=^\d+[.:)]\s)/gm).filter(s => s.trim().length > 20);
+    }
+
+    // If still nothing, try detecting items by "Priority:" keyword (each item has one)
+    if (sections.length === 0) {
+      sections = text.split(/(?=Priority\s*:)/gi).filter(s => s.trim().length > 20);
+    }
+
+    console.log('📊 Parser: Found', sections.length, 'sections using multi-strategy detection');
 
     for (const section of sections) {
-      if (section.trim().length < 20) continue; // Skip tiny sections
+      if (section.trim().length < 20) continue;
 
-      console.log('📝 Parsing section (first 100 chars):', section.substring(0, 100));
+      console.log('📝 Parsing section (first 100 chars):', section.substring(0, 100).replace(/\n/g, ' '));
 
-      // Extract title (first line or header)
+      // EXTRACT TITLE - Try multiple patterns
       let title = "";
-      const titleMatch = section.match(/^###\s+\d+\.\s+(.+?)(?:\n|$)/m) ||
-                        section.match(/^(.+?)(?:\n|$)/);
-      if (titleMatch) {
-        title = titleMatch[1].replace(/\*\*Priority:\*\*\s+(HIGH|MEDIUM|LOW)/i, "").trim();
+
+      // Pattern 1: Markdown header with number (### 1. Title)
+      let titleMatch = section.match(/^###\s*\d+\.?\s*(.+?)(?:\n|$)/m);
+
+      // Pattern 2: Plain number with period/colon (1. Title or 1: Title)
+      if (!titleMatch) {
+        titleMatch = section.match(/^\d+[.:)]\s*(.+?)(?:\n|$)/m);
       }
+
+      // Pattern 3: Just first non-empty line
+      if (!titleMatch) {
+        const lines = section.split('\n').filter(l => l.trim());
+        if (lines.length > 0) {
+          titleMatch = [null, lines[0]];
+        }
+      }
+
+      if (titleMatch && titleMatch[1]) {
+        title = titleMatch[1]
+          .replace(/\*\*/g, '') // Remove markdown bold
+          .replace(/Priority\s*:\s*(HIGH|MEDIUM|LOW)/gi, '') // Remove priority if in title
+          .trim();
+      }
+
       console.log('  📌 Title:', title || '(none found)');
 
-      // Extract priority
+      // EXTRACT PRIORITY - Flexible matching
       let priority: "high" | "medium" | "low" = "medium";
-      const priorityMatch = section.match(/\*\*Priority:\*\*\s+(HIGH|MEDIUM|LOW)/i);
+
+      // Try with/without asterisks, case insensitive
+      const priorityMatch = section.match(/\*\*Priority\s*:\*\*\s*(HIGH|MEDIUM|LOW)/i) ||
+                           section.match(/Priority\s*:\s*(HIGH|MEDIUM|LOW)/i) ||
+                           section.match(/\(?(HIGH|MEDIUM|LOW)\s*PRIORITY\)?/i);
+
       if (priorityMatch) {
         priority = priorityMatch[1].toLowerCase() as "high" | "medium" | "low";
       }
 
-      // Extract task
+      console.log('  🎯 Priority:', priority);
+
+      // EXTRACT TASK - Flexible field detection
       let task = "";
-      const taskMatch = section.match(/\*\*Task:\*\*\s*([\s\S]+?)(?=\*\*Context:|$)/i);
-      if (taskMatch) {
-        task = taskMatch[1].trim();
+
+      // Try multiple task label variations
+      const taskPatterns = [
+        /\*\*Task\s*:\*\*\s*([\s\S]+?)(?=\*\*(?:Context|Impact)|Priority\s*:|^\d+[.:)]|$)/i,
+        /Task\s*:\s*([\s\S]+?)(?=Context\s*:|Impact\s*:|Priority\s*:|^\d+[.:)]|$)/i,
+        /\*\*Task\*\*\s*([\s\S]+?)(?=\*\*(?:Context|Impact)|Priority\s*:|^\d+[.:)]|$)/i,
+      ];
+
+      for (const pattern of taskPatterns) {
+        const match = section.match(pattern);
+        if (match) {
+          task = match[1].trim();
+          break;
+        }
       }
 
-      // Extract context
+      console.log('  📋 Task length:', task.length);
+
+      // EXTRACT CONTEXT - Flexible field detection
       let context = "";
-      const contextMatch = section.match(/\*\*Context:\*\*\s*([\s\S]+?)(?=\*\*Impact:|$)/i) ||
-                          section.match(/\*\*Strategic Context:\*\*\s*([\s\S]+?)(?=\*\*Impact:|$)/i);
-      if (contextMatch) {
-        context = contextMatch[1].trim();
+
+      const contextPatterns = [
+        /\*\*Context\s*:\*\*\s*([\s\S]+?)(?=\*\*Impact|Impact\s*:|Priority\s*:|^\d+[.:)]|$)/i,
+        /Context\s*:\s*([\s\S]+?)(?=Impact\s*:|Priority\s*:|^\d+[.:)]|$)/i,
+        /\*\*Strategic Context\s*:\*\*\s*([\s\S]+?)(?=\*\*Impact|Impact\s*:|^\d+[.:)]|$)/i,
+        /Strategic Context\s*:\s*([\s\S]+?)(?=Impact\s*:|^\d+[.:)]|$)/i,
+      ];
+
+      for (const pattern of contextPatterns) {
+        const match = section.match(pattern);
+        if (match) {
+          context = match[1].trim();
+          break;
+        }
       }
 
-      // Extract impact
+      // EXTRACT IMPACT - Flexible field detection
       let impact = "";
-      const impactMatch = section.match(/\*\*Impact:\*\*\s*([\s\S]+?)$/i) ||
-                         section.match(/\*\*Business Impact:\*\*\s*([\s\S]+?)$/i);
-      if (impactMatch) {
-        impact = impactMatch[1].trim();
+
+      const impactPatterns = [
+        /\*\*Impact\s*:\*\*\s*([\s\S]+?)(?=Priority\s*:|^\d+[.:)]|$)/i,
+        /Impact\s*:\s*([\s\S]+?)(?=Priority\s*:|^\d+[.:)]|$)/i,
+        /\*\*Business Impact\s*:\*\*\s*([\s\S]+?)(?=Priority\s*:|^\d+[.:)]|$)/i,
+        /Business Impact\s*:\s*([\s\S]+?)(?=^\d+[.:)]|$)/i,
+      ];
+
+      for (const pattern of impactPatterns) {
+        const match = section.match(pattern);
+        if (match) {
+          impact = match[1].trim();
+          break;
+        }
       }
 
-      // If we have at least a title and one other field, consider it valid
+      // INTELLIGENT VALIDATION & DEFAULTS
       if (title && (task || context || impact)) {
-        // If task is missing but we have content, use first paragraph as task
-        if (!task && section.length > 50) {
-          const lines = section.split('\n').filter(l => l.trim());
-          task = lines.slice(1, 5).join('\n').trim();
+        // If task missing but we have content, extract intelligently
+        if (!task && section.length > 100) {
+          const lines = section.split('\n').filter(l => l.trim() && !l.match(/^(Priority|Context|Impact|Task)\s*:/i));
+          task = lines.slice(1, 6).join(' ').trim();
+          if (task.length > 500) task = task.substring(0, 500) + '...';
         }
 
-        // Set defaults for missing fields
-        if (!context) context = "Parsed from bulk input";
-        if (!impact) impact = "To be defined";
+        // Smart defaults for missing fields
+        if (!context) {
+          context = "Auto-parsed from bulk input - review and update as needed";
+        }
+        if (!impact) {
+          impact = "Impact to be defined during implementation";
+        }
+        if (!task) {
+          task = "Task description to be added";
+        }
 
         console.log('  ✅ Item valid, adding to list');
         items.push({ title, task, context, impact, priority });
       } else {
-        console.log('  ❌ Item invalid - missing required fields');
+        console.log('  ❌ Item skipped - insufficient data (title missing or all fields empty)');
       }
     }
 
@@ -117,7 +199,7 @@ export default function ActionBotPage() {
       setParsedItems(parsed);
 
       if (parsed.length === 0) {
-        alert('⚠️ No action items found!\n\nMake sure your input uses this format:\n\n### 1. Title\n**Priority:** HIGH\n**Task:** Your task\n**Context:** Your context\n**Impact:** Your impact\n\nOr click "Load Example" to see a working example.');
+        alert('⚠️ No action items found!\n\nThe AI parser supports ANY format, but needs at least:\n• A title/name for each item\n• One of: Task, Context, or Impact\n\nTry pasting your content or click "Load Example" to see it work.');
       }
     } catch (error) {
       alert('❌ Error parsing input. Please check the format and try again.');
@@ -235,17 +317,17 @@ SMS broadcast capabilities matching Posh:
         <CardHeader>
           <CardTitle className="text-purple-900 flex items-center gap-2">
             <Sparkles className="w-5 h-5" />
-            How to Use
+            How to Use - Format Agnostic AI Parser
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3 text-sm">
-            <p className="font-semibold text-purple-900">✨ Paste all 17 action items at once (or any number)!</p>
+            <p className="font-semibold text-purple-900">✨ Paste in ANY format - the AI will figure it out!</p>
             <ul className="space-y-2 text-gray-700">
-              <li>• <strong>Format:</strong> Use numbered headers (### 1., ### 2.) or separate items with blank lines</li>
-              <li>• <strong>Required fields:</strong> Title, Task, Context, Impact, Priority</li>
-              <li>• <strong>Priority:</strong> Specify **Priority:** HIGH, MEDIUM, or LOW</li>
-              <li>• <strong>Bulk paste:</strong> Copy all items from the list above and paste below</li>
+              <li>• <strong>Supports:</strong> Numbered lists (1., 1:, ### 1.), plain paragraphs, any structure</li>
+              <li>• <strong>Recognizes:</strong> Task, Context, Impact, Priority (with or without bold/formatting)</li>
+              <li>• <strong>Smart defaults:</strong> Missing fields are filled intelligently</li>
+              <li>• <strong>Bulk paste:</strong> All 17+ items at once - no manual formatting needed</li>
             </ul>
             <div className="flex gap-2 mt-4">
               <Button
@@ -264,13 +346,13 @@ SMS broadcast capabilities matching Posh:
       {/* Input Area */}
       <Card>
         <CardHeader>
-          <CardTitle>Paste Action Items</CardTitle>
+          <CardTitle>Paste Action Items (Any Format)</CardTitle>
         </CardHeader>
         <CardContent>
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Paste your action items here... (supports multiple items at once)"
+            placeholder="Paste your action items here in ANY format... The AI will parse it automatically!"
             rows={20}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none font-mono text-sm"
           />

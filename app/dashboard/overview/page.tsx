@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase, getCurrentUser } from "@/lib/supabase";
+import { getCurrentUser } from "@/lib/firebase";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import TaskList from "@/components/TaskList";
+import SharedNotes from "@/components/SharedNotes";
 import {
   TrendingUp,
   TrendingDown,
@@ -31,6 +33,8 @@ interface MetricsSummary {
 
 export default function OverviewPage() {
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState<string>('');
+  const [userCoFounder, setUserCoFounder] = useState<'issiah' | 'soya' | null>(null);
   const [metrics, setMetrics] = useState<MetricsSummary>({
     isaiah: { totalOutreach: 0, weeklyOutreach: 0, totalMeetings: 0, weeklyMeetings: 0 },
     soya: { totalRevenue: 0, totalSignups: 0, weeklySignups: 0, weeklyTickets: 0 },
@@ -42,6 +46,14 @@ export default function OverviewPage() {
 
   async function loadMetrics() {
     try {
+      const user = await getCurrentUser();
+      if (user) {
+        setUserId(user.uid);
+        // Determine co-founder based on email or other identifier
+        const coFounder = user.email?.includes('issiah') ? 'issiah' : 'soya';
+        setUserCoFounder(coFounder);
+      }
+
       // This will be replaced with actual database queries once Supabase is set up
       // For now, using placeholder data
       setMetrics({
@@ -150,13 +162,24 @@ export default function OverviewPage() {
         </Card>
       </div>
 
+      {/* Shared Notes & Ideas */}
+      <SharedNotes currentUser={userCoFounder || undefined} />
+
+      {/* Weekly Tasks - All Co-Founders */}
+      {userId && (
+        <TaskList
+          userId={userId}
+          title="All Tasks This Week (Issiah & Soya)"
+        />
+      )}
+
       {/* Co-Founder Sections */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Isaiah Section */}
+        {/* Issiah Section */}
         <Card>
           <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b">
             <div className="flex items-center justify-between">
-              <CardTitle>Isaiah's Progress</CardTitle>
+              <CardTitle>Issiah's Progress</CardTitle>
               <span className="px-3 py-1 bg-blue-200 text-blue-800 text-xs font-semibold rounded-full">
                 Business
               </span>
@@ -213,7 +236,7 @@ export default function OverviewPage() {
             </p>
             <div className="flex gap-3">
               <Link href="/dashboard/isaiah">
-                <Button size="sm">Isaiah's Dashboard</Button>
+                <Button size="sm">Issiah's Dashboard</Button>
               </Link>
               <Link href="/dashboard/soya">
                 <Button size="sm" variant="outline">Soya's Dashboard</Button>

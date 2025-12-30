@@ -1,9 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getCurrentUser } from "@/lib/firebase";
+import { saveIssiahMetrics, getAllIssiahMetrics } from "@/lib/firestore";
+import type { IsaiahMetrics } from "@/types";
 import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import ChatInterface from "@/components/ChatInterface";
+import MetricsHistory from "@/components/MetricsHistory";
+import TaskList from "@/components/TaskList";
 import {
   Target,
   Users,
@@ -18,6 +24,9 @@ import {
 export default function IsaiahDashboard() {
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [userId, setUserId] = useState<string>('');
+  const [allMetrics, setAllMetrics] = useState<IsaiahMetrics[]>([]);
+  const [todayMetrics, setTodayMetrics] = useState<IsaiahMetrics | null>(null);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     outreach_contacts: '',
@@ -31,29 +40,71 @@ export default function IsaiahDashboard() {
     notes: '',
   });
 
+  useEffect(() => {
+    loadUserAndMetrics();
+  }, []);
+
+  async function loadUserAndMetrics() {
+    const user = await getCurrentUser();
+    if (user) {
+      setUserId(user.uid);
+      await loadMetrics(user.uid);
+    }
+  }
+
+  async function loadMetrics(uid: string) {
+    const { data } = await getAllIssiahMetrics(uid, 30);
+    if (data) {
+      setAllMetrics(data);
+      // Find today's metrics
+      const today = new Date().toISOString().split('T')[0];
+      const todaysData = data.find(m => m.date === today);
+      setTodayMetrics(todaysData || null);
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!userId) {
+      alert('Please log in first');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // TODO: Save to Supabase once database is set up
-      console.log('Saving metrics:', formData);
-
-      // Show success message
-      alert('Metrics saved successfully!');
-      setShowForm(false);
-      setFormData({
-        date: new Date().toISOString().split('T')[0],
-        outreach_contacts: '',
-        meetings_scheduled: '',
-        partnership_emails: '',
-        business_concepts: '',
-        college_outreach: '',
-        personal_brand_posts: '',
-        event_host_outreach: '',
-        enterprise_outreach: '',
-        notes: '',
+      const result = await saveIssiahMetrics(userId, formData.date, {
+        outreach_contacts: parseInt(formData.outreach_contacts) || 0,
+        meetings_scheduled: parseInt(formData.meetings_scheduled) || 0,
+        partnership_emails: parseInt(formData.partnership_emails) || 0,
+        business_concepts: parseInt(formData.business_concepts) || 0,
+        college_outreach: parseInt(formData.college_outreach) || 0,
+        personal_brand_posts: parseInt(formData.personal_brand_posts) || 0,
+        event_host_outreach: parseInt(formData.event_host_outreach) || 0,
+        enterprise_outreach: parseInt(formData.enterprise_outreach) || 0,
+        notes: formData.notes,
       });
+
+      if (result.success) {
+        alert('Metrics saved successfully! 🎉');
+        setShowForm(false);
+        setFormData({
+          date: new Date().toISOString().split('T')[0],
+          outreach_contacts: '',
+          meetings_scheduled: '',
+          partnership_emails: '',
+          business_concepts: '',
+          college_outreach: '',
+          personal_brand_posts: '',
+          event_host_outreach: '',
+          enterprise_outreach: '',
+          notes: '',
+        });
+        // Reload metrics
+        await loadMetrics(userId);
+      } else {
+        alert(`Failed to save: ${result.error}`);
+      }
     } catch (error) {
       console.error('Error saving metrics:', error);
       alert('Failed to save metrics');
@@ -66,15 +117,20 @@ export default function IsaiahDashboard() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  // Calculate totals for display
+  const calculateTotal = (key: keyof Omit<IsaiahMetrics, 'id' | 'user_id' | 'date' | 'notes' | 'created_at' | 'updated_at'>) => {
+    return allMetrics.reduce((sum, m) => sum + (Number(m[key]) || 0), 0);
+  };
+
   const metrics = [
-    { label: "Outreach Contacts Made", icon: Target, value: 0, color: "blue" },
-    { label: "Meetings Scheduled", icon: Users, value: 0, color: "purple" },
-    { label: "Partnership Emails Sent", icon: Mail, value: 0, color: "green" },
-    { label: "Business Concepts Explored", icon: Lightbulb, value: 0, color: "amber" },
-    { label: "College Outreach Activities", icon: GraduationCap, value: 0, color: "indigo" },
-    { label: "Personal Brand Posts", icon: Share2, value: 0, color: "pink" },
-    { label: "Event Host Outreach", icon: Building2, value: 0, color: "cyan" },
-    { label: "Enterprise Outreach", icon: TrendingUp, value: 0, color: "emerald" },
+    { label: "Outreach Contacts Made", icon: Target, value: calculateTotal('outreach_contacts'), color: "blue" },
+    { label: "Meetings Scheduled", icon: Users, value: calculateTotal('meetings_scheduled'), color: "purple" },
+    { label: "Partnership Emails Sent", icon: Mail, value: calculateTotal('partnership_emails'), color: "green" },
+    { label: "Business Concepts Explored", icon: Lightbulb, value: calculateTotal('business_concepts'), color: "amber" },
+    { label: "College Outreach Activities", icon: GraduationCap, value: calculateTotal('college_outreach'), color: "indigo" },
+    { label: "Personal Brand Posts", icon: Share2, value: calculateTotal('personal_brand_posts'), color: "pink" },
+    { label: "Event Host Outreach", icon: Building2, value: calculateTotal('event_host_outreach'), color: "cyan" },
+    { label: "Enterprise Outreach", icon: TrendingUp, value: calculateTotal('enterprise_outreach'), color: "emerald" },
   ];
 
   return (
@@ -82,7 +138,7 @@ export default function IsaiahDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Isaiah's Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Issiah's Dashboard</h1>
           <p className="text-gray-600 mt-1">Business & Outreach Metrics</p>
         </div>
         <Button onClick={() => setShowForm(!showForm)}>
@@ -206,6 +262,24 @@ export default function IsaiahDashboard() {
         </Card>
       )}
 
+      {/* Chat Interface */}
+      {userId && (
+        <ChatInterface
+          userId={userId}
+          onMetricsSaved={() => loadMetrics(userId)}
+        />
+      )}
+
+      {/* Weekly Tasks */}
+      {userId && (
+        <TaskList
+          userId={userId}
+          owner="issiah"
+          title="Issiah's Tasks This Week"
+          onTaskCompleted={() => loadMetrics(userId)}
+        />
+      )}
+
       {/* Metrics Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {metrics.map((metric) => {
@@ -241,16 +315,7 @@ export default function IsaiahDashboard() {
       </div>
 
       {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12 text-gray-500">
-            <p>No activity logged yet. Click "Log Today's Metrics" to get started!</p>
-          </div>
-        </CardContent>
-      </Card>
+      <MetricsHistory metrics={allMetrics} type="issiah" />
     </div>
   );
 }

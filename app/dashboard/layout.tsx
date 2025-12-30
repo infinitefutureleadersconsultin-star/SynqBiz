@@ -3,15 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { supabase, getCurrentUser, signOut } from "@/lib/supabase";
-import { User as SupabaseUser } from "@supabase/supabase-js";
+import { getCurrentUser, signOut, User as FirebaseUser } from "@/lib/firebase";
 import {
   LayoutDashboard,
   User,
   Users,
   LogOut,
   Menu,
-  X
+  X,
+  Rocket,
+  TrendingUp,
+  Presentation,
+  Receipt
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -21,7 +24,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [user, setUser] = useState<FirebaseUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -46,8 +49,12 @@ export default function DashboardLayout({
 
   const navigation = [
     { name: "Overview", href: "/dashboard/overview", icon: LayoutDashboard },
-    { name: "Isaiah's Dashboard", href: "/dashboard/isaiah", icon: User },
+    { name: "HEADLINER", href: "/dashboard/headliner", icon: Presentation },
+    { name: "Expenses", href: "/dashboard/expenses", icon: Receipt },
+    { name: "Issiah's Dashboard", href: "/dashboard/isaiah", icon: User },
     { name: "Soya's Dashboard", href: "/dashboard/soya", icon: Users },
+    { name: "Competitor Analysis", href: "/dashboard/competitors", icon: TrendingUp },
+    { name: "Phase 4 Features", href: "/dashboard/phase4", icon: Rocket },
   ];
 
   if (loading) {

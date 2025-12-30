@@ -1,0 +1,116 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==============================================
+    // USERS COLLECTION
+    // ==============================================
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // ==============================================
+    // METRICS COLLECTIONS
+    // ==============================================
+
+    // Issiah's metrics - only authenticated users can read/write their own
+    match /isaiah_metrics/{metricId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == resource.data.user_id;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.user_id;
+    }
+
+    // Soya's metrics - only authenticated users can read/write their own
+    match /soya_metrics/{metricId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == resource.data.user_id;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.user_id;
+    }
+
+    // ==============================================
+    // PHASE 4: PARTNERSHIP AGREEMENT
+    // ==============================================
+
+    // Partnership agreements - both co-founders can read and sign
+    match /partnership_agreements/{agreementId} {
+      // Both co-founders can read all agreements
+      allow read: if request.auth != null;
+
+      // Both co-founders can create initial agreements
+      allow create: if request.auth != null;
+
+      // Both co-founders can update (sign) agreements
+      allow update: if request.auth != null;
+
+      // Only allow delete in specific circumstances (optional, can be removed)
+      allow delete: if request.auth != null;
+    }
+
+    // ==============================================
+    // PHASE 4: THINK TANK / IDEAS
+    // ==============================================
+
+    // Ideas - both co-founders can create and vote
+    match /ideas/{ideaId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null; // For voting and status changes
+      allow delete: if request.auth != null && request.auth.uid == resource.data.author_id;
+    }
+
+    // Idea comments - both co-founders can comment
+    match /idea_comments/{commentId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.author_id;
+    }
+
+    // ==============================================
+    // PHASE 4: MILESTONES
+    // ==============================================
+
+    // Milestones - both co-founders can create and update progress
+    match /milestones/{milestoneId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    // ==============================================
+    // PHASE 4: CALENDAR EVENTS
+    // ==============================================
+
+    // Calendar events - both co-founders can create and manage
+    match /calendar_events/{eventId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    // ==============================================
+    // WEEKLY TASKS
+    // ==============================================
+
+    // Weekly Tasks - both co-founders can create and manage
+    match /tasks/{taskId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null;
+    }
+
+    // ==============================================
+    // SHARED NOTES & IDEAS
+    // ==============================================
+
+    // Shared Notes - both co-founders can create, read, and acknowledge
+    match /shared_notes/{noteId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null; // For acknowledgments
+      allow delete: if request.auth != null && request.auth.uid == resource.data.created_by;
+    }
+  }
+}

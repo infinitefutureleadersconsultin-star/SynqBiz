@@ -112,5 +112,29 @@ service cloud.firestore {
       allow update: if request.auth != null; // For acknowledgments
       allow delete: if request.auth != null && request.auth.uid == resource.data.created_by;
     }
+
+    // ==============================================
+    // SHARED EXPENSES
+    // ==============================================
+
+    // Shared Expenses - both co-founders can create, read, and manage
+    match /shared_expenses/{expenseId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.created_by;
+    }
+
+    // ==============================================
+    // STRATEGIC ACTION ITEMS
+    // ==============================================
+
+    // Action Items - both co-founders can create, read, and approve
+    match /action_items/{itemId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null; // For approvals and status changes
+      allow delete: if request.auth != null;
+    }
   }
 }

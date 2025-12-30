@@ -42,13 +42,13 @@ export default function ActionBotPage() {
     // Try markdown headers first (### 1., ### 2., etc)
     sections = text.split(/(?=###\s*\d+\.?\s)/g).filter(s => s.trim().length > 20);
 
-    // If that didn't work, try plain numbered lists (1., 2., 3. or 1:, 2:, 3:)
-    if (sections.length === 0) {
+    // If that didn't work (only 1 section = no split), try plain numbered lists (1., 2., 3. or 1:, 2:, 3:)
+    if (sections.length <= 1) {
       sections = text.split(/(?=^\d+[.:)]\s)/gm).filter(s => s.trim().length > 20);
     }
 
-    // If still nothing, try detecting items by "Priority:" keyword (each item has one)
-    if (sections.length === 0) {
+    // If still nothing (only 1 section), try detecting items by "Priority:" keyword (each item has one)
+    if (sections.length <= 1) {
       sections = text.split(/(?=Priority\s*:)/gi).filter(s => s.trim().length > 20);
     }
 

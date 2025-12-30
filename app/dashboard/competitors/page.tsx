@@ -5,7 +5,7 @@ import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { FileSpreadsheet, TrendingUp, Target, Award, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
 export default function CompetitorsPage() {
-  const [activeTab, setActiveTab] = useState<"quick" | "revenue" | "differentiators" | "summary" | "actions">("quick");
+  const [activeTab, setActiveTab] = useState<"quick" | "revenue" | "differentiators" | "summary">("quick");
 
   return (
     <div className="space-y-6">
@@ -70,13 +70,6 @@ export default function CompetitorsPage() {
           >
             Revenue Summary
           </TabButton>
-          <TabButton
-            active={activeTab === "actions"}
-            onClick={() => setActiveTab("actions")}
-            icon={<AlertCircle className="w-4 h-4" />}
-          >
-            Action Items
-          </TabButton>
         </div>
       </div>
 
@@ -86,7 +79,6 @@ export default function CompetitorsPage() {
         {activeTab === "revenue" && <RevenueStreamsTab />}
         {activeTab === "differentiators" && <DifferentiatorsTab />}
         {activeTab === "summary" && <RevenueSummaryTab />}
-        {activeTab === "actions" && <ActionItemsTab />}
       </div>
     </div>
   );
@@ -372,93 +364,5 @@ function RevenueSummaryTab() {
         </div>
       </CardContent>
     </Card>
-  );
-}
-
-function ActionItemsTab() {
-  const highPriority = [
-    { area: "Sponsor Matching", task: "Build excellent AI matching algorithm", why: "Our 12% commission must feel justified by quality matches" },
-    { area: "Verification System", task: "Robust photo upload + attendance tracking", why: "Sponsors need proof their money worked" },
-    { area: "Dashboard Savings Display", task: "Show subscribers monthly savings vs 5%", why: "Psychological win every month" },
-    { area: "Ambassador Visibility", task: "Prominently feature program in UI", why: "Users won't discover it unless we surface it" },
-  ];
-
-  const mediumPriority = [
-    { area: "Performance Tracking", task: "Track Boost & Featured Placement results", why: "Need data to prove these upgrades work" },
-    { area: "Instant Payout Cap", task: "Implement 1.5% with $15 max", why: "Makes instant payout attractive for large payouts" },
-    { area: "Annual Subscription", task: "Offer $190/year option", why: "Locks in committed hosts, improves predictability" },
-    { area: "Tiered Boost Options", task: "$10/3d, $15/7d, $25/14d", why: "Flexibility for different event timelines" },
-  ];
-
-  const lowPriority = [
-    { area: "Enterprise Compliance", task: "Approval workflows, audit trails, SIS integration", why: "Required for university sales" },
-    { area: "Leaderboards", task: "Show top ambassadors", why: "Creates competition, shows what's possible" },
-  ];
-
-  return (
-    <div className="space-y-6">
-      {/* High Priority */}
-      <Card className="border-2 border-red-600">
-        <CardHeader className="bg-red-600">
-          <CardTitle className="text-white">HIGH PRIORITY</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4 mt-4">
-            {highPriority.map((item, index) => (
-              <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-red-900">{item.area}</h4>
-                  <span className="px-2 py-1 bg-red-200 text-red-800 text-xs font-bold rounded">HIGH</span>
-                </div>
-                <p className="text-sm text-gray-900 mb-2"><strong>Task:</strong> {item.task}</p>
-                <p className="text-sm text-gray-700"><strong>Why:</strong> {item.why}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Medium Priority */}
-      <Card className="border-2 border-yellow-600">
-        <CardHeader className="bg-yellow-600">
-          <CardTitle className="text-white">MEDIUM PRIORITY</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4 mt-4">
-            {mediumPriority.map((item, index) => (
-              <div key={index} className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-yellow-900">{item.area}</h4>
-                  <span className="px-2 py-1 bg-yellow-200 text-yellow-800 text-xs font-bold rounded">MEDIUM</span>
-                </div>
-                <p className="text-sm text-gray-900 mb-2"><strong>Task:</strong> {item.task}</p>
-                <p className="text-sm text-gray-700"><strong>Why:</strong> {item.why}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Low Priority */}
-      <Card className="border-2 border-green-600">
-        <CardHeader className="bg-green-600">
-          <CardTitle className="text-white">LOW PRIORITY</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4 mt-4">
-            {lowPriority.map((item, index) => (
-              <div key={index} className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-green-900">{item.area}</h4>
-                  <span className="px-2 py-1 bg-green-200 text-green-800 text-xs font-bold rounded">LOW</span>
-                </div>
-                <p className="text-sm text-gray-900 mb-2"><strong>Task:</strong> {item.task}</p>
-                <p className="text-sm text-gray-700"><strong>Why:</strong> {item.why}</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
   );
 }

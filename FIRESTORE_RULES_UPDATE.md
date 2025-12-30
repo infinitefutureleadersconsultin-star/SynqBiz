@@ -1,16 +1,16 @@
 # 🔥 URGENT: Update Firestore Security Rules
 
 ## ⚠️ Issue
-Your Partnership Agreement and Phase 4 features are failing with:
+Your Action Bot and Expenses features are failing with:
 ```
-❌ Failed to create agreement: Missing or insufficient permissions
+❌ Missing or insufficient permissions (all 25 items failed)
 ```
 
-**Root Cause**: Firestore security rules don't include Phase 4 collections.
+**Root Cause**: Firestore security rules don't include `action_items` and `shared_expenses` collections.
 
 ---
 
-## ✅ Fix Instructions
+## ✅ Fix Instructions (2 Minutes)
 
 ### Step 1: Go to Firebase Console
 1. Visit [Firebase Console](https://console.firebase.google.com/)
@@ -25,62 +25,89 @@ Your Partnership Agreement and Phase 4 features are failing with:
 4. Click **Publish** button (top right)
 5. Wait for confirmation: "Rules published successfully"
 
-### Step 3: Verify Rules Are Applied
+### Step 3: Verify New Collections Are Included
 ```
-✅ Check that rules show:
-- partnership_agreements
-- ideas
-- idea_comments
-- milestones
-- calendar_events
+✅ Check that rules show these NEW collections:
+- action_items ← ADDED
+- shared_expenses ← ADDED
 ```
 
-### Step 4: Test Partnership Agreement
-1. Reload your app: `https://synq-biz.vercel.app/dashboard/phase4`
-2. Click **Partnership Agreement** tab
-3. Click **Create Partnership Agreement** button
-4. Should see: "✅ Partnership Agreement created successfully!"
+### Step 4: Test Action Bot
+1. Reload your app: `/dashboard/action-bot`
+2. Paste your 25 action items
+3. Click **Parse Items** → Should see "✓ Parsed 25 Action Items"
+4. Click **Create All 25 Items** → Should see "25 items created successfully" ✅
+5. Go to `/dashboard/overview` → See all 25 items with dual approval workflow
 
 ---
 
 ## 📋 What Changed
 
-### Old Rules (Only 3 collections)
+### Before (10 collections)
 - ✅ users
 - ✅ isaiah_metrics
 - ✅ soya_metrics
+- ✅ partnership_agreements
+- ✅ ideas
+- ✅ idea_comments
+- ✅ milestones
+- ✅ calendar_events
+- ✅ tasks
+- ✅ shared_notes
 
-### New Rules (8 collections)
+### After (12 collections)
 - ✅ users
 - ✅ isaiah_metrics
 - ✅ soya_metrics
-- ✅ **partnership_agreements** ← NEW
-- ✅ **ideas** ← NEW
-- ✅ **idea_comments** ← NEW
-- ✅ **milestones** ← NEW
-- ✅ **calendar_events** ← NEW
+- ✅ partnership_agreements
+- ✅ ideas
+- ✅ idea_comments
+- ✅ milestones
+- ✅ calendar_events
+- ✅ tasks
+- ✅ shared_notes
+- ✅ **action_items** ← NEW (lines 133-138)
+- ✅ **shared_expenses** ← NEW (lines 121-126)
 
 ---
 
 ## 🔐 Security Rules Summary
 
-### Partnership Agreements
-- ✅ Both co-founders can read all agreements
-- ✅ Both co-founders can create agreements
-- ✅ Both co-founders can update (sign) agreements
+### Action Items (NEW)
+- ✅ Both co-founders can read all action items
+- ✅ Both co-founders can create action items
+- ✅ Both co-founders can update (for approvals)
+- ✅ Both co-founders can delete action items
 
-### Think Tank (Ideas)
-- ✅ Both co-founders can read, create, vote
-- ✅ Only author can delete their own ideas
+### Shared Expenses (NEW)
+- ✅ Both co-founders can read all expenses
+- ✅ Both co-founders can create expenses
+- ✅ Both co-founders can update expenses
+- ✅ Only creator can delete their own expenses
 
-### Milestones
-- ✅ Both co-founders have full access
+---
 
-### Calendar
-- ✅ Both co-founders can create/edit/delete events
+## 🚨 Why This Matters
+
+**Without deploying these rules:**
+- ❌ Action Bot: All 25 items fail with permissions error
+- ❌ Expenses: Cannot create or track shared expenses
+- ❌ Overview: Action items don't display (no data in Firestore)
+
+**After deploying these rules:**
+- ✅ Action Bot: All 25 items save successfully
+- ✅ Expenses: Full create/read/update/delete access
+- ✅ Overview: Action items appear with dual approval workflow
 
 ---
 
 ## ⏱️ Estimated Time: 2 minutes
 
-Once published, your Phase 4 features will work immediately!
+Once published, your Action Bot will work immediately!
+
+**Next Steps After Publishing:**
+1. Refresh the Action Bot page
+2. Paste your 25 action items again
+3. Click "Parse Items" → "Create All 25 Items"
+4. All 25 will save successfully ✅
+5. View them on Overview page with approval workflow

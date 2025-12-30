@@ -33,11 +33,16 @@ export default function ActionBotPage() {
   const parseActionItems = (text: string): ParsedActionItem[] => {
     const items: ParsedActionItem[] = [];
 
-    // Split by numbered headers (### 1., ### 2., etc) or by double newlines
-    const sections = text.split(/(?=###\s+\d+\.|(?:\n\n)+)/g).filter(Boolean);
+    // Split by numbered headers (### 1., ### 2., etc)
+    // Use lookahead to keep the header with each section
+    const sections = text.split(/(?=###\s+\d+\.)/g).filter(s => s.trim().length > 20);
+
+    console.log('📊 Parser: Found', sections.length, 'sections to parse');
 
     for (const section of sections) {
       if (section.trim().length < 20) continue; // Skip tiny sections
+
+      console.log('📝 Parsing section (first 100 chars):', section.substring(0, 100));
 
       // Extract title (first line or header)
       let title = "";
@@ -46,6 +51,7 @@ export default function ActionBotPage() {
       if (titleMatch) {
         title = titleMatch[1].replace(/\*\*Priority:\*\*\s+(HIGH|MEDIUM|LOW)/i, "").trim();
       }
+      console.log('  📌 Title:', title || '(none found)');
 
       // Extract priority
       let priority: "high" | "medium" | "low" = "medium";
@@ -89,23 +95,33 @@ export default function ActionBotPage() {
         if (!context) context = "Parsed from bulk input";
         if (!impact) impact = "To be defined";
 
+        console.log('  ✅ Item valid, adding to list');
         items.push({ title, task, context, impact, priority });
+      } else {
+        console.log('  ❌ Item invalid - missing required fields');
       }
     }
 
+    console.log('✅ Parser: Successfully parsed', items.length, 'action items');
     return items;
   };
 
   const handleParse = () => {
     setParsing(true);
     setShowResults(false);
+    setParsedItems([]); // Clear previous results
 
     try {
+      console.log('🔍 Starting parse with input length:', input.length);
       const parsed = parseActionItems(input);
       setParsedItems(parsed);
+
+      if (parsed.length === 0) {
+        alert('⚠️ No action items found!\n\nMake sure your input uses this format:\n\n### 1. Title\n**Priority:** HIGH\n**Task:** Your task\n**Context:** Your context\n**Impact:** Your impact\n\nOr click "Load Example" to see a working example.');
+      }
     } catch (error) {
-      alert('Error parsing input. Please check the format and try again.');
-      console.error(error);
+      alert('❌ Error parsing input. Please check the format and try again.');
+      console.error('Parser error:', error);
     } finally {
       setParsing(false);
     }

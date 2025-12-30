@@ -197,6 +197,19 @@ export interface SharedNote {
   tags?: string[];
 }
 
+// Action Items - Dynamic items created via Action Bot
+export interface ActionItem {
+  id: string;
+  area: string; // Title/area of work
+  priority: 'high' | 'medium' | 'low';
+  task: string; // What needs to be done
+  context: string; // Why this matters
+  impact: string; // Expected outcome
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // Action Item Approvals - Dual approval system for strategic action items
 export interface ActionItemApproval {
   id: string; // matches action item identifier (area)

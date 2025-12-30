@@ -13,7 +13,8 @@ import {
   X,
   Rocket,
   TrendingUp,
-  Presentation
+  Presentation,
+  Zap
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -48,6 +49,7 @@ export default function DashboardLayout({
 
   const navigation = [
     { name: "Overview", href: "/dashboard/overview", icon: LayoutDashboard },
+    { name: "Action Bot", href: "/dashboard/action-bot", icon: Zap },
     { name: "HEADLINER", href: "/dashboard/headliner", icon: Presentation },
     { name: "Issiah's Dashboard", href: "/dashboard/isaiah", icon: User },
     { name: "Soya's Dashboard", href: "/dashboard/soya", icon: Users },

@@ -25,6 +25,7 @@ import type {
   Task,
   CoFounder,
   SharedNote,
+  ActionItem,
   ActionItemApproval
 } from '@/types';
 
@@ -1069,6 +1070,72 @@ export async function deleteSharedNote(noteId: string) {
     return { success: true, error: null };
   } catch (error: any) {
     console.error('Error deleting note:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================
+// ACTION ITEMS
+// ============================================
+
+/**
+ * Create a new action item
+ */
+export async function createActionItem(item: Omit<ActionItem, 'id' | 'created_at' | 'updated_at'>) {
+  try {
+    const itemsRef = collection(db, 'action_items');
+
+    const docData = {
+      ...item,
+      created_at: Timestamp.now(),
+      updated_at: Timestamp.now(),
+    };
+
+    const docRef = await addDoc(itemsRef, docData);
+    return { success: true, id: docRef.id, error: null };
+  } catch (error: any) {
+    console.error('Error creating action item:', error);
+    return { success: false, id: null, error: error.message };
+  }
+}
+
+/**
+ * Get all action items
+ */
+export async function getAllActionItems() {
+  try {
+    const itemsRef = collection(db, 'action_items');
+    const q = query(itemsRef, orderBy('created_at', 'desc'));
+    const querySnapshot = await getDocs(q);
+
+    const items: ActionItem[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      items.push({
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+      } as ActionItem);
+    });
+
+    return { data: items, error: null };
+  } catch (error: any) {
+    console.error('Error getting action items:', error);
+    return { data: [], error: error.message };
+  }
+}
+
+/**
+ * Delete an action item
+ */
+export async function deleteActionItem(itemId: string) {
+  try {
+    const itemRef = doc(db, 'action_items', itemId);
+    await deleteDoc(itemRef);
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error deleting action item:', error);
     return { success: false, error: error.message };
   }
 }

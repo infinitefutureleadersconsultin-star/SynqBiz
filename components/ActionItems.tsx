@@ -52,7 +52,7 @@ export default function ActionItems({ currentUser }: ActionItemsProps) {
   }
 
   async function handleToggleApproval(area: string) {
-    if (!userCoFounder) return;
+    if (!userCoFounder || !area) return;
 
     // Create a unique ID from the area (sanitized)
     const itemId = area.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -81,6 +81,16 @@ export default function ActionItems({ currentUser }: ActionItemsProps) {
   }
 
   function getApprovalStatus(area: string) {
+    // Null safety: Handle undefined/null area
+    if (!area) {
+      return {
+        issiahApproved: false,
+        soyaApproved: false,
+        completed: false,
+        currentUserApproved: false
+      };
+    }
+
     const itemId = area.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     const approval = approvals.find(a => a.id === itemId);
     return {

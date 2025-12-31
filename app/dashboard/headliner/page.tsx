@@ -841,49 +841,6 @@ export default function HeadlinerPage() {
               </div>
             )}
 
-            {slide.type === "comparison" && (
-              <div className="text-white space-y-8 animate-fade-in">
-                <div className="text-center mb-8">
-                  <h2 className="text-5xl font-bold mb-3">{slide.title}</h2>
-                  <p className="text-xl opacity-90">{slide.subtitle}</p>
-                </div>
-                <div className="grid grid-cols-2 gap-6">
-                  {/* Free Tier */}
-                  <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/20">
-                    <h3 className="text-2xl font-bold mb-2 text-center">{slide.free?.title}</h3>
-                    <p className="text-sm opacity-75 text-center mb-6">{slide.free?.subtitle}</p>
-                    <ul className="space-y-4">
-                      {slide.free?.features.map((item: any, idx: number) => (
-                        <li key={idx} className="bg-white/5 rounded-xl p-4 border border-white/10">
-                          <div className="flex items-start gap-3 mb-2">
-                            <span className="text-green-300 mt-1 flex-shrink-0">✓</span>
-                            <span className="font-semibold text-base">{item.feature}</span>
-                          </div>
-                          <p className="text-sm opacity-75 ml-6">{item.why}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  {/* Pro Tier */}
-                  <div className="bg-white/20 backdrop-blur-md rounded-3xl p-6 border-2 border-yellow-300/50 shadow-2xl">
-                    <h3 className="text-2xl font-bold mb-2 text-center text-yellow-200">{slide.pro?.title}</h3>
-                    <p className="text-sm opacity-75 text-center mb-6">{slide.pro?.subtitle}</p>
-                    <ul className="space-y-4">
-                      {slide.pro?.features.map((item: any, idx: number) => (
-                        <li key={idx} className="bg-white/10 rounded-xl p-4 border border-yellow-300/30">
-                          <div className="flex items-start gap-3 mb-2">
-                            <span className="text-yellow-300 mt-1 flex-shrink-0">★</span>
-                            <span className="font-bold text-base">{item.feature}</span>
-                          </div>
-                          <p className="text-sm opacity-90 ml-6 font-medium text-yellow-100">{item.why}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {slide.type === "final" && (
               <div className="text-center text-white space-y-10 animate-fade-in">
                 <h2 className="text-6xl font-black">{slide.title}</h2>

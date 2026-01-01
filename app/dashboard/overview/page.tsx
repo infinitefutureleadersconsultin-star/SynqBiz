@@ -39,7 +39,7 @@ export default function OverviewPage() {
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [metrics, setMetrics] = useState<MetricsSummary>({
     isaiah: { totalOutreach: 0, weeklyOutreach: 0, totalMeetings: 0, weeklyMeetings: 0 },
-    soya: { totalRevenue: 0, totalSignups: 0, weeklyTickets: 0 },
+    soya: { totalRevenue: 0, totalSignups: 0, weeklySignups: 0, weeklyTickets: 0 },
   });
 
   useEffect(() => {

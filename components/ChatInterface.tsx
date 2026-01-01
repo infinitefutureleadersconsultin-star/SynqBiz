@@ -136,13 +136,20 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
         const hasMetrics = Object.keys(parsedResult.issiahMetrics).length > 0 || Object.keys(parsedResult.soyaMetrics).length > 0;
         const hasEvents = parsedResult.calendarEvents && parsedResult.calendarEvents.length > 0;
         const hasTasks = parsedResult.tasks && parsedResult.tasks.length > 0;
+        const isBulkImport = parsedResult.tasks.length > 5;
 
         const messages = [];
         if (hasMetrics) messages.push('✅ Metrics');
         if (hasEvents) messages.push(`📅 ${parsedResult.calendarEvents.length} event(s)`);
-        if (hasTasks) messages.push(`✔️ ${parsedResult.tasks.length} task(s)`);
+        if (hasTasks) {
+          if (isBulkImport) {
+            messages.push(`✔️ ${parsedResult.tasks.length} tasks (BULK IMPORT)`);
+          } else {
+            messages.push(`✔️ ${parsedResult.tasks.length} task(s)`);
+          }
+        }
 
-        alert(`${messages.join(', ')} saved successfully!`);
+        alert(`${messages.join(', ')} saved successfully!${isBulkImport ? '\n\nAll tasks have been created and assigned to the appropriate owners.' : ''}`);
       } else {
         throw new Error("Failed to save some data");
       }
@@ -295,14 +302,44 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
 
                 {parsedResult.tasks && parsedResult.tasks.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1">
-                      <CheckSquare className="w-3 h-3" />
-                      Tasks ({parsedResult.tasks.length}):
+                    <p className="text-xs font-semibold text-gray-700 mb-2 flex items-center justify-between">
+                      <span className="flex items-center gap-1">
+                        <CheckSquare className="w-3 h-3" />
+                        Tasks ({parsedResult.tasks.length}):
+                      </span>
+                      {parsedResult.tasks.length > 5 && (
+                        <span className="text-blue-600 font-normal">Bulk Import Detected</span>
+                      )}
                     </p>
-                    <div className="space-y-2">
+
+                    {/* Summary for bulk imports */}
+                    {parsedResult.tasks.length > 5 && (
+                      <div className="bg-blue-50 border border-blue-200 rounded p-2 mb-3 text-xs">
+                        <p className="font-semibold text-blue-900 mb-1">Summary:</p>
+                        <div className="grid grid-cols-3 gap-2 text-blue-700">
+                          <div>High: {parsedResult.tasks.filter(t => t.priority === 'high').length}</div>
+                          <div>Medium: {parsedResult.tasks.filter(t => t.priority === 'medium').length}</div>
+                          <div>Low: {parsedResult.tasks.filter(t => t.priority === 'low').length}</div>
+                          <div>Issiah: {parsedResult.tasks.filter(t => t.owner === 'issiah').length}</div>
+                          <div>Soya: {parsedResult.tasks.filter(t => t.owner === 'soya').length}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
                       {parsedResult.tasks.map((task, idx) => (
                         <div key={idx} className="bg-white px-3 py-2 rounded border border-purple-200">
-                          <p className="text-sm font-semibold text-gray-800">{task.title}</p>
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="text-sm font-semibold text-gray-800 flex-1">{task.title}</p>
+                            <span className="text-xs text-gray-500 whitespace-nowrap">#{idx + 1}</span>
+                          </div>
+
+                          {task.description && task.description.length > 100 && (
+                            <p className="text-xs text-gray-600 mt-1 line-clamp-2">
+                              {task.description.substring(0, 100)}...
+                            </p>
+                          )}
+
                           <p className="text-xs text-gray-600 mt-1">
                             Due: {new Date(task.due_date).toLocaleDateString('en-US', {
                               weekday: 'short',
@@ -310,7 +347,7 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
                               day: 'numeric',
                             })}
                           </p>
-                          <div className="flex gap-2 mt-1">
+                          <div className="flex gap-2 mt-1 flex-wrap">
                             <span className={`text-xs px-2 py-0.5 rounded ${
                               task.priority === 'high' ? 'bg-red-100 text-red-700' :
                               task.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
@@ -440,6 +477,24 @@ export default function ChatInterface({ userId, onMetricsSaved }: ChatInterfaceP
               <li>• "Task for Issiah: Send partnership emails by Monday"</li>
               <li>• "Todo: Fix login bug (high priority)"</li>
             </ul>
+          </div>
+
+          <div className="mt-3 pt-3 border-t border-gray-300">
+            <p className="text-xs font-semibold text-purple-700 mb-1">🚀 Bulk Task Import:</p>
+            <p className="text-xs text-gray-600 mb-1">Paste structured task lists with this format:</p>
+            <div className="bg-white border border-gray-200 rounded p-2 text-xs font-mono text-gray-700">
+              <div>1. Task Title</div>
+              <div>Priority: HIGH</div>
+              <div>Task: Description...</div>
+              <div>Context: Background...</div>
+              <div>Impact: Expected outcome...</div>
+              <div className="mt-1">2. Next Task Title</div>
+              <div>Priority: MEDIUM</div>
+              <div>...</div>
+            </div>
+            <p className="text-xs text-gray-500 mt-1 italic">
+              Automatically assigns to Issiah or Soya based on content
+            </p>
           </div>
         </CardContent>
       </Card>

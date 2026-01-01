@@ -7,6 +7,7 @@ import Card, { CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import TaskList from "@/components/TaskList";
 import SharedNotes from "@/components/SharedNotes";
+import ChatInterface from "@/components/ChatInterface";
 import {
   TrendingUp,
   TrendingDown,
@@ -14,7 +15,8 @@ import {
   Target,
   Users,
   Briefcase,
-  StickyNote
+  StickyNote,
+  Sparkles
 } from "lucide-react";
 
 interface MetricsSummary {
@@ -37,6 +39,7 @@ export default function OverviewPage() {
   const [userId, setUserId] = useState<string>('');
   const [userCoFounder, setUserCoFounder] = useState<'issiah' | 'soya' | null>(null);
   const [showNotesModal, setShowNotesModal] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false);
   const [metrics, setMetrics] = useState<MetricsSummary>({
     isaiah: { totalOutreach: 0, weeklyOutreach: 0, totalMeetings: 0, weeklyMeetings: 0 },
     soya: { totalRevenue: 0, totalSignups: 0, weeklySignups: 0, weeklyTickets: 0 },
@@ -87,13 +90,24 @@ export default function OverviewPage() {
           <h1 className="text-3xl font-bold text-gray-900">Co-Founder Dashboard</h1>
           <p className="text-gray-600 mt-1">Track progress and metrics for SponsorSynq</p>
         </div>
-        <Button
-          onClick={() => setShowNotesModal(true)}
-          className="flex items-center gap-2"
-        >
-          <StickyNote className="w-4 h-4" />
-          Shared Notes & Ideas
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => setShowChatModal(true)}
+            className="flex items-center gap-2"
+            variant="default"
+          >
+            <Sparkles className="w-4 h-4" />
+            AI Assistant
+          </Button>
+          <Button
+            onClick={() => setShowNotesModal(true)}
+            className="flex items-center gap-2"
+            variant="outline"
+          >
+            <StickyNote className="w-4 h-4" />
+            Shared Notes
+          </Button>
+        </div>
       </div>
 
       {/* Quick Stats Grid */}
@@ -252,6 +266,31 @@ export default function OverviewPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* AI Chat Assistant Modal */}
+      {showChatModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center p-6 border-b">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-6 h-6 text-primary-600" />
+                <h2 className="text-2xl font-bold text-gray-900">AI Assistant</h2>
+              </div>
+              <button
+                onClick={() => setShowChatModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-6">
+              {userId && <ChatInterface userId={userId} onMetricsSaved={loadMetrics} />}
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Shared Notes Modal */}

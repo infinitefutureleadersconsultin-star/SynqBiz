@@ -523,6 +523,117 @@ function parseCalendarEvents(text: string): ParsedCalendarEvent[] {
 }
 
 /**
+ * Parse bulk structured tasks from formatted text
+ * Handles format like:
+ * 1. Task Title
+ * Priority: HIGH
+ * Task: Description here
+ * Context: Background info
+ * Impact: Expected outcome
+ */
+export function parseBulkStructuredTasks(text: string): ParsedTask[] {
+  const tasks: ParsedTask[] = [];
+
+  // Split by numbered sections (1., 2., 3., etc.)
+  const sections = text.split(/\n(?=\d+\.\s+)/);
+
+  for (const section of sections) {
+    if (!section.trim()) continue;
+
+    // Extract title (first line after number)
+    const titleMatch = section.match(/^\d+\.\s+(.+?)(?:\n|$)/);
+    if (!titleMatch) continue;
+
+    const title = titleMatch[1].trim();
+
+    // Extract Priority
+    const priorityMatch = section.match(/Priority:\s*(HIGH|MEDIUM|LOW)/i);
+    let priority: 'low' | 'medium' | 'high' = 'medium';
+    if (priorityMatch) {
+      priority = priorityMatch[1].toLowerCase() as 'low' | 'medium' | 'high';
+    }
+
+    // Extract Task description
+    const taskMatch = section.match(/Task:\s*(.+?)(?=\n(?:Context:|Impact:|Priority:|$))/is);
+    const taskDescription = taskMatch ? taskMatch[1].trim() : '';
+
+    // Extract Context
+    const contextMatch = section.match(/Context:\s*(.+?)(?=\n(?:Task:|Impact:|Priority:|$))/is);
+    const context = contextMatch ? contextMatch[1].trim() : '';
+
+    // Extract Impact
+    const impactMatch = section.match(/Impact:\s*(.+?)(?=\n(?:Task:|Context:|Priority:|$))/is);
+    const impact = impactMatch ? impactMatch[1].trim() : '';
+
+    // Combine description, context, and impact
+    let fullDescription = taskDescription;
+    if (context) fullDescription += `\n\nContext: ${context}`;
+    if (impact) fullDescription += `\n\nImpact: ${impact}`;
+
+    // Determine owner based on keywords in task description
+    const combinedText = `${title} ${taskDescription} ${context}`.toLowerCase();
+    let owner: 'issiah' | 'soya' = 'issiah'; // Default
+
+    // Issiah keywords (business, outreach, partnerships)
+    const issiahKeywords = [
+      'landing page', 'branding', 'marketing', 'pricing', 'customer',
+      'sponsor', 'partnership', 'outreach', 'sales', 'presentation',
+      'messaging', 'purple cow', 'ambassador', 'university', 'compliance',
+      'enterprise', 'messaging', 'strategy', 'positioning'
+    ];
+
+    // Soya keywords (technical, development, product)
+    const soyaKeywords = [
+      'build', 'system', 'dashboard', 'api', 'integration', 'database',
+      'feature', 'ui', 'payout', 'sms', 'promoter', 'qr code', 'tracking',
+      'analytics', 'performance', 'auto-generate', 'placid', 'webhook',
+      'stripe', 'twilio', 'technical', 'development', 'code', 'implement'
+    ];
+
+    const issiahScore = issiahKeywords.filter(k => combinedText.includes(k)).length;
+    const soyaScore = soyaKeywords.filter(k => combinedText.includes(k)).length;
+
+    if (soyaScore > issiahScore) {
+      owner = 'soya';
+    }
+
+    // Determine category based on keywords
+    let category: string | undefined;
+    if (combinedText.includes('landing') || combinedText.includes('marketing') || combinedText.includes('messaging')) {
+      category = 'marketing';
+    } else if (combinedText.includes('pricing') || combinedText.includes('revenue') || combinedText.includes('subscription')) {
+      category = 'revenue';
+    } else if (combinedText.includes('build') || combinedText.includes('feature') || combinedText.includes('development')) {
+      category = 'development';
+    } else if (combinedText.includes('sponsor') || combinedText.includes('partnership')) {
+      category = 'outreach';
+    } else if (combinedText.includes('compliance') || combinedText.includes('university') || combinedText.includes('enterprise')) {
+      category = 'enterprise';
+    }
+
+    // Default due date (7 days from now for HIGH, 14 days for MEDIUM, 30 days for LOW)
+    const now = new Date();
+    let daysToAdd = 14;
+    if (priority === 'high') daysToAdd = 7;
+    if (priority === 'low') daysToAdd = 30;
+
+    const dueDate = new Date(now);
+    dueDate.setDate(dueDate.getDate() + daysToAdd);
+
+    tasks.push({
+      title,
+      description: fullDescription,
+      owner,
+      due_date: dueDate.toISOString().split('T')[0],
+      priority,
+      category,
+    });
+  }
+
+  return tasks;
+}
+
+/**
  * Parse tasks from message
  * Detects patterns like:
  * - "Add task: Contact 5 sponsors by Friday"
@@ -632,6 +743,16 @@ function parseTasks(text: string): ParsedTask[] {
 }
 
 /**
+ * Detect if message contains bulk structured task format
+ */
+function isBulkStructuredFormat(text: string): boolean {
+  // Check for multiple numbered sections with Priority/Task/Context/Impact
+  const hasNumberedSections = /\d+\.\s+.+\n.*Priority:/i.test(text);
+  const hasMultipleSections = (text.match(/\n\d+\.\s+/g) || []).length >= 2;
+  return hasNumberedSections && hasMultipleSections;
+}
+
+/**
  * Main parser function - analyzes text and extracts metrics and calendar events
  */
 export function parseMessage(message: string): ParsedMetrics {
@@ -646,6 +767,12 @@ export function parseMessage(message: string): ParsedMetrics {
     date,
     notes: message,
   };
+
+  // Check if this is bulk structured format
+  if (isBulkStructuredFormat(message)) {
+    result.tasks = parseBulkStructuredTasks(message);
+    return result;
+  }
 
   // Extract Issiah's metrics if relevant
   if (role === 'issiah' || role === 'both') {

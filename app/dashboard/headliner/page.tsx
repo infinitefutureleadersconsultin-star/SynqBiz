@@ -1138,24 +1138,6 @@ export default function HeadlinerPage() {
                     <p className="text-xl font-semibold text-yellow-100">{slide.highlight}</p>
                   </div>
                 )}
-
-                {slide.purpleCow && (
-                  <div className="mt-10 space-y-6">
-                    <div className="bg-white text-purple-600 rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-transform">
-                      <p className="text-4xl font-black text-center">{slide.purpleCow}</p>
-                    </div>
-                    {slide.explanation && (
-                      <p className="text-lg text-center opacity-90">{slide.explanation}</p>
-                    )}
-                    {slide.callout && (
-                      <div className="text-center">
-                        <div className="inline-block bg-white/20 backdrop-blur-md px-8 py-4 rounded-full border-2 border-white/30">
-                          <p className="text-xl font-bold">{slide.callout}</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             )}
           </div>

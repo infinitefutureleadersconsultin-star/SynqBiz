@@ -1186,18 +1186,18 @@ export default function HeadlinerPage() {
                   </div>
                 )}
 
-                {slide.purpleCow && (
+                {(slide as any).purpleCow && (
                   <div className="mt-10 space-y-6">
                     <div className="bg-white text-purple-600 rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-transform">
-                      <p className="text-4xl font-black text-center">{slide.purpleCow}</p>
+                      <p className="text-4xl font-black text-center">{(slide as any).purpleCow}</p>
                     </div>
-                    {slide.explanation && (
-                      <p className="text-lg text-center opacity-90">{slide.explanation}</p>
+                    {(slide as any).explanation && (
+                      <p className="text-lg text-center opacity-90">{(slide as any).explanation}</p>
                     )}
-                    {slide.callout && (
+                    {(slide as any).callout && (
                       <div className="text-center">
                         <div className="inline-block bg-white/20 backdrop-blur-md px-8 py-4 rounded-full border-2 border-white/30">
-                          <p className="text-xl font-bold">{slide.callout}</p>
+                          <p className="text-xl font-bold">{(slide as any).callout}</p>
                         </div>
                       </div>
                     )}

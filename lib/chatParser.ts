@@ -554,15 +554,15 @@ export function parseBulkStructuredTasks(text: string): ParsedTask[] {
     }
 
     // Extract Task description
-    const taskMatch = section.match(/Task:\s*(.+?)(?=\n(?:Context:|Impact:|Priority:|$))/is);
+    const taskMatch = section.match(/Task:\s*([\s\S]+?)(?=\n(?:Context:|Impact:|Priority:|$))/i);
     const taskDescription = taskMatch ? taskMatch[1].trim() : '';
 
     // Extract Context
-    const contextMatch = section.match(/Context:\s*(.+?)(?=\n(?:Task:|Impact:|Priority:|$))/is);
+    const contextMatch = section.match(/Context:\s*([\s\S]+?)(?=\n(?:Task:|Impact:|Priority:|$))/i);
     const context = contextMatch ? contextMatch[1].trim() : '';
 
     // Extract Impact
-    const impactMatch = section.match(/Impact:\s*(.+?)(?=\n(?:Task:|Context:|Priority:|$))/is);
+    const impactMatch = section.match(/Impact:\s*([\s\S]+?)(?=\n(?:Task:|Context:|Priority:|$))/i);
     const impact = impactMatch ? impactMatch[1].trim() : '';
 
     // Combine description, context, and impact

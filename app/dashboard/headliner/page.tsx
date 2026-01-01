@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, DollarSign, TrendingUp, Users, Zap, Target, Award, ChevronDown } from "lucide-react";
 
-const slides = [
+// Marketplace Strategy Presentation
+const marketplaceSlides = [
   {
     id: 1,
     title: "HEADLINER",
@@ -322,8 +323,114 @@ const slides = [
   }
 ];
 
+// Revenue Projections 2026 Presentation
+const revenueSlides = [
+  {
+    id: 1,
+    title: "HEADLINER 2026",
+    subtitle: "Revenue Projections & Growth Strategy",
+    type: "cover",
+    gradient: "from-emerald-600 via-teal-600 to-cyan-600",
+  },
+  {
+    id: 2,
+    title: "The Core Insight",
+    subtitle: "The Math That Makes VCs Salivate",
+    content: [
+      "On any given Saturday night, thousands of events are happening simultaneously",
+      "Every single one is a potential transaction on our platform",
+      "We're not getting paid once — we earn from MULTIPLE revenue streams per event",
+      "Each event = a mini revenue machine"
+    ],
+    why: {
+      title: "Why This Changes Everything:",
+      points: [
+        "Traditional platforms charge one fee → we stack multiple revenue streams",
+        "More events = exponential revenue growth, not linear",
+        "Every event creates value for hosts AND sponsors → self-reinforcing cycle",
+        "At scale, Saturday nights alone can generate $400K+ in revenue"
+      ]
+    },
+    icon: Zap,
+    gradient: "from-purple-600 to-fuchsia-600",
+  },
+  {
+    id: 3,
+    title: "2026 Growth Scenarios",
+    subtitle: "Three Paths to Success",
+    content: [
+      {
+        title: "Scenario 1: Conservative Growth",
+        desc: "We execute okay, grow steadily, nothing viral. 2026 Revenue: $5.4M | December ARR: $11.5M"
+      },
+      {
+        title: "Scenario 2: Moderate Growth",
+        desc: "We nail the HBCU market, expand to 20 cities, sponsors start recurring. 2026 Revenue: $13.8M | December ARR: $28.8M"
+      },
+      {
+        title: "Scenario 3: Aggressive Growth",
+        desc: "Venue lock-in works, viral TikTok growth, sponsors addicted to data. 2026 Revenue: $38.7M | December ARR: $84M"
+      }
+    ],
+    why: {
+      title: "The Reality Check:",
+      points: [
+        "Even 'aggressive' scenario = 0.03% market penetration of US events",
+        "Conservative scenario requires just 3,500 events/month by December",
+        "Moderate scenario = capturing 10% of HBCUs + 1% of venues",
+        "All three scenarios are achievable with proper execution"
+      ]
+    },
+    icon: TrendingUp,
+    gradient: "from-green-500 to-emerald-600",
+  },
+  {
+    id: 4,
+    title: "The Bottom Line",
+    subtitle: "Your Equity at 40%",
+    content: [
+      {
+        title: "Conservative (Scenario 1)",
+        desc: "2026 Revenue: $5.4M | Exit Valuation: $25-50M | Your equity: $10-20M"
+      },
+      {
+        title: "Moderate (Scenario 2)",
+        desc: "2026 Revenue: $13.8M | Exit Valuation: $70-140M | Your equity: $28-56M"
+      },
+      {
+        title: "Aggressive (Scenario 3)",
+        desc: "2026 Revenue: $38.7M | Exit Valuation: $200-400M | Your equity: $80-160M"
+      }
+    ],
+    highlight: "Even the conservative scenario puts you at $10-20M in equity value",
+    icon: DollarSign,
+    gradient: "from-yellow-600 to-amber-600",
+  },
+  {
+    id: 5,
+    title: "The Closing Pitch",
+    subtitle: "This Is a System, Not a Guess",
+    type: "final",
+    message: "On any given Saturday, there are 2,000 events happening on our platform. Each one generates $300+ in revenue across tickets, sponsors, and promoters. That's $600K every Saturday, $2.4M every month, $30M a year — and our cost to service each event is $6. That's 98% gross margin on a marketplace that hasn't existed before.",
+    why: {
+      title: "The Math Is Undeniable:",
+      points: [
+        "January: 6 hours/day → 150 events → $30K revenue",
+        "December: Team running → 8,000 events → $2.8M revenue",
+        "Marketing ROI: 40x ($11.3M / $280K)",
+        "Gross margin: 98% (near-zero marginal cost)",
+        "Exit multiple: 10-15x on $30M ARR = $300-450M valuation"
+      ]
+    },
+    gradient: "from-purple-600 via-fuchsia-600 to-pink-600",
+  }
+];
+
 export default function HeadlinerPage() {
+  const [activeDeck, setActiveDeck] = useState<'marketplace' | 'revenue'>('marketplace');
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const slides = activeDeck === 'marketplace' ? marketplaceSlides : revenueSlides;
   const slide = slides[currentSlide];
 
   const nextSlide = () => {
@@ -342,8 +449,37 @@ export default function HeadlinerPage() {
     setCurrentSlide(index);
   };
 
+  const switchDeck = (deck: 'marketplace' | 'revenue') => {
+    setActiveDeck(deck);
+    setCurrentSlide(0); // Reset to first slide when switching decks
+  };
+
   return (
     <div className="min-h-screen -m-8 bg-gray-900">
+      {/* Deck Selector */}
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20 flex gap-3 bg-gray-800/90 backdrop-blur-md p-2 rounded-full border border-white/10">
+        <button
+          onClick={() => switchDeck('marketplace')}
+          className={`px-6 py-2 rounded-full font-semibold transition-all ${
+            activeDeck === 'marketplace'
+              ? 'bg-blue-600 text-white shadow-lg'
+              : 'text-gray-400 hover:text-white hover:bg-gray-700'
+          }`}
+        >
+          Marketplace Strategy
+        </button>
+        <button
+          onClick={() => switchDeck('revenue')}
+          className={`px-6 py-2 rounded-full font-semibold transition-all ${
+            activeDeck === 'revenue'
+              ? 'bg-emerald-600 text-white shadow-lg'
+              : 'text-gray-400 hover:text-white hover:bg-gray-700'
+          }`}
+        >
+          Revenue Projections
+        </button>
+      </div>
+
       {/* Presentation Container */}
       <div className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Slide Content - SCROLLABLE */}
@@ -372,7 +508,7 @@ export default function HeadlinerPage() {
               </div>
             )}
 
-            {slide.type === "comparison" && (
+            {slide.type === "comparison" && activeDeck === 'marketplace' && (
               <div className="text-white space-y-8 animate-fade-in">
                 <div className="text-center mb-8">
                   <h2 className="text-5xl font-bold mb-3">{slide.title}</h2>
@@ -381,10 +517,10 @@ export default function HeadlinerPage() {
                 <div className="grid grid-cols-2 gap-6">
                   {/* Free Tier */}
                   <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/20">
-                    <h3 className="text-2xl font-bold mb-2 text-center">{slide.free?.title}</h3>
-                    <p className="text-sm opacity-75 text-center mb-6">{slide.free?.subtitle}</p>
+                    <h3 className="text-2xl font-bold mb-2 text-center">{(slide as any).free?.title}</h3>
+                    <p className="text-sm opacity-75 text-center mb-6">{(slide as any).free?.subtitle}</p>
                     <ul className="space-y-4">
-                      {slide.free?.features.map((item: any, idx: number) => (
+                      {(slide as any).free?.features.map((item: any, idx: number) => (
                         <li key={idx} className="bg-white/5 rounded-xl p-4 border border-white/10">
                           <div className="flex items-start gap-3 mb-2">
                             <span className="text-green-300 mt-1 flex-shrink-0">✓</span>
@@ -397,10 +533,10 @@ export default function HeadlinerPage() {
                   </div>
                   {/* Pro Tier */}
                   <div className="bg-white/20 backdrop-blur-md rounded-3xl p-6 border-2 border-yellow-300/50 shadow-2xl">
-                    <h3 className="text-2xl font-bold mb-2 text-center text-yellow-200">{slide.pro?.title}</h3>
-                    <p className="text-sm opacity-75 text-center mb-6">{slide.pro?.subtitle}</p>
+                    <h3 className="text-2xl font-bold mb-2 text-center text-yellow-200">{(slide as any).pro?.title}</h3>
+                    <p className="text-sm opacity-75 text-center mb-6">{(slide as any).pro?.subtitle}</p>
                     <ul className="space-y-4">
-                      {slide.pro?.features.map((item: any, idx: number) => (
+                      {(slide as any).pro?.features.map((item: any, idx: number) => (
                         <li key={idx} className="bg-white/10 rounded-xl p-4 border border-yellow-300/30">
                           <div className="flex items-start gap-3 mb-2">
                             <span className="text-yellow-300 mt-1 flex-shrink-0">★</span>
@@ -510,18 +646,18 @@ export default function HeadlinerPage() {
                   </div>
                 )}
 
-                {slide.purpleCow && (
+                {(slide as any).purpleCow && activeDeck === 'marketplace' && (
                   <div className="mt-10 space-y-6">
                     <div className="bg-white text-purple-600 rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-transform">
-                      <p className="text-4xl font-black text-center">{slide.purpleCow}</p>
+                      <p className="text-4xl font-black text-center">{(slide as any).purpleCow}</p>
                     </div>
-                    {slide.explanation && (
-                      <p className="text-lg text-center opacity-90">{slide.explanation}</p>
+                    {(slide as any).explanation && (
+                      <p className="text-lg text-center opacity-90">{(slide as any).explanation}</p>
                     )}
-                    {slide.callout && (
+                    {(slide as any).callout && (
                       <div className="text-center">
                         <div className="inline-block bg-white/20 backdrop-blur-md px-8 py-4 rounded-full border-2 border-white/30">
-                          <p className="text-xl font-bold">{slide.callout}</p>
+                          <p className="text-xl font-bold">{(slide as any).callout}</p>
                         </div>
                       </div>
                     )}

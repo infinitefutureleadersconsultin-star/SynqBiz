@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, DollarSign, TrendingUp, Users, Zap, Target, Award, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, DollarSign, TrendingUp, Users, Zap, Target, Award, ChevronDown, Presentation, BarChart3, Calendar } from "lucide-react";
 
-const slides = [
+// Marketplace Strategy Deck
+const marketplaceSlides = [
   {
     id: 1,
     title: "HEADLINER",
@@ -322,8 +323,410 @@ const slides = [
   }
 ];
 
+// Revenue Projections Deck
+const revenueProjectionsSlides = [
+  {
+    id: 1,
+    title: "Revenue Projections",
+    subtitle: "2026 Growth Scenarios, Valuation Models, and Exit Strategies",
+    type: "cover",
+    gradient: "from-emerald-600 via-teal-600 to-cyan-600",
+  },
+  {
+    id: 2,
+    title: "How We Make Money",
+    subtitle: "6 Revenue Streams | We Win When Money Moves",
+    content: [
+      {
+        title: "Sponsorship Commission (12%)",
+        desc: "Cut of every sponsorship deal ($250-$2,500+)",
+        why: "We take a percentage of every sponsorship deal closed through our marketplace"
+      },
+      {
+        title: "Ticket Sales Fee (5%)",
+        desc: "Platform fee on all ticket sales (waived for Pro)",
+        why: "Host-side fees waived on Pro → incentive to upgrade while we still make money from attendee fees"
+      },
+      {
+        title: "Processing Fee Profit (~$1/ticket)",
+        desc: "We charge fee to cover Stripe + keep $1 profit",
+        why: "Additional margin on every ticket transaction"
+      },
+      {
+        title: "Promoter Commission (20%)",
+        desc: "Cut of promoter-driven ticket sales",
+        why: "We take a cut of every ticket sold by promoters. More promoters = more sales = more revenue"
+      },
+      {
+        title: "Instant Payout Fee (1.5%, max $15)",
+        desc: "Same-day payout option for hosts",
+        why: "Premium service for hosts who want immediate access to funds"
+      },
+      {
+        title: "Pro Subscription ($100/month)",
+        desc: "Premium tier for high-volume hosts",
+        why: "Recurring revenue + guaranteed event volume on our platform"
+      }
+    ],
+    why: {
+      title: "Key Insight:",
+      points: [
+        "We're not a SaaS company. We're a marketplace.",
+        "Every transaction = multiple revenue streams stacking.",
+        "FREE events still generate sponsorship revenue.",
+        "Revenue follows transaction volume, not subscription count"
+      ]
+    },
+    icon: DollarSign,
+    gradient: "from-emerald-500 to-teal-600",
+  },
+  {
+    id: 3,
+    title: "Year 1 Projections",
+    subtitle: "Conservative | Moderate | Aggressive",
+    type: "scenarios",
+    scenarios: [
+      {
+        name: "CONSERVATIVE",
+        tagline: "Slower growth, lower sponsor adoption",
+        data: [
+          { label: "Total Events", value: "62,678" },
+          { label: "Sponsored Events", value: "20,056 (32%)" },
+          { label: "Total Sponsorships", value: "36,100" },
+          { label: "Tickets Sold", value: "1,212,019" },
+          { label: "Estimated Hosts", value: "7,835" },
+          { label: "Sponsorship GMV", value: "$16.2M" },
+          { label: "Ticket GMV", value: "$26.7M" },
+          { label: "TOTAL GMV", value: "$42.9M", highlight: true },
+          { label: "PLATFORM REVENUE", value: "$5.5M", highlight: true }
+        ]
+      },
+      {
+        name: "MODERATE",
+        tagline: "We hit our targets consistently",
+        data: [
+          { label: "Total Events", value: "89,541" },
+          { label: "Sponsored Events", value: "35,816 (40%)" },
+          { label: "Total Sponsorships", value: "64,468" },
+          { label: "Tickets Sold", value: "2,037,035" },
+          { label: "Estimated Hosts", value: "11,193" },
+          { label: "Sponsorship GMV", value: "$29.0M" },
+          { label: "Ticket GMV", value: "$44.8M" },
+          { label: "TOTAL GMV", value: "$73.8M", highlight: true },
+          { label: "PLATFORM REVENUE", value: "$9.4M", highlight: true }
+        ]
+      },
+      {
+        name: "AGGRESSIVE",
+        tagline: "Viral growth, high sponsor adoption",
+        data: [
+          { label: "Total Events", value: "125,357" },
+          { label: "Sponsored Events", value: "62,678 (50%)" },
+          { label: "Total Sponsorships", value: "112,820" },
+          { label: "Tickets Sold", value: "3,279,581" },
+          { label: "Estimated Hosts", value: "15,670" },
+          { label: "Sponsorship GMV", value: "$50.8M" },
+          { label: "Ticket GMV", value: "$72.2M" },
+          { label: "TOTAL GMV", value: "$122.9M", highlight: true },
+          { label: "PLATFORM REVENUE", value: "$15.5M", highlight: true }
+        ]
+      }
+    ],
+    why: {
+      title: "What Determines Which Scenario:",
+      points: [
+        "Conservative: Slower city exits, 32% sponsor rate, modest viral growth",
+        "Moderate: Consistent execution, 40% sponsor rate, steady TikTok traction",
+        "Aggressive: Fast exits, 50% sponsor rate, viral moment, inbound demand"
+      ]
+    },
+    gradient: "from-teal-500 to-cyan-600",
+  },
+  {
+    id: 4,
+    title: "Revenue Breakdown (Moderate)",
+    subtitle: "Where The $9.4M Comes From",
+    type: "breakdown",
+    breakdown: [
+      { stream: "Sponsorship Commission (12%)", calculation: "64K sponsorships × $450 × 12%", total: "$3,481,272" },
+      { stream: "Ticket Sales Fee (5%)", calculation: "$44.8M ticket GMV × 5%", total: "$2,128,702" },
+      { stream: "Processing Profit ($1/tix)", calculation: "2.04M tickets × $1", total: "$2,037,035" },
+      { stream: "Promoter Commission (20%)", calculation: "12% promoter-driven × 20%", total: "$1,075,554" },
+      { stream: "Pro Subscriptions", calculation: "560 Pro hosts × $100 × 6mo", total: "$335,779" },
+      { stream: "Instant Payout Fees (1.5%)", calculation: "30% adoption", total: "$296,382" }
+    ],
+    total: "$9,354,724",
+    takeRate: "12.7%",
+    why: {
+      title: "Quarterly Progression:",
+      points: [
+        "Q1: $151,407 (1,555 events)",
+        "Q2: $1,288,970 (13,233 events)",
+        "Q3: $3,185,220 (32,698 events)",
+        "Q4: $4,096,745 (42,055 events)",
+        "Key Insight: Q4 revenue ($4.1M) is 27x Q1 ($151K). That's compounding growth."
+      ]
+    },
+    gradient: "from-cyan-500 to-blue-600",
+  },
+  {
+    id: 5,
+    title: "The Real Upside (Year 2+)",
+    subtitle: "Year 1 Is Just The Foundation",
+    type: "upside",
+    content: [
+      {
+        title: "Regional/National Sponsors",
+        desc: "$5K-$50K deals (vs. $450 avg)",
+        impact: "Year 2+ Impact"
+      },
+      {
+        title: "Enterprise Tier",
+        desc: "Venues, festivals, agencies ($500+/mo)",
+        impact: "Recurring revenue expansion"
+      },
+      {
+        title: "Sponsor Subscriptions",
+        desc: "Monthly plans ($200-$1K/mo)",
+        impact: "Predictable revenue stream"
+      },
+      {
+        title: "Data/Insights Products",
+        desc: "Audience analytics for brands",
+        impact: "High-margin add-on"
+      },
+      {
+        title: "Premium Placements",
+        desc: "Featured sponsor spots (auction)",
+        impact: "Premium pricing tier"
+      },
+      {
+        title: "Geographic Expansion",
+        desc: "West Coast, Midwest, International",
+        impact: "TAM expansion"
+      }
+    ],
+    projections: {
+      year2: {
+        title: "Year 2 Projection (Moderate Path):",
+        items: [
+          "200,000+ events",
+          "$150M+ GMV",
+          "$20M+ platform revenue",
+          "Series A at $50M+ valuation"
+        ]
+      },
+      year3: {
+        title: "Year 3+:",
+        items: [
+          "National presence",
+          "$500M+ GMV potential",
+          "IPO/Acquisition pathway"
+        ]
+      }
+    },
+    highlight: "Year 1 proves the model. Year 2+ scales it exponentially.",
+    gradient: "from-blue-600 via-purple-600 to-pink-600",
+  }
+];
+
+// Marketing Rollout Deck
+const marketingRolloutSlides = [
+  {
+    id: 1,
+    title: "Marketing Rollout",
+    subtitle: "Month-by-Month Execution Plan, Daily Activities, and Growth Tactics",
+    type: "cover",
+    gradient: "from-orange-600 via-red-600 to-pink-600",
+  },
+  {
+    id: 2,
+    title: "The Strategy",
+    subtitle: "One City. One Spark. Statewide Fire.",
+    content: [
+      "We do NOT spread thin across an entire state",
+      "We DOMINATE one major city",
+      "Create undeniable proof",
+      "Let results pull the rest of the state in naturally"
+    ],
+    formula: {
+      title: "The Formula:",
+      steps: [
+        "Pick one 'ignition city' per state",
+        "Load it with sponsors (money first)",
+        "Fill it with event hosts (inventory second)",
+        "Activate sponsorships (proof third)",
+        "Document wins and move on",
+        "Let organic growth spread statewide"
+      ]
+    },
+    why: {
+      title: "Why This Works:",
+      points: [
+        "When Charlotte promoters post 'Just got $500 from sponsors on HEADLINER' → Raleigh promoters see it",
+        "They sign up → Fire spreads WITHOUT manual effort",
+        "Depth beats breadth. Proof beats promises.",
+        "Each city we dominate creates 50%+ organic growth in surrounding areas"
+      ]
+    },
+    icon: Zap,
+    gradient: "from-orange-500 to-red-600",
+  },
+  {
+    id: 3,
+    title: "12-Month Expansion Roadmap",
+    subtitle: "12 States. 12 Cities. 12 Months.",
+    type: "roadmap",
+    roadmap: [
+      { month: 1, state: "North Carolina", city: "Charlotte", why: "Largest city, strong event scene" },
+      { month: 2, state: "South Carolina", city: "Columbia", why: "College town (USC), central" },
+      { month: 3, state: "Georgia", city: "Atlanta", why: "Massive event economy" },
+      { month: 4, state: "Virginia", city: "Richmond", why: "Young professionals, colleges" },
+      { month: 5, state: "Tennessee", city: "Nashville", why: "Music/entertainment capital" },
+      { month: 6, state: "Florida", city: "Miami", why: "Event capital of the South" },
+      { month: 7, state: "Texas", city: "Houston", why: "Largest TX city, diverse" },
+      { month: 8, state: "Maryland", city: "Baltimore", why: "Underserved, hungry market" },
+      { month: 9, state: "Alabama", city: "Birmingham", why: "Central hub, HBCU presence" },
+      { month: 10, state: "Louisiana", city: "New Orleans", why: "Built-in event culture" },
+      { month: 11, state: "Mississippi", city: "Jackson", why: "HBCU hub (Jackson State)" },
+      { month: 12, state: "Arkansas", city: "Little Rock", why: "State capital, central" }
+    ],
+    flywheel: {
+      title: "The Flywheel Effect:",
+      points: [
+        "City 1 (Charlotte): Hardest - no proof yet",
+        "City 2-3: Show previous city results",
+        "City 4-6: Inbound starts happening",
+        "City 7-9: Regional brands reach out",
+        "City 10-12: National credibility"
+      ]
+    },
+    gradient: "from-red-500 to-pink-600",
+  },
+  {
+    id: 4,
+    title: "Daily Operating Cadence",
+    subtitle: "The Daily Rhythm",
+    type: "schedule",
+    schedule: {
+      morning: {
+        title: "Morning Block (8am-12pm): OUTREACH",
+        activities: [
+          "8:00-9:00 → Sponsor DMs (batch 1)",
+          "9:00-10:00 → Sponsor DMs (batch 2) + emails",
+          "10:00-11:00 → Follow-ups from yesterday",
+          "11:00-12:00 → Demo calls (2-3 sponsors)"
+        ]
+      },
+      afternoon: {
+        title: "Afternoon Block (1pm-5pm): HOSTS + OPS",
+        activities: [
+          "1:00-2:30 → Host DMs (50-70)",
+          "2:30-3:30 → Host demo calls (2-3)",
+          "3:30-4:30 → Manual matchmaking (connect sponsors to events)",
+          "4:30-5:00 → CRM updates, plan tomorrow"
+        ]
+      },
+      evening: {
+        title: "Evening Block (7pm-9pm): ENGAGEMENT",
+        activities: [
+          "7:00-8:00 → Respond to all DMs",
+          "8:00-9:00 → Engage local hashtags, build relationships"
+        ]
+      }
+    },
+    sprint: {
+      title: "30-Day City Sprint:",
+      weeks: [
+        { week: 1, focus: "SPONSOR LOADING", ratio: "80% Sponsors / 20% Hosts", target: "40 sponsors signed" },
+        { week: 2, focus: "BALANCED PUSH", ratio: "50% Sponsors / 50% Hosts", target: "70 sponsors, 35 hosts, 10 events" },
+        { week: 3, focus: "HOST HEAVY", ratio: "30% Sponsors / 70% Hosts", target: "85 sponsors, 60 hosts, 30 events, 5 sponsorships" },
+        { week: 4, focus: "ACTIVATION & HANDOFF", ratio: "20% New / 60% Activation", target: "All metrics hit" }
+      ]
+    },
+    gradient: "from-pink-500 to-rose-600",
+  },
+  {
+    id: 5,
+    title: "Content Strategy",
+    subtitle: "TikTok as the Growth Engine",
+    content: [
+      "Daily Output: 2 TikToks per day",
+      "Content Split: 70% City-Specific / 30% Universal",
+      "Best Posting Times: 7am, 12pm, 6pm"
+    ],
+    themes: {
+      hosts: {
+        title: "For Hosts:",
+        content: [
+          "How I got paid $500 to throw my party",
+          "Event hosts are leaving money on the table",
+          "Sponsors are BEGGING to fund local events"
+        ]
+      },
+      sponsors: {
+        title: "For Sponsors:",
+        content: [
+          "Stop wasting money on Facebook ads",
+          "Your customers are at local events",
+          "This is how smart brands do local marketing"
+        ]
+      }
+    },
+    viralMechanic: "When Raleigh sees Charlotte wins → 'When is this coming to Raleigh?' → 'Sign up now, we're already there'",
+    roles: {
+      title: "Team Role Alignment:",
+      issiah: {
+        title: "Issiah's Focus: Event Host Growth & Market Buzz",
+        channels: ["TikTok (primary growth engine)", "Word-of-mouth activation", "HBCU & PWI campus outreach", "Local news & publicity"],
+        metric: "75+ hosts per city, 3+ case studies, viral TikTok content"
+      },
+      soya: {
+        title: "Soya's Focus: Sponsor Growth & Platform Visibility",
+        channels: ["Facebook Ads", "Email campaigns (Instantly.io)", "Sponsor data & analytics (Google Analytics)", "Search & AI visibility"],
+        metric: "100+ sponsors per city, 50+ active offers, consistent inbound inquiries"
+      }
+    },
+    gradient: "from-rose-500 to-orange-600",
+  }
+];
+
+const decks = [
+  {
+    id: "marketplace",
+    name: "Marketplace Strategy",
+    description: "Our competitive positioning, purple cow messaging, and strategic edge",
+    slides: marketplaceSlides,
+    slideCount: 11,
+    icon: Presentation,
+    gradient: "from-blue-500 to-purple-600"
+  },
+  {
+    id: "revenue",
+    name: "Revenue Projections",
+    description: "2026 growth scenarios, valuation models, and exit strategies",
+    slides: revenueProjectionsSlides,
+    slideCount: 5,
+    icon: BarChart3,
+    gradient: "from-emerald-500 to-teal-600"
+  },
+  {
+    id: "marketing",
+    name: "Marketing Rollout",
+    description: "Month-by-month execution plan, daily activities, and growth tactics",
+    slides: marketingRolloutSlides,
+    slideCount: 5,
+    icon: Calendar,
+    gradient: "from-orange-500 to-red-600"
+  }
+];
+
 export default function HeadlinerPage() {
+  const [selectedDeck, setSelectedDeck] = useState<string | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const currentDeck = decks.find(d => d.id === selectedDeck);
+  const slides = currentDeck?.slides || [];
   const slide = slides[currentSlide];
 
   const nextSlide = () => {
@@ -342,6 +745,67 @@ export default function HeadlinerPage() {
     setCurrentSlide(index);
   };
 
+  const selectDeck = (deckId: string) => {
+    setSelectedDeck(deckId);
+    setCurrentSlide(0);
+  };
+
+  const backToSelection = () => {
+    setSelectedDeck(null);
+    setCurrentSlide(0);
+  };
+
+  // Deck Selection View
+  if (!selectedDeck) {
+    return (
+      <div className="min-h-screen -m-8 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="max-w-7xl mx-auto px-8 py-16">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h1 className="text-7xl font-black text-white mb-4 tracking-tight">HEADLINER</h1>
+            <p className="text-2xl text-gray-400 font-light">Select a Pitch Deck to View</p>
+          </div>
+
+          {/* Deck Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {decks.map((deck) => (
+              <button
+                key={deck.id}
+                onClick={() => selectDeck(deck.id)}
+                className={`group relative bg-gradient-to-br ${deck.gradient} rounded-3xl p-8 border-4 border-transparent hover:border-white/30 transition-all duration-300 hover:scale-105 hover:shadow-2xl`}
+              >
+                <div className="text-center space-y-6">
+                  {/* Icon */}
+                  <div className="flex justify-center">
+                    <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-3xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                      <deck.icon className="w-12 h-12 text-white" />
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <div>
+                    <h2 className="text-3xl font-bold text-white mb-2">{deck.name}</h2>
+                    <p className="text-base text-white/80 font-light leading-relaxed min-h-[60px]">
+                      {deck.description}
+                    </p>
+                  </div>
+
+                  {/* Slide Count */}
+                  <div className="pt-4">
+                    <div className="inline-block bg-white/20 backdrop-blur-sm rounded-full px-6 py-2">
+                      <span className="text-lg font-semibold text-white">{deck.slideCount} slides</span>
+                    </div>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Presentation View
   return (
     <div className="min-h-screen -m-8 bg-gray-900">
       {/* Presentation Container */}
@@ -448,6 +912,218 @@ export default function HeadlinerPage() {
               </div>
             )}
 
+            {slide.type === "scenarios" && (
+              <div className="text-white space-y-8 animate-fade-in pb-8">
+                <div className="text-center mb-8">
+                  <h2 className="text-5xl font-bold mb-3">{slide.title}</h2>
+                  <p className="text-xl opacity-90">{slide.subtitle}</p>
+                </div>
+                <div className="grid grid-cols-3 gap-6">
+                  {slide.scenarios?.map((scenario: any, idx: number) => (
+                    <div key={idx} className={`bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 ${idx === 1 ? 'border-yellow-300/50 shadow-xl' : 'border-white/20'}`}>
+                      <h3 className={`text-2xl font-bold mb-2 text-center ${idx === 1 ? 'text-yellow-300' : 'text-white'}`}>{scenario.name}</h3>
+                      <p className="text-sm opacity-75 text-center mb-6 italic">{scenario.tagline}</p>
+                      <div className="space-y-3">
+                        {scenario.data.map((item: any, i: number) => (
+                          <div key={i} className={`${item.highlight ? 'bg-white/20 border-2 border-yellow-300/50 font-bold' : 'bg-white/5 border border-white/10'} rounded-lg p-3`}>
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm opacity-90">{item.label}</span>
+                              <span className={`text-base font-semibold ${item.highlight ? 'text-yellow-300' : 'text-white'}`}>{item.value}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {slide.why && (
+                  <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/20 mt-8">
+                    <h3 className="text-xl font-bold mb-4 text-yellow-300">{slide.why.title}</h3>
+                    <ul className="space-y-2">
+                      {slide.why.points.map((point: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
+                          <span className="text-base">{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {slide.type === "breakdown" && (
+              <div className="text-white space-y-8 animate-fade-in pb-8">
+                <div className="flex items-center gap-6 mb-6">
+                  <div>
+                    <h2 className="text-5xl font-bold">{slide.title}</h2>
+                    <p className="text-xl opacity-90 mt-2">{slide.subtitle}</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {slide.breakdown?.map((item: any, idx: number) => (
+                    <div key={idx} className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-lg font-bold">{item.stream}</span>
+                        <span className="text-2xl font-bold text-yellow-300">{item.total}</span>
+                      </div>
+                      <p className="text-sm opacity-75 italic">{item.calculation}</p>
+                    </div>
+                  ))}
+                  <div className="bg-yellow-400/20 backdrop-blur-md border-2 border-yellow-300/50 rounded-2xl p-6 mt-6">
+                    <div className="flex justify-between items-center">
+                      <span className="text-2xl font-bold">TOTAL YEAR 1 REVENUE</span>
+                      <span className="text-4xl font-black text-yellow-300">{slide.total}</span>
+                    </div>
+                    <p className="text-base opacity-90 mt-2">Effective Take Rate: <span className="font-bold">{slide.takeRate} of GMV</span></p>
+                  </div>
+                </div>
+                {slide.why && (
+                  <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/20 mt-8">
+                    <h3 className="text-xl font-bold mb-4 text-yellow-300">{slide.why.title}</h3>
+                    <ul className="space-y-2">
+                      {slide.why.points.map((point: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
+                          <span className="text-base">{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {slide.type === "upside" && (
+              <div className="text-white space-y-8 animate-fade-in pb-8">
+                <div className="text-center mb-6">
+                  <h2 className="text-5xl font-bold mb-3">{slide.title}</h2>
+                  <p className="text-xl opacity-90">{slide.subtitle}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-5">
+                  {slide.content?.map((item: any, idx: number) => (
+                    <div key={idx} className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
+                      <h3 className="text-lg font-bold mb-2">{item.title}</h3>
+                      <p className="text-sm opacity-90 mb-2">{item.desc}</p>
+                      <p className="text-xs opacity-75 italic text-yellow-300">{item.impact}</p>
+                    </div>
+                  ))}
+                </div>
+                {slide.projections && (
+                  <div className="space-y-6 mt-8">
+                    <div className="bg-white/20 backdrop-blur-lg rounded-3xl p-6 border-2 border-white/30">
+                      <h3 className="text-2xl font-bold mb-4 text-yellow-300">{slide.projections.year2.title}</h3>
+                      <ul className="space-y-2">
+                        {slide.projections.year2.items.map((item: string, idx: number) => (
+                          <li key={idx} className="flex items-start gap-3 text-lg">
+                            <span className="text-yellow-300 mt-1">→</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div className="bg-white/20 backdrop-blur-lg rounded-3xl p-6 border-2 border-white/30">
+                      <h3 className="text-2xl font-bold mb-4 text-yellow-300">{slide.projections.year3.title}</h3>
+                      <ul className="space-y-2">
+                        {slide.projections.year3.items.map((item: string, idx: number) => (
+                          <li key={idx} className="flex items-start gap-3 text-lg">
+                            <span className="text-yellow-300 mt-1">→</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+                {slide.highlight && (
+                  <div className="bg-yellow-400/20 backdrop-blur-md border-2 border-yellow-300/50 rounded-2xl p-6 mt-6">
+                    <p className="text-xl font-semibold text-yellow-100 text-center">{slide.highlight}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {slide.type === "roadmap" && (
+              <div className="text-white space-y-8 animate-fade-in pb-8">
+                <div className="text-center mb-6">
+                  <h2 className="text-5xl font-bold mb-3">{slide.title}</h2>
+                  <p className="text-xl opacity-90">{slide.subtitle}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {slide.roadmap?.map((item: any, idx: number) => (
+                    <div key={idx} className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
+                      <div className="flex items-start gap-4">
+                        <div className="bg-yellow-400/20 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
+                          <span className="text-2xl font-bold text-yellow-300">{item.month}</span>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-yellow-300">{item.city}, {item.state}</h3>
+                          <p className="text-sm opacity-75 mt-1">{item.why}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {slide.flywheel && (
+                  <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/20 mt-8">
+                    <h3 className="text-xl font-bold mb-4 text-yellow-300">{slide.flywheel.title}</h3>
+                    <ul className="space-y-2">
+                      {slide.flywheel.points.map((point: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
+                          <span className="text-base">{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {slide.type === "schedule" && (
+              <div className="text-white space-y-8 animate-fade-in pb-8">
+                <div className="flex items-center gap-6 mb-6">
+                  <div>
+                    <h2 className="text-5xl font-bold">{slide.title}</h2>
+                    <p className="text-xl opacity-90 mt-2">{slide.subtitle}</p>
+                  </div>
+                </div>
+                <div className="space-y-6">
+                  {slide.schedule && (
+                    <>
+                      {Object.entries(slide.schedule).map(([key, block]: any, idx: number) => (
+                        <div key={idx} className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                          <h3 className="text-xl font-bold mb-4 text-yellow-300">{block.title}</h3>
+                          <ul className="space-y-2">
+                            {block.activities.map((activity: string, i: number) => (
+                              <li key={i} className="flex items-start gap-3">
+                                <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
+                                <span className="text-base font-light">{activity}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </>
+                  )}
+                </div>
+                {slide.sprint && (
+                  <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/20 mt-8">
+                    <h3 className="text-2xl font-bold mb-6 text-yellow-300 text-center">{slide.sprint.title}</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      {slide.sprint.weeks.map((week: any, idx: number) => (
+                        <div key={idx} className="bg-white/5 rounded-xl p-4 border border-white/10">
+                          <div className="text-lg font-bold text-yellow-300 mb-2">Week {week.week}: {week.focus}</div>
+                          <div className="text-sm opacity-90 mb-2">Ratio: {week.ratio}</div>
+                          <div className="text-sm opacity-75 italic">Target: {week.target}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {!slide.type && (
               <div className="text-white space-y-8 animate-fade-in pb-8">
                 <div className="flex items-center gap-6 mb-6">
@@ -527,6 +1203,93 @@ export default function HeadlinerPage() {
                     )}
                   </div>
                 )}
+
+                {slide.formula && (
+                  <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border-2 border-white/20 mt-8">
+                    <h3 className="text-2xl font-bold mb-6 text-yellow-300">{slide.formula.title}</h3>
+                    <ol className="space-y-3">
+                      {slide.formula.steps.map((step: string, idx: number) => (
+                        <li key={idx} className="flex items-start gap-4">
+                          <span className="bg-yellow-400/20 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 text-yellow-300 font-bold">{idx + 1}</span>
+                          <span className="text-lg font-light mt-1">{step}</span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+
+                {slide.themes && (
+                  <div className="mt-8 space-y-6">
+                    {slide.themes.hosts && (
+                      <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                        <h3 className="text-xl font-bold mb-4 text-yellow-300">{slide.themes.hosts.title}</h3>
+                        <ul className="space-y-2">
+                          {slide.themes.hosts.content.map((item: string, idx: number) => (
+                            <li key={idx} className="flex items-start gap-3">
+                              <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
+                              <span className="text-base font-light">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {slide.themes.sponsors && (
+                      <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                        <h3 className="text-xl font-bold mb-4 text-yellow-300">{slide.themes.sponsors.title}</h3>
+                        <ul className="space-y-2">
+                          {slide.themes.sponsors.content.map((item: string, idx: number) => (
+                            <li key={idx} className="flex items-start gap-3">
+                              <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
+                              <span className="text-base font-light">{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {slide.viralMechanic && (
+                  <div className="bg-yellow-400/20 backdrop-blur-md border-2 border-yellow-300/50 rounded-2xl p-6 mt-8">
+                    <p className="text-lg font-semibold text-yellow-100 text-center">{slide.viralMechanic}</p>
+                  </div>
+                )}
+
+                {slide.roles && (
+                  <div className="mt-8 space-y-6">
+                    <h3 className="text-2xl font-bold text-yellow-300 text-center">{slide.roles.title}</h3>
+                    <div className="grid grid-cols-2 gap-6">
+                      {slide.roles.issiah && (
+                        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                          <h4 className="text-lg font-bold mb-4 text-yellow-300">{slide.roles.issiah.title}</h4>
+                          <ul className="space-y-2 mb-4">
+                            {slide.roles.issiah.channels.map((channel: string, idx: number) => (
+                              <li key={idx} className="flex items-start gap-3">
+                                <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
+                                <span className="text-sm font-light">{channel}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          <p className="text-sm opacity-75 italic">Metric: {slide.roles.issiah.metric}</p>
+                        </div>
+                      )}
+                      {slide.roles.soya && (
+                        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                          <h4 className="text-lg font-bold mb-4 text-yellow-300">{slide.roles.soya.title}</h4>
+                          <ul className="space-y-2 mb-4">
+                            {slide.roles.soya.channels.map((channel: string, idx: number) => (
+                              <li key={idx} className="flex items-start gap-3">
+                                <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
+                                <span className="text-sm font-light">{channel}</span>
+                              </li>
+                            ))}
+                          </ul>
+                          <p className="text-sm opacity-75 italic">Metric: {slide.roles.soya.metric}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -546,6 +1309,15 @@ export default function HeadlinerPage() {
           className="absolute right-8 top-1/2 -translate-y-1/2 w-16 h-16 bg-white/20 hover:bg-white/30 disabled:opacity-30 disabled:cursor-not-allowed backdrop-blur-md rounded-full flex items-center justify-center transition-all group z-10"
         >
           <ChevronRight className="w-8 h-8 text-white group-hover:scale-110 transition-transform" />
+        </button>
+
+        {/* Back Button */}
+        <button
+          onClick={backToSelection}
+          className="absolute top-8 left-8 px-6 py-3 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full text-white font-semibold transition-all z-10 flex items-center gap-2"
+        >
+          <ChevronLeft className="w-5 h-5" />
+          Back to Decks
         </button>
 
         {/* Slide Counter */}

@@ -94,7 +94,6 @@ export default function OverviewPage() {
           <Button
             onClick={() => setShowChatModal(true)}
             className="flex items-center gap-2"
-            variant="default"
           >
             <Sparkles className="w-4 h-4" />
             AI Assistant

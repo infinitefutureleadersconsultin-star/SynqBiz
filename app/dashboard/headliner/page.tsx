@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, DollarSign, TrendingUp, Users, Zap, Target, Award, ChevronDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, DollarSign, TrendingUp, Users, Zap, Target, Award, ChevronDown, X, Presentation, BarChart, Calendar } from "lucide-react";
 
 // Marketplace Strategy Presentation
 const marketplaceSlides = [
@@ -426,11 +426,124 @@ const revenueSlides = [
   }
 ];
 
+// Marketing Rollout 2026 Presentation
+const marketingSlides = [
+  {
+    id: 1,
+    title: "HEADLINER 2026",
+    subtitle: "Marketing Rollout & Execution Plan",
+    type: "cover",
+    gradient: "from-orange-600 via-red-600 to-pink-600",
+  },
+  {
+    id: 2,
+    title: "The Formula",
+    subtitle: "How We Convert Outreach to Revenue",
+    content: [
+      {
+        title: "Host Acquisition:",
+        desc: "For every 100 people you reach out to → 1-2 active hosts"
+      },
+      {
+        title: "Content Virality:",
+        desc: "10K TikTok/IG views → 5-15 new hosts"
+      },
+      {
+        title: "Sponsor Acquisition:",
+        desc: "For every 100 businesses contacted → 1-2 paying sponsors"
+      }
+    ],
+    why: {
+      title: "Why This Works:",
+      points: [
+        "Each host averages 3-4 events per year",
+        "Each event generates $250-350 in revenue",
+        "Sponsors recurring at 40-50% retention rate",
+        "Viral content compounds organic growth"
+      ]
+    },
+    icon: Target,
+    gradient: "from-blue-600 to-indigo-600",
+  },
+  {
+    id: 3,
+    title: "Q1 2026: Foundation",
+    subtitle: "January - March",
+    content: [
+      {
+        title: "January (150 events, $30K revenue)",
+        desc: "2,000 host DMs • 1,000 emails • 20 TikTok videos • 2 HBCU campus visits"
+      },
+      {
+        title: "February (300 events, $63K revenue)",
+        desc: "3,000 host DMs • 1,500 emails • 25 TikToks • 15 Reels • 10 campus ambassadors recruited"
+      },
+      {
+        title: "March (500 events, $110K revenue)",
+        desc: "4,000 host DMs • 2,000 emails • 30 TikToks • 20 Reels • 25 ambassadors • $2K paid ads"
+      }
+    ],
+    highlight: "Q1 Goal: Prove the system works. Hit $100K month by March.",
+    icon: Calendar,
+    gradient: "from-green-600 to-teal-600",
+  },
+  {
+    id: 4,
+    title: "Q2-Q4 2026: Scale",
+    subtitle: "Growth Acceleration",
+    content: [
+      {
+        title: "Q2: $477K (1,800 events/month by June)",
+        desc: "Hire 1 VA • Scale to 315 outreach/day • 100 campus ambassadors • $12K paid ads"
+      },
+      {
+        title: "Q3: $1.5M (5,000 events/month by Sept)",
+        desc: "2-3 person team • HBCU homecoming prep • First $1M month in August 🎉"
+      },
+      {
+        title: "Q4: $2.8M (8,000 events/month by Dec)",
+        desc: "Peak homecoming season • NYE premium pricing • Brand partnership deals"
+      }
+    ],
+    highlight: "2026 Total: $11.3M revenue | Marketing spend: $280K | ROI: 40x",
+    gradient: "from-purple-600 to-pink-600",
+  },
+  {
+    id: 5,
+    title: "Daily Execution",
+    subtitle: "What It Actually Takes",
+    type: "final",
+    message: "January: 6 hours/day of outreach + content → 150 events → $30K. December: Team running system → 8,000 events → $2.8M. This isn't a guess. This is math.",
+    why: {
+      title: "The Playbook:",
+      points: [
+        "100 host DMs/day = 1-2 new hosts (automated with tools)",
+        "1 TikTok/day = 50-100K views/month = 50+ new hosts",
+        "50 sponsor emails/day = 15-20 new sponsors/month",
+        "Start solo, hire at $100K/month milestone",
+        "By Q4, 40-50% growth is organic referrals"
+      ]
+    },
+    gradient: "from-red-600 via-orange-600 to-yellow-600",
+  }
+];
+
+type DeckType = 'marketplace' | 'revenue' | 'marketing' | null;
+
 export default function HeadlinerPage() {
-  const [activeDeck, setActiveDeck] = useState<'marketplace' | 'revenue'>('marketplace');
+  const [selectedDeck, setSelectedDeck] = useState<DeckType>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const slides = activeDeck === 'marketplace' ? marketplaceSlides : revenueSlides;
+  const getSlides = () => {
+    switch(selectedDeck) {
+      case 'marketplace': return marketplaceSlides;
+      case 'revenue': return revenueSlides;
+      case 'marketing': return marketingSlides;
+      default: return [];
+    }
+  };
+
+  const slides = getSlides();
   const slide = slides[currentSlide];
 
   const nextSlide = () => {
@@ -449,36 +562,99 @@ export default function HeadlinerPage() {
     setCurrentSlide(index);
   };
 
-  const switchDeck = (deck: 'marketplace' | 'revenue') => {
-    setActiveDeck(deck);
-    setCurrentSlide(0); // Reset to first slide when switching decks
+  const openDeck = (deck: DeckType) => {
+    setSelectedDeck(deck);
+    setCurrentSlide(0);
   };
 
+  const closeDeck = () => {
+    setSelectedDeck(null);
+    setCurrentSlide(0);
+  };
+
+  // Portal Selection Screen
+  if (!selectedDeck) {
+    return (
+      <div className="min-h-screen -m-8 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-8">
+        <div className="max-w-6xl w-full">
+          <div className="text-center mb-12">
+            <h1 className="text-6xl font-black text-white mb-4">HEADLINER</h1>
+            <p className="text-2xl text-gray-400">Select a Pitch Deck to View</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Marketplace Strategy Deck */}
+            <button
+              onClick={() => openDeck('marketplace')}
+              className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 p-1 transition-all hover:scale-105 hover:shadow-2xl"
+            >
+              <div className="bg-gray-900 rounded-[1.375rem] p-8 h-full flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Presentation className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-white">Marketplace Strategy</h3>
+                <p className="text-gray-400 text-sm">Our competitive positioning, purple cow messaging, and strategic edge</p>
+                <div className="pt-4">
+                  <span className="px-4 py-2 bg-blue-600/20 text-blue-400 rounded-full text-sm font-semibold">
+                    11 slides
+                  </span>
+                </div>
+              </div>
+            </button>
+
+            {/* Revenue Projections Deck */}
+            <button
+              onClick={() => openDeck('revenue')}
+              className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 p-1 transition-all hover:scale-105 hover:shadow-2xl"
+            >
+              <div className="bg-gray-900 rounded-[1.375rem] p-8 h-full flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <BarChart className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-white">Revenue Projections</h3>
+                <p className="text-gray-400 text-sm">2026 growth scenarios, valuation models, and exit strategies</p>
+                <div className="pt-4">
+                  <span className="px-4 py-2 bg-emerald-600/20 text-emerald-400 rounded-full text-sm font-semibold">
+                    5 slides
+                  </span>
+                </div>
+              </div>
+            </button>
+
+            {/* Marketing Rollout Deck */}
+            <button
+              onClick={() => openDeck('marketing')}
+              className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-orange-600 via-red-600 to-pink-600 p-1 transition-all hover:scale-105 hover:shadow-2xl"
+            >
+              <div className="bg-gray-900 rounded-[1.375rem] p-8 h-full flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-20 h-20 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Calendar className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-white">Marketing Rollout</h3>
+                <p className="text-gray-400 text-sm">Month-by-month execution plan, daily activities, and growth tactics</p>
+                <div className="pt-4">
+                  <span className="px-4 py-2 bg-orange-600/20 text-orange-400 rounded-full text-sm font-semibold">
+                    5 slides
+                  </span>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Presentation View
   return (
     <div className="min-h-screen -m-8 bg-gray-900">
-      {/* Deck Selector */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20 flex gap-3 bg-gray-800/90 backdrop-blur-md p-2 rounded-full border border-white/10">
-        <button
-          onClick={() => switchDeck('marketplace')}
-          className={`px-6 py-2 rounded-full font-semibold transition-all ${
-            activeDeck === 'marketplace'
-              ? 'bg-blue-600 text-white shadow-lg'
-              : 'text-gray-400 hover:text-white hover:bg-gray-700'
-          }`}
-        >
-          Marketplace Strategy
-        </button>
-        <button
-          onClick={() => switchDeck('revenue')}
-          className={`px-6 py-2 rounded-full font-semibold transition-all ${
-            activeDeck === 'revenue'
-              ? 'bg-emerald-600 text-white shadow-lg'
-              : 'text-gray-400 hover:text-white hover:bg-gray-700'
-          }`}
-        >
-          Revenue Projections
-        </button>
-      </div>
+      {/* Close Button */}
+      <button
+        onClick={closeDeck}
+        className="absolute top-8 right-8 z-30 w-12 h-12 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center transition-all group"
+      >
+        <X className="w-6 h-6 text-white group-hover:scale-110 transition-transform" />
+      </button>
 
       {/* Presentation Container */}
       <div className="relative h-screen flex items-center justify-center overflow-hidden">
@@ -508,7 +684,7 @@ export default function HeadlinerPage() {
               </div>
             )}
 
-            {slide.type === "comparison" && activeDeck === 'marketplace' && (
+            {slide.type === "comparison" && selectedDeck === 'marketplace' && (
               <div className="text-white space-y-8 animate-fade-in">
                 <div className="text-center mb-8">
                   <h2 className="text-5xl font-bold mb-3">{slide.title}</h2>
@@ -578,7 +754,7 @@ export default function HeadlinerPage() {
 
                 <div className="pt-8">
                   <div className="inline-block px-12 py-4 bg-white text-purple-600 rounded-full text-2xl font-bold shadow-2xl">
-                    Let the Marketplace Be the Engine
+                    {selectedDeck === 'marketplace' ? 'Let the Marketplace Be the Engine' : 'This Is a System, Not a Guess'}
                   </div>
                 </div>
               </div>
@@ -646,7 +822,7 @@ export default function HeadlinerPage() {
                   </div>
                 )}
 
-                {(slide as any).purpleCow && activeDeck === 'marketplace' && (
+                {(slide as any).purpleCow && selectedDeck === 'marketplace' && (
                   <div className="mt-10 space-y-6">
                     <div className="bg-white text-purple-600 rounded-3xl p-10 shadow-2xl transform hover:scale-105 transition-transform">
                       <p className="text-4xl font-black text-center">{(slide as any).purpleCow}</p>

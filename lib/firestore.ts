@@ -24,7 +24,9 @@ import type {
   CalendarEvent,
   Task,
   CoFounder,
-  SharedNote
+  SharedNote,
+  ActionItem,
+  ActionItemApproval
 } from '@/types';
 
 // ============================================
@@ -1069,5 +1071,165 @@ export async function deleteSharedNote(noteId: string) {
   } catch (error: any) {
     console.error('Error deleting note:', error);
     return { success: false, error: error.message };
+  }
+}
+
+// ============================================
+// ACTION ITEMS
+// ============================================
+
+/**
+ * Create a new action item
+ */
+export async function createActionItem(item: Omit<ActionItem, 'id' | 'created_at' | 'updated_at'>) {
+  try {
+    const itemsRef = collection(db, 'action_items');
+
+    const docData = {
+      ...item,
+      created_at: Timestamp.now(),
+      updated_at: Timestamp.now(),
+    };
+
+    const docRef = await addDoc(itemsRef, docData);
+    return { success: true, id: docRef.id, error: null };
+  } catch (error: any) {
+    console.error('Error creating action item:', error);
+    return { success: false, id: null, error: error.message };
+  }
+}
+
+/**
+ * Get all action items
+ */
+export async function getAllActionItems() {
+  try {
+    const itemsRef = collection(db, 'action_items');
+    const q = query(itemsRef, orderBy('created_at', 'desc'));
+    const querySnapshot = await getDocs(q);
+
+    const items: ActionItem[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      items.push({
+        id: doc.id,
+        ...data,
+        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+      } as ActionItem);
+    });
+
+    return { data: items, error: null };
+  } catch (error: any) {
+    console.error('Error getting action items:', error);
+    return { data: [], error: error.message };
+  }
+}
+
+/**
+ * Delete an action item
+ */
+export async function deleteActionItem(itemId: string) {
+  try {
+    const itemRef = doc(db, 'action_items', itemId);
+    await deleteDoc(itemRef);
+    return { success: true, error: null };
+  } catch (error: any) {
+    console.error('Error deleting action item:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// ============================================
+// ACTION ITEM APPROVALS
+// ============================================
+
+/**
+ * Get all action item approvals
+ */
+export async function getAllActionItemApprovals() {
+  try {
+    const approvalsRef = collection(db, 'action_item_approvals');
+    const querySnapshot = await getDocs(approvalsRef);
+    const approvals: ActionItemApproval[] = [];
+
+    querySnapshot.forEach((doc) => {
+      approvals.push({ id: doc.id, ...doc.data() } as ActionItemApproval);
+    });
+
+    return { data: approvals, error: null };
+  } catch (error: any) {
+    console.error('Error getting action item approvals:', error);
+    return { data: [], error: error.message };
+  }
+}
+
+/**
+ * Toggle approval for an action item by a co-founder
+ */
+export async function toggleActionItemApproval(
+  itemId: string,
+  area: string,
+  coFounder: CoFounder
+) {
+  try {
+    const approvalRef = doc(db, 'action_item_approvals', itemId);
+    const approvalDoc = await getDoc(approvalRef);
+
+    let approvalData: any;
+    const now = new Date().toISOString();
+
+    if (approvalDoc.exists()) {
+      // Document exists, toggle approval
+      const existing = approvalDoc.data() as ActionItemApproval;
+      const currentApproval = existing.approvals[coFounder]?.approved || false;
+
+      approvalData = {
+        ...existing,
+        approvals: {
+          ...existing.approvals,
+          [coFounder]: {
+            approved: !currentApproval,
+            approved_at: !currentApproval ? now : undefined
+          }
+        },
+        updated_at: now
+      };
+    } else {
+      // Create new approval document
+      approvalData = {
+        id: itemId,
+        area,
+        approvals: {
+          [coFounder]: {
+            approved: true,
+            approved_at: now
+          }
+        },
+        completed: false,
+        created_at: now,
+        updated_at: now
+      };
+    }
+
+    // Check if both co-founders have approved
+    const issiahApproved = approvalData.approvals.issiah?.approved || false;
+    const soyaApproved = approvalData.approvals.soya?.approved || false;
+
+    if (issiahApproved && soyaApproved && !approvalData.completed) {
+      approvalData.completed = true;
+      approvalData.completed_at = now;
+    } else if ((!issiahApproved || !soyaApproved) && approvalData.completed) {
+      // If one co-founder un-approves, mark as not completed
+      approvalData.completed = false;
+      approvalData.completed_at = undefined;
+    }
+
+    await setDoc(approvalRef, approvalData);
+
+    return { success: true, data: approvalData as ActionItemApproval, error: null };
+  } catch (error: any) {
+    console.error('Error toggling action item approval:', error);
+    return { success: false, data: null, error: error.message };
   }
 }

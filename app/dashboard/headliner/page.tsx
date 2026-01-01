@@ -845,10 +845,10 @@ export default function HeadlinerPage() {
                 <div className="grid grid-cols-2 gap-6">
                   {/* Free Tier */}
                   <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/20">
-                    <h3 className="text-2xl font-bold mb-2 text-center">{slide.free?.title}</h3>
-                    <p className="text-sm opacity-75 text-center mb-6">{slide.free?.subtitle}</p>
+                    <h3 className="text-2xl font-bold mb-2 text-center">{(slide as any).free?.title}</h3>
+                    <p className="text-sm opacity-75 text-center mb-6">{(slide as any).free?.subtitle}</p>
                     <ul className="space-y-4">
-                      {slide.free?.features.map((item: any, idx: number) => (
+                      {(slide as any).free?.features.map((item: any, idx: number) => (
                         <li key={idx} className="bg-white/5 rounded-xl p-4 border border-white/10">
                           <div className="flex items-start gap-3 mb-2">
                             <span className="text-green-300 mt-1 flex-shrink-0">✓</span>
@@ -861,10 +861,10 @@ export default function HeadlinerPage() {
                   </div>
                   {/* Pro Tier */}
                   <div className="bg-white/20 backdrop-blur-md rounded-3xl p-6 border-2 border-yellow-300/50 shadow-2xl">
-                    <h3 className="text-2xl font-bold mb-2 text-center text-yellow-200">{slide.pro?.title}</h3>
-                    <p className="text-sm opacity-75 text-center mb-6">{slide.pro?.subtitle}</p>
+                    <h3 className="text-2xl font-bold mb-2 text-center text-yellow-200">{(slide as any).pro?.title}</h3>
+                    <p className="text-sm opacity-75 text-center mb-6">{(slide as any).pro?.subtitle}</p>
                     <ul className="space-y-4">
-                      {slide.pro?.features.map((item: any, idx: number) => (
+                      {(slide as any).pro?.features.map((item: any, idx: number) => (
                         <li key={idx} className="bg-white/10 rounded-xl p-4 border border-yellow-300/30">
                           <div className="flex items-start gap-3 mb-2">
                             <span className="text-yellow-300 mt-1 flex-shrink-0">★</span>

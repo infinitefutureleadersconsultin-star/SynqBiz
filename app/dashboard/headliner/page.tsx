@@ -885,7 +885,7 @@ export default function HeadlinerPage() {
                 <p className="text-2xl font-light opacity-90">{slide.subtitle}</p>
                 <div className="bg-white/20 backdrop-blur-lg rounded-3xl p-10 max-w-4xl mx-auto border-2 border-white/30">
                   <p className="text-2xl font-medium leading-relaxed">
-                    {slide.message}
+                    {(slide as any).message}
                   </p>
                 </div>
 
@@ -919,7 +919,7 @@ export default function HeadlinerPage() {
                   <p className="text-xl opacity-90">{slide.subtitle}</p>
                 </div>
                 <div className="grid grid-cols-3 gap-6">
-                  {slide.scenarios?.map((scenario: any, idx: number) => (
+                  {(slide as any).scenarios?.map((scenario: any, idx: number) => (
                     <div key={idx} className={`bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 ${idx === 1 ? 'border-yellow-300/50 shadow-xl' : 'border-white/20'}`}>
                       <h3 className={`text-2xl font-bold mb-2 text-center ${idx === 1 ? 'text-yellow-300' : 'text-white'}`}>{scenario.name}</h3>
                       <p className="text-sm opacity-75 text-center mb-6 italic">{scenario.tagline}</p>
@@ -961,7 +961,7 @@ export default function HeadlinerPage() {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  {slide.breakdown?.map((item: any, idx: number) => (
+                  {(slide as any).breakdown?.map((item: any, idx: number) => (
                     <div key={idx} className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
                       <div className="flex justify-between items-start mb-2">
                         <span className="text-lg font-bold">{item.stream}</span>
@@ -973,9 +973,9 @@ export default function HeadlinerPage() {
                   <div className="bg-yellow-400/20 backdrop-blur-md border-2 border-yellow-300/50 rounded-2xl p-6 mt-6">
                     <div className="flex justify-between items-center">
                       <span className="text-2xl font-bold">TOTAL YEAR 1 REVENUE</span>
-                      <span className="text-4xl font-black text-yellow-300">{slide.total}</span>
+                      <span className="text-4xl font-black text-yellow-300">{(slide as any).total}</span>
                     </div>
-                    <p className="text-base opacity-90 mt-2">Effective Take Rate: <span className="font-bold">{slide.takeRate} of GMV</span></p>
+                    <p className="text-base opacity-90 mt-2">Effective Take Rate: <span className="font-bold">{(slide as any).takeRate} of GMV</span></p>
                   </div>
                 </div>
                 {slide.why && (
@@ -1009,12 +1009,12 @@ export default function HeadlinerPage() {
                     </div>
                   ))}
                 </div>
-                {slide.projections && (
+                {(slide as any).projections && (
                   <div className="space-y-6 mt-8">
                     <div className="bg-white/20 backdrop-blur-lg rounded-3xl p-6 border-2 border-white/30">
-                      <h3 className="text-2xl font-bold mb-4 text-yellow-300">{slide.projections.year2.title}</h3>
+                      <h3 className="text-2xl font-bold mb-4 text-yellow-300">{(slide as any).projections.year2.title}</h3>
                       <ul className="space-y-2">
-                        {slide.projections.year2.items.map((item: string, idx: number) => (
+                        {(slide as any).projections.year2.items.map((item: string, idx: number) => (
                           <li key={idx} className="flex items-start gap-3 text-lg">
                             <span className="text-yellow-300 mt-1">→</span>
                             <span>{item}</span>
@@ -1023,9 +1023,9 @@ export default function HeadlinerPage() {
                       </ul>
                     </div>
                     <div className="bg-white/20 backdrop-blur-lg rounded-3xl p-6 border-2 border-white/30">
-                      <h3 className="text-2xl font-bold mb-4 text-yellow-300">{slide.projections.year3.title}</h3>
+                      <h3 className="text-2xl font-bold mb-4 text-yellow-300">{(slide as any).projections.year3.title}</h3>
                       <ul className="space-y-2">
-                        {slide.projections.year3.items.map((item: string, idx: number) => (
+                        {(slide as any).projections.year3.items.map((item: string, idx: number) => (
                           <li key={idx} className="flex items-start gap-3 text-lg">
                             <span className="text-yellow-300 mt-1">→</span>
                             <span>{item}</span>
@@ -1050,7 +1050,7 @@ export default function HeadlinerPage() {
                   <p className="text-xl opacity-90">{slide.subtitle}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  {slide.roadmap?.map((item: any, idx: number) => (
+                  {(slide as any).roadmap?.map((item: any, idx: number) => (
                     <div key={idx} className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20">
                       <div className="flex items-start gap-4">
                         <div className="bg-yellow-400/20 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
@@ -1064,11 +1064,11 @@ export default function HeadlinerPage() {
                     </div>
                   ))}
                 </div>
-                {slide.flywheel && (
+                {(slide as any).flywheel && (
                   <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/20 mt-8">
-                    <h3 className="text-xl font-bold mb-4 text-yellow-300">{slide.flywheel.title}</h3>
+                    <h3 className="text-xl font-bold mb-4 text-yellow-300">{(slide as any).flywheel.title}</h3>
                     <ul className="space-y-2">
-                      {slide.flywheel.points.map((point: string, idx: number) => (
+                      {(slide as any).flywheel.points.map((point: string, idx: number) => (
                         <li key={idx} className="flex items-start gap-3">
                           <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
                           <span className="text-base">{point}</span>
@@ -1089,9 +1089,9 @@ export default function HeadlinerPage() {
                   </div>
                 </div>
                 <div className="space-y-6">
-                  {slide.schedule && (
+                  {(slide as any).schedule && (
                     <>
-                      {Object.entries(slide.schedule).map(([key, block]: any, idx: number) => (
+                      {Object.entries((slide as any).schedule).map(([key, block]: any, idx: number) => (
                         <div key={idx} className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
                           <h3 className="text-xl font-bold mb-4 text-yellow-300">{block.title}</h3>
                           <ul className="space-y-2">
@@ -1107,11 +1107,11 @@ export default function HeadlinerPage() {
                     </>
                   )}
                 </div>
-                {slide.sprint && (
+                {(slide as any).sprint && (
                   <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border-2 border-white/20 mt-8">
-                    <h3 className="text-2xl font-bold mb-6 text-yellow-300 text-center">{slide.sprint.title}</h3>
+                    <h3 className="text-2xl font-bold mb-6 text-yellow-300 text-center">{(slide as any).sprint.title}</h3>
                     <div className="grid grid-cols-2 gap-4">
-                      {slide.sprint.weeks.map((week: any, idx: number) => (
+                      {(slide as any).sprint.weeks.map((week: any, idx: number) => (
                         <div key={idx} className="bg-white/5 rounded-xl p-4 border border-white/10">
                           <div className="text-lg font-bold text-yellow-300 mb-2">Week {week.week}: {week.focus}</div>
                           <div className="text-sm opacity-90 mb-2">Ratio: {week.ratio}</div>
@@ -1204,11 +1204,11 @@ export default function HeadlinerPage() {
                   </div>
                 )}
 
-                {slide.formula && (
+                {(slide as any).formula && (
                   <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border-2 border-white/20 mt-8">
-                    <h3 className="text-2xl font-bold mb-6 text-yellow-300">{slide.formula.title}</h3>
+                    <h3 className="text-2xl font-bold mb-6 text-yellow-300">{(slide as any).formula.title}</h3>
                     <ol className="space-y-3">
-                      {slide.formula.steps.map((step: string, idx: number) => (
+                      {(slide as any).formula.steps.map((step: string, idx: number) => (
                         <li key={idx} className="flex items-start gap-4">
                           <span className="bg-yellow-400/20 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 text-yellow-300 font-bold">{idx + 1}</span>
                           <span className="text-lg font-light mt-1">{step}</span>
@@ -1218,13 +1218,13 @@ export default function HeadlinerPage() {
                   </div>
                 )}
 
-                {slide.themes && (
+                {(slide as any).themes && (
                   <div className="mt-8 space-y-6">
-                    {slide.themes.hosts && (
+                    {(slide as any).themes.hosts && (
                       <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                        <h3 className="text-xl font-bold mb-4 text-yellow-300">{slide.themes.hosts.title}</h3>
+                        <h3 className="text-xl font-bold mb-4 text-yellow-300">{(slide as any).themes.hosts.title}</h3>
                         <ul className="space-y-2">
-                          {slide.themes.hosts.content.map((item: string, idx: number) => (
+                          {(slide as any).themes.hosts.content.map((item: string, idx: number) => (
                             <li key={idx} className="flex items-start gap-3">
                               <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
                               <span className="text-base font-light">{item}</span>
@@ -1233,11 +1233,11 @@ export default function HeadlinerPage() {
                         </ul>
                       </div>
                     )}
-                    {slide.themes.sponsors && (
+                    {(slide as any).themes.sponsors && (
                       <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                        <h3 className="text-xl font-bold mb-4 text-yellow-300">{slide.themes.sponsors.title}</h3>
+                        <h3 className="text-xl font-bold mb-4 text-yellow-300">{(slide as any).themes.sponsors.title}</h3>
                         <ul className="space-y-2">
-                          {slide.themes.sponsors.content.map((item: string, idx: number) => (
+                          {(slide as any).themes.sponsors.content.map((item: string, idx: number) => (
                             <li key={idx} className="flex items-start gap-3">
                               <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
                               <span className="text-base font-light">{item}</span>
@@ -1249,42 +1249,42 @@ export default function HeadlinerPage() {
                   </div>
                 )}
 
-                {slide.viralMechanic && (
+                {(slide as any).viralMechanic && (
                   <div className="bg-yellow-400/20 backdrop-blur-md border-2 border-yellow-300/50 rounded-2xl p-6 mt-8">
-                    <p className="text-lg font-semibold text-yellow-100 text-center">{slide.viralMechanic}</p>
+                    <p className="text-lg font-semibold text-yellow-100 text-center">{(slide as any).viralMechanic}</p>
                   </div>
                 )}
 
-                {slide.roles && (
+                {(slide as any).roles && (
                   <div className="mt-8 space-y-6">
-                    <h3 className="text-2xl font-bold text-yellow-300 text-center">{slide.roles.title}</h3>
+                    <h3 className="text-2xl font-bold text-yellow-300 text-center">{(slide as any).roles.title}</h3>
                     <div className="grid grid-cols-2 gap-6">
-                      {slide.roles.issiah && (
+                      {(slide as any).roles.issiah && (
                         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                          <h4 className="text-lg font-bold mb-4 text-yellow-300">{slide.roles.issiah.title}</h4>
+                          <h4 className="text-lg font-bold mb-4 text-yellow-300">{(slide as any).roles.issiah.title}</h4>
                           <ul className="space-y-2 mb-4">
-                            {slide.roles.issiah.channels.map((channel: string, idx: number) => (
+                            {(slide as any).roles.issiah.channels.map((channel: string, idx: number) => (
                               <li key={idx} className="flex items-start gap-3">
                                 <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
                                 <span className="text-sm font-light">{channel}</span>
                               </li>
                             ))}
                           </ul>
-                          <p className="text-sm opacity-75 italic">Metric: {slide.roles.issiah.metric}</p>
+                          <p className="text-sm opacity-75 italic">Metric: {(slide as any).roles.issiah.metric}</p>
                         </div>
                       )}
-                      {slide.roles.soya && (
+                      {(slide as any).roles.soya && (
                         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                          <h4 className="text-lg font-bold mb-4 text-yellow-300">{slide.roles.soya.title}</h4>
+                          <h4 className="text-lg font-bold mb-4 text-yellow-300">{(slide as any).roles.soya.title}</h4>
                           <ul className="space-y-2 mb-4">
-                            {slide.roles.soya.channels.map((channel: string, idx: number) => (
+                            {(slide as any).roles.soya.channels.map((channel: string, idx: number) => (
                               <li key={idx} className="flex items-start gap-3">
                                 <span className="text-yellow-300 mt-1 flex-shrink-0">→</span>
                                 <span className="text-sm font-light">{channel}</span>
                               </li>
                             ))}
                           </ul>
-                          <p className="text-sm opacity-75 italic">Metric: {slide.roles.soya.metric}</p>
+                          <p className="text-sm opacity-75 italic">Metric: {(slide as any).roles.soya.metric}</p>
                         </div>
                       )}
                     </div>

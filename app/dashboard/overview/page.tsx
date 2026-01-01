@@ -13,7 +13,8 @@ import {
   ArrowRight,
   Target,
   Users,
-  Briefcase
+  Briefcase,
+  StickyNote
 } from "lucide-react";
 
 interface MetricsSummary {
@@ -35,9 +36,10 @@ export default function OverviewPage() {
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState<string>('');
   const [userCoFounder, setUserCoFounder] = useState<'issiah' | 'soya' | null>(null);
+  const [showNotesModal, setShowNotesModal] = useState(false);
   const [metrics, setMetrics] = useState<MetricsSummary>({
     isaiah: { totalOutreach: 0, weeklyOutreach: 0, totalMeetings: 0, weeklyMeetings: 0 },
-    soya: { totalRevenue: 0, totalSignups: 0, weeklySignups: 0, weeklyTickets: 0 },
+    soya: { totalRevenue: 0, totalSignups: 0, weeklyTickets: 0 },
   });
 
   useEffect(() => {
@@ -80,9 +82,18 @@ export default function OverviewPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Co-Founder Dashboard</h1>
-        <p className="text-gray-600 mt-1">Track progress and metrics for SponsorSynq</p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Co-Founder Dashboard</h1>
+          <p className="text-gray-600 mt-1">Track progress and metrics for SponsorSynq</p>
+        </div>
+        <Button
+          onClick={() => setShowNotesModal(true)}
+          className="flex items-center gap-2"
+        >
+          <StickyNote className="w-4 h-4" />
+          Shared Notes & Ideas
+        </Button>
       </div>
 
       {/* Quick Stats Grid */}
@@ -162,10 +173,7 @@ export default function OverviewPage() {
         </Card>
       </div>
 
-      {/* Shared Notes & Ideas */}
-      <SharedNotes currentUser={userCoFounder || undefined} />
-
-      {/* Weekly Tasks - All Co-Founders */}
+      {/* Action Items - All Co-Founders */}
       {userId && (
         <TaskList
           userId={userId}
@@ -244,6 +252,28 @@ export default function OverviewPage() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Shared Notes Modal */}
+      {showNotesModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] flex flex-col">
+            <div className="flex justify-between items-center p-6 border-b">
+              <h2 className="text-2xl font-bold text-gray-900">Shared Notes & Ideas</h2>
+              <button
+                onClick={() => setShowNotesModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="overflow-y-auto flex-1 p-6">
+              <SharedNotes currentUser={userCoFounder || undefined} />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

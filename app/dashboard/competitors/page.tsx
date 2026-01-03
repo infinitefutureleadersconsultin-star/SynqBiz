@@ -377,10 +377,86 @@ function RevenueSummaryTab() {
 
 function ActionItemsTab() {
   const highPriority = [
-    { area: "Sponsor Matching", task: "Build excellent AI matching algorithm", why: "Our 12% commission must feel justified by quality matches" },
-    { area: "Verification System", task: "Robust photo upload + attendance tracking", why: "Sponsors need proof their money worked" },
-    { area: "Dashboard Savings Display", task: "Show subscribers monthly savings vs 5%", why: "Psychological win every month" },
-    { area: "Ambassador Visibility", task: "Prominently feature program in UI", why: "Users won't discover it unless we surface it" },
+    { area: "✓ Sponsor Matching", task: "Build excellent AI matching algorithm", why: "Our 12% commission must feel justified by quality matches", completed: true },
+    { area: "✓ Verification System", task: "Robust photo upload + attendance tracking", why: "Sponsors need proof their money worked", completed: true },
+    { area: "✓ Dashboard Savings Display", task: "Show subscribers monthly savings vs 5%", why: "Psychological win every month", completed: true },
+    { area: "Ambassador Visibility", task: "Prominently feature program in UI", why: "Users won't discover it unless we surface it", completed: false },
+    {
+      area: "Event Collaboration/Co-hosting",
+      task: `Multi-host event collaboration system:
+• Primary & secondary event hosts
+• Real-time ticket revenue tracking for all hosts
+• Customizable revenue split (50/50, 60/40, etc.)
+• Primary host controls fund distribution
+• Venue payment tracking/metrics
+• Multi-city tour dashboard
+• Track all events under one tour umbrella`,
+      why: "Game-changer for large-scale events and tours. Creates network effects - hosts bring other hosts. Differentiates us from all competitors who only support single-host events.",
+      completed: false
+    },
+    {
+      area: "Promoter Referral System",
+      task: `Role-based promoter program:
+• Event hosts assign 'promoter' roles
+• Unique tracking links/QR codes per promoter
+• Track ticket sales by promoter link
+• Automatic commission payouts
+• Works like affiliate program but for event promotion
+• Promoters share on Instagram/TikTok stories`,
+      why: "Viral growth engine. Turns every event into distributed sales team. Promoters are incentivized to drive ticket sales. Event hosts get free marketing.",
+      completed: false
+    },
+    {
+      area: "Landing Page Overhaul",
+      task: `PRICING: Only 2 tiers:
+• Free: Unlimited events, basic features
+• $100/mo: Money-making features (was $19)
+
+MESSAGING:
+• Focus on ROI, not features
+• 'Save X, Make Y' psychology
+• Fewer words, clearer value
+• Show savings/earnings potential per feature
+
+COMPETITOR COMPARISON:
+• REMOVE from landing page entirely
+• Move to post-signup dashboard
+• Only show after they're already users
+• Prevent competitors from copying our strategy`,
+      why: "Simplicity converts better. People don't want subscriptions - they want to 'pay when they get paid' or see clear ROI. Hiding competitor intel protects our competitive advantage.",
+      completed: false
+    },
+    {
+      area: "Venue Partnership System",
+      task: `Venue integration features:
+• Venues can create accounts
+• Event hosts connect their venue
+• Transparent revenue sharing dashboard
+• Track bar/food/door splits in real-time
+• Simple fund distribution
+
+VENUE LOCK-IN STRATEGY:
+• Partner with venues to require SponsorSynq
+• 'Want to use our venue? Use SponsorSynq'
+• Creates vendor lock-in
+• Eliminates competition with Eventbrite/Posh
+• Market domination through venue partnerships`,
+      why: "This is the ULTIMATE competitive moat. If venues require SponsorSynq, event hosts have no choice. We stop competing on features and own the distribution channel. Venue adoption = market domination.",
+      completed: false
+    },
+    {
+      area: "Revenue Stream Documentation",
+      task: `Comprehensive revenue analysis:
+• Document ALL current revenue streams
+• Platform fee, processing, sponsorship commission, etc.
+• Strategy for free events (no ticket sales)
+• How to monetize users who don't charge for tickets?
+• Options: Sponsorship-only commission, require subscription, tiered free limits
+• Question: Is free platform usage okay if it brings brand awareness?
+• Alternative revenue from free event hosts?`,
+      why: "Need clarity on business model edge cases. Free events still have value (brand awareness, sponsor discovery) but need strategy to ensure sustainable revenue. Must balance growth with monetization.",
+      completed: false
+    }
   ];
 
   const mediumPriority = [
@@ -405,13 +481,32 @@ function ActionItemsTab() {
         <CardContent>
           <div className="space-y-4 mt-4">
             {highPriority.map((item, index) => (
-              <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div
+                key={index}
+                className={`rounded-lg p-4 border ${
+                  item.completed
+                    ? "bg-green-50 border-green-200"
+                    : "bg-red-50 border-red-200"
+                }`}
+              >
                 <div className="flex justify-between items-start mb-2">
-                  <h4 className="font-semibold text-red-900">{item.area}</h4>
-                  <span className="px-2 py-1 bg-red-200 text-red-800 text-xs font-bold rounded">HIGH</span>
+                  <h4 className={`font-semibold ${item.completed ? "text-green-900 italic" : "text-red-900"}`}>
+                    {item.area}
+                  </h4>
+                  <span className={`px-2 py-1 text-xs font-bold rounded ${
+                    item.completed
+                      ? "bg-green-200 text-green-800"
+                      : "bg-red-200 text-red-800"
+                  }`}>
+                    {item.completed ? "COMPLETED" : "HIGH"}
+                  </span>
                 </div>
-                <p className="text-sm text-gray-900 mb-2"><strong>Task:</strong> {item.task}</p>
-                <p className="text-sm text-gray-700"><strong>Why:</strong> {item.why}</p>
+                <p className="text-sm text-gray-900 mb-2 whitespace-pre-line">
+                  <strong>Task:</strong> {item.task}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <strong>Why:</strong> {item.why}
+                </p>
               </div>
             ))}
           </div>

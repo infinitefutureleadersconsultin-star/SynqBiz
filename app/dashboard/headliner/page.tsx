@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, DollarSign, TrendingUp, Users, Zap, Target, Award, ChevronDown, Presentation, Megaphone, ArrowLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight, DollarSign, TrendingUp, Users, Zap, Target, Award, ChevronDown, Presentation, Megaphone, ArrowLeft, Calculator, Video } from "lucide-react";
 
 // Import pitch deck data
 import { marketplaceStrategySlides } from "./decks/marketplace-strategy";
 import { marketingRolloutSlides } from "./decks/marketing-rollout-2026";
+import { revenueProjectionsSlides } from "./decks/revenue-projections";
+import { contentMarketingSlides } from "./decks/content-marketing";
 
 type PitchDeck = {
   id: string;
@@ -32,6 +34,22 @@ const pitchDecks: PitchDeck[] = [
     icon: Megaphone,
     gradient: "from-orange-500 via-red-500 to-pink-600",
     slides: marketingRolloutSlides
+  },
+  {
+    id: "revenue-projections",
+    name: "Revenue Projections & Financial Model",
+    description: "Unit economics, revenue streams, growth projections, and path to $10M ARR",
+    icon: Calculator,
+    gradient: "from-emerald-600 via-teal-600 to-cyan-600",
+    slides: revenueProjectionsSlides
+  },
+  {
+    id: "content-marketing",
+    name: "Content Marketing Strategy & Video Scripts",
+    description: "Audience segmentation, content calendar, 15 ready-to-film video scripts, and platform strategy",
+    icon: Video,
+    gradient: "from-orange-600 via-red-600 to-pink-600",
+    slides: contentMarketingSlides
   }
 ];
 

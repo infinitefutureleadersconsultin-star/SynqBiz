@@ -204,16 +204,49 @@ export interface Expense {
   created_by_name: CoFounder; // "issiah" or "soya" - who paid it
   amount: number; // total amount paid
   description: string;
-  category: "software" | "marketing" | "infrastructure" | "equipment" | "office" | "travel" | "other";
+  category: ExpenseCategory;
   date: string; // YYYY-MM-DD when expense occurred
+  month_key: string; // YYYY-MM for monthly grouping
+  split_type: "50/50" | "custom" | "full"; // how the expense is split
+  split_percentage?: number; // custom split: partner's share as percentage (e.g., 30 means partner pays 30%)
   status: "pending" | "paid_by_partner" | "completed";
   // pending: waiting for partner to pay their half
   // paid_by_partner: partner marked as paid
   // completed: creator confirmed receipt
   payment_proof?: string; // note from partner when they mark as paid (e.g., "Sent via Venmo")
+  receipt_note?: string; // additional notes about the expense (vendor, invoice #, etc.)
   confirmed_at?: string; // when creator confirmed receipt
   created_at: string;
   updated_at: string;
+}
+
+export type ExpenseCategory =
+  | "software"
+  | "marketing"
+  | "infrastructure"
+  | "equipment"
+  | "office"
+  | "travel"
+  | "meals"
+  | "subscriptions"
+  | "legal"
+  | "design"
+  | "hosting"
+  | "domains"
+  | "advertising"
+  | "other";
+
+// Monthly settlement record
+export interface MonthlySettlement {
+  month_key: string; // YYYY-MM
+  issiah_total_paid: number;
+  soya_total_paid: number;
+  issiah_owes_soya: number; // what issiah owes soya for soya's expenses
+  soya_owes_issiah: number; // what soya owes issiah for issiah's expenses
+  net_owed_by: CoFounder | "settled"; // who owes money, or "settled" if balanced
+  net_amount: number; // the net amount owed
+  expense_count: number;
+  expenses: Expense[];
 }
 
 // Strategic Action Items - Database-driven action items for Overview dashboard

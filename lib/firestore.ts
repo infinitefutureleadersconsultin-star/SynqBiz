@@ -26,6 +26,8 @@ import type {
   CoFounder,
   SharedNote,
   Expense,
+  ExpenseCategory,
+  MonthlySettlement,
   ActionItem
 } from '@/types';
 
@@ -1081,11 +1083,15 @@ export async function deleteSharedNote(noteId: string) {
 /**
  * Create a new expense
  */
-export async function createExpense(expense: Omit<Expense, 'id' | 'created_at' | 'updated_at' | 'status' | 'confirmed_at'>) {
+export async function createExpense(expense: Omit<Expense, 'id' | 'created_at' | 'updated_at' | 'status' | 'confirmed_at' | 'month_key'>) {
   try {
     const expensesRef = collection(db, 'shared_expenses');
+    const month_key = expense.date.substring(0, 7); // YYYY-MM
+
     const docRef = await addDoc(expensesRef, {
       ...expense,
+      month_key,
+      split_type: expense.split_type || '50/50',
       status: 'pending',
       created_at: Timestamp.now(),
       updated_at: Timestamp.now(),
@@ -1101,20 +1107,22 @@ export async function createExpense(expense: Omit<Expense, 'id' | 'created_at' |
 /**
  * Get all expenses
  */
-export async function getAllExpenses(limitCount = 100) {
+export async function getAllExpenses(limitCount = 200) {
   try {
     const expensesRef = collection(db, 'shared_expenses');
     const q = query(expensesRef, orderBy('date', 'desc'), limit(limitCount));
     const querySnapshot = await getDocs(q);
 
     const expenses: Expense[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
       expenses.push({
-        id: doc.id,
+        id: docSnap.id,
         ...data,
-        created_at: data.created_at?.toDate().toISOString() || new Date().toISOString(),
-        updated_at: data.updated_at?.toDate().toISOString() || new Date().toISOString(),
+        month_key: data.month_key || (data.date ? data.date.substring(0, 7) : ''),
+        split_type: data.split_type || '50/50',
+        created_at: data.created_at?.toDate?.().toISOString() || data.created_at || new Date().toISOString(),
+        updated_at: data.updated_at?.toDate?.().toISOString() || data.updated_at || new Date().toISOString(),
         confirmed_at: data.confirmed_at || undefined,
       } as Expense);
     });
@@ -1124,6 +1132,96 @@ export async function getAllExpenses(limitCount = 100) {
     console.error('Error fetching expenses:', error);
     return { data: null, error: error.message };
   }
+}
+
+/**
+ * Get expenses filtered by month
+ */
+export async function getExpensesByMonth(monthKey: string) {
+  try {
+    const allResult = await getAllExpenses(500);
+    if (!allResult.data) {
+      return { data: null, error: allResult.error };
+    }
+
+    const filtered = allResult.data.filter(e => {
+      const key = e.month_key || e.date.substring(0, 7);
+      return key === monthKey;
+    });
+
+    return { data: filtered, error: null };
+  } catch (error: any) {
+    console.error('Error fetching monthly expenses:', error);
+    return { data: null, error: error.message };
+  }
+}
+
+/**
+ * Calculate the partner's share of an expense based on split type
+ */
+export function calculatePartnerShare(expense: Expense): number {
+  switch (expense.split_type) {
+    case '50/50':
+      return expense.amount / 2;
+    case 'custom':
+      return expense.amount * ((expense.split_percentage || 50) / 100);
+    case 'full':
+      return expense.amount;
+    default:
+      return expense.amount / 2;
+  }
+}
+
+/**
+ * Calculate monthly settlement between cofounders
+ */
+export function calculateMonthlySettlement(expenses: Expense[]): MonthlySettlement {
+  const monthKey = expenses.length > 0
+    ? (expenses[0].month_key || expenses[0].date.substring(0, 7))
+    : new Date().toISOString().substring(0, 7);
+
+  const issiahExpenses = expenses.filter(e => e.created_by_name === 'issiah');
+  const soyaExpenses = expenses.filter(e => e.created_by_name === 'soya');
+
+  const issiahTotalPaid = issiahExpenses.reduce((sum, e) => sum + e.amount, 0);
+  const soyaTotalPaid = soyaExpenses.reduce((sum, e) => sum + e.amount, 0);
+
+  // Calculate what each person owes the other (partner's share of expenses they didn't pay)
+  const issiahOwesToSoya = soyaExpenses.reduce((sum, e) => sum + calculatePartnerShare(e), 0);
+  const soyaOwesToIssiah = issiahExpenses.reduce((sum, e) => sum + calculatePartnerShare(e), 0);
+
+  // Net settlement
+  const netAmount = Math.abs(issiahOwesToSoya - soyaOwesToIssiah);
+  let netOwedBy: CoFounder | 'settled' = 'settled';
+  if (issiahOwesToSoya > soyaOwesToIssiah) {
+    netOwedBy = 'issiah';
+  } else if (soyaOwesToIssiah > issiahOwesToSoya) {
+    netOwedBy = 'soya';
+  }
+
+  return {
+    month_key: monthKey,
+    issiah_total_paid: issiahTotalPaid,
+    soya_total_paid: soyaTotalPaid,
+    issiah_owes_soya: issiahOwesToSoya,
+    soya_owes_issiah: soyaOwesToIssiah,
+    net_owed_by: netOwedBy,
+    net_amount: Math.round(netAmount * 100) / 100,
+    expense_count: expenses.length,
+    expenses,
+  };
+}
+
+/**
+ * Get all unique months that have expenses
+ */
+export function getExpenseMonths(expenses: Expense[]): string[] {
+  const months = new Set<string>();
+  expenses.forEach(e => {
+    const key = e.month_key || e.date.substring(0, 7);
+    if (key) months.add(key);
+  });
+  return Array.from(months).sort().reverse();
 }
 
 /**
@@ -1167,13 +1265,21 @@ export async function confirmExpenseReceived(expenseId: string) {
 /**
  * Update an expense
  */
-export async function updateExpense(expenseId: string, updates: Partial<Pick<Expense, 'amount' | 'description' | 'category' | 'date'>>) {
+export async function updateExpense(
+  expenseId: string,
+  updates: Partial<Pick<Expense, 'amount' | 'description' | 'category' | 'date' | 'split_type' | 'split_percentage' | 'receipt_note'>>
+) {
   try {
     const expenseRef = doc(db, 'shared_expenses', expenseId);
-    await updateDoc(expenseRef, {
+    const updateData: Record<string, unknown> = {
       ...updates,
       updated_at: Timestamp.now(),
-    });
+    };
+    // Update month_key if date changed
+    if (updates.date) {
+      updateData.month_key = updates.date.substring(0, 7);
+    }
+    await updateDoc(expenseRef, updateData);
 
     return { success: true, error: null };
   } catch (error: any) {
